@@ -69,15 +69,21 @@ export function PricingSection() {
   return (
     <Section
       id="pricing"
-      eyebrow="Offerings & Pricing"
-      title="Packages from the live site"
-      description="The commercial structure stays intact. The presentation gets cleaner, sharper, and easier to scan."
+      eyebrow="Pricing / live links preserved"
+      title="Commercial structure, visually simplified for the storyscroll."
+      description="The live Stripe links stay intact while the panel shifts toward a cleaner, more modular presentation."
     >
-      <div className="pricing-grid">
+      <div
+        className="pricing-grid"
+        style={{
+          gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+        }}
+      >
         {pricing.map((plan) => (
           <article
             key={plan.title}
             className={`pricing-card glass-panel ${plan.featured ? "is-featured" : ""}`.trim()}
+            style={{ display: "grid", alignContent: "start", gap: "0.9rem" }}
           >
             <p className="pricing-card__label">{plan.label}</p>
             <h3>{plan.title}</h3>

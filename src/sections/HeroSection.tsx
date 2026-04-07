@@ -7,18 +7,18 @@ export function HeroSection() {
     <section id="hero" className="hero-section story-section">
       <div className="hero-layout">
         <div className="hero-copy reveal-sequence">
-          <p className="hero-kicker reveal-item">Canadian creative stress-testing ad engine</p>
+          <p className="hero-kicker reveal-item">Six-stage storyscroll opener</p>
           <div className="hero-brand reveal-item">
             <span>Stressed</span>
             <span>Out</span>
           </div>
           <h1 className="hero-title reveal-item">
-            Stress-test the idea before you pay to scale it.
+            A cinematic shell for the wheel-of-fortune navigation system.
           </h1>
           <p className="hero-description reveal-item">
-            Stressed Out turns concepts, static UGC, and underperforming ads into
-            dynamic video creatives built to convert faster and cost less than doing
-            the same volume in-house.
+            This opening panel stays intentionally lightweight: a strong headline
+            zone, a visual anchor, and clear routes into the pricing and contact
+            stages.
           </p>
           <div className="hero-actions reveal-item">
             <GlassButton href="#pricing" icon={ArrowRight}>
@@ -33,7 +33,7 @@ export function HeroSection() {
         <div className="hero-media reveal-item">
           <GlassMediaFrame
             className="hero-media-frame"
-            caption="Stress-tested variants presented inside a resin-finished visual plane."
+            caption="Placeholder-ready motion vessel for the first panel."
           >
             <video
               className="hero-video"
@@ -52,7 +52,7 @@ export function HeroSection() {
             <div className="hero-media-overlay" aria-hidden="true">
               <span className="hero-media-badge">
                 <Play size={14} strokeWidth={2} />
-                Dynamic creative preview
+                Opening sequence
               </span>
             </div>
           </GlassMediaFrame>
