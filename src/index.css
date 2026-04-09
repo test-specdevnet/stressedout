@@ -638,6 +638,140 @@ video {
   max-width: 38rem;
 }
 
+.about-stage-layout {
+  align-items: start;
+}
+
+.about-copy {
+  max-width: 40rem;
+  padding-top: clamp(0.45rem, 1.8vw, 1.35rem);
+}
+
+.about-title {
+  max-width: 8ch;
+}
+
+.about-intro {
+  max-width: 33rem;
+}
+
+.about-editorial-stack {
+  display: grid;
+  gap: 1.15rem;
+  margin-top: 2rem;
+}
+
+.about-subtitle,
+.about-process-title {
+  margin: 0;
+  font-size: clamp(1.25rem, 2vw, 1.8rem);
+  letter-spacing: -0.03em;
+}
+
+.about-bullet-list {
+  display: grid;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.about-bullet-list li {
+  position: relative;
+  padding-left: 1.4rem;
+  color: var(--bg-muted);
+  line-height: 1.78;
+}
+
+.about-bullet-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.78rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(140, 239, 255, 0.85));
+  box-shadow: 0 0 18px rgba(140, 239, 255, 0.28);
+}
+
+.about-process-stack {
+  gap: 1.2rem;
+}
+
+.about-process-header {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.about-process-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.about-process-card {
+  position: relative;
+  display: grid;
+  gap: 1rem;
+  min-height: 12.75rem;
+  align-content: start;
+  overflow: hidden;
+  animation: aboutProcessGlow 4.4s var(--process-delay, 0s) infinite;
+  will-change: box-shadow, transform;
+}
+
+.about-process-card::before {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.26), transparent 24%),
+    radial-gradient(circle at 18% 14%, rgba(140, 239, 255, 0.24), transparent 20%),
+    radial-gradient(circle at 82% 10%, rgba(231, 57, 214, 0.16), transparent 18%);
+}
+
+.about-process-card::after {
+  opacity: 0.9;
+}
+
+.about-process-card__topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.about-process-card__step {
+  color: rgba(255, 255, 255, 0.66);
+  font-size: 0.82rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.about-process-card__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.95rem;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.06));
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: var(--accent-aqua);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.about-process-card h4 {
+  margin: 0;
+  font-size: 1rem;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.about-process-card p {
+  margin: 0;
+  color: var(--bg-muted);
+  line-height: 1.75;
+}
+
 .hero-copy {
   justify-self: start;
   align-self: start;
@@ -975,6 +1109,26 @@ video {
   }
 }
 
+@keyframes aboutProcessGlow {
+  0%,
+  68%,
+  100% {
+    transform: translate3d(0, 0, 0);
+    box-shadow: var(--glass-shadow);
+  }
+  16%,
+  26% {
+    transform: translate3d(0, -3px, 0);
+    box-shadow:
+      0 28px 100px rgba(5, 9, 21, 0.55),
+      0 0 0 1px rgba(140, 239, 255, 0.2),
+      0 0 28px rgba(140, 239, 255, 0.18),
+      inset 0 1px 0 rgba(255, 255, 255, 0.58),
+      inset 0 -18px 28px rgba(62, 21, 108, 0.16),
+      inset 0 18px 36px rgba(255, 255, 255, 0.08);
+  }
+}
+
 @media (max-width: 1180px) {
   .site-header {
     grid-template-columns: 1fr;
@@ -1016,6 +1170,15 @@ video {
   .hero-copy {
     width: min(100%, 38rem);
     padding-top: 0;
+  }
+
+  .about-copy {
+    max-width: 100%;
+    padding-top: 0;
+  }
+
+  .about-process-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .hero-logo-panel {
@@ -1157,6 +1320,18 @@ video {
     width: 100%;
   }
 
+  .about-editorial-stack {
+    margin-top: 1.6rem;
+  }
+
+  .about-process-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .about-process-card {
+    min-height: 0;
+  }
+
   .hero-logo-column {
     justify-content: center;
   }
@@ -1219,6 +1394,10 @@ video {
 
   .story-panel {
     transition: opacity 180ms ease, transform 180ms ease;
+  }
+
+  .about-process-card {
+    animation: none;
   }
 
   .story-stage__pinwheel-spokes {
