@@ -1,4 +1,4 @@
-import { ArrowRight, ChevronDown, ChevronUp, Instagram, Mail } from "lucide-react";
+import { ChevronDown, ChevronUp, Instagram, Mail } from "lucide-react";
 import { useEffect, useState } from "react";
 import { GlassButton } from "./components/GlassButton";
 import { useStoryScroll } from "./hooks/useStoryScroll";
@@ -23,20 +23,29 @@ type StorySection = {
 };
 
 const sections: StorySection[] = [
-  { id: "hero", label: "Hero Section", shortLabel: "Hero", render: HeroStage },
-  { id: "about", label: "About Us", shortLabel: "About", render: AboutStage },
+  { id: "hero", label: "Welcome", shortLabel: "Welcome", render: HeroStage },
+  { id: "about", label: "About Us", shortLabel: "About Us", render: AboutStage },
   {
     id: "dynamic-videos",
-    label: "Static Content to Dynamic Videos",
-    shortLabel: "Dynamic",
+    label: "Static → Dynamic",
+    shortLabel: "Static → Dynamic",
     render: DynamicVideosStage,
   },
-  { id: "gallery", label: "Ad Gallery", shortLabel: "Gallery", render: GalleryStage },
+  { id: "gallery", label: "Ad Gallery", shortLabel: "Ad Gallery", render: GalleryStage },
   { id: "contact", label: "Contact", shortLabel: "Contact", render: ContactStage },
-  { id: "testimonials", label: "Testimonials", shortLabel: "Praise", render: TestimonialsStage },
+  { id: "testimonials", label: "Praise", shortLabel: "Praise", render: TestimonialsStage },
   { id: "pricing", label: "Pricing", shortLabel: "Pricing", render: PricingStage },
 ];
 const sectionIds = sections.map((section) => section.id);
+const progressNavItems = [
+  { id: "hero", label: "Welcome" },
+  { id: "about", label: "About Us" },
+  { id: "dynamic-videos", label: "Static → Dynamic" },
+  { id: "gallery", label: "Ad Gallery" },
+  { id: "testimonials", label: "Praise" },
+  { id: "pricing", label: "Pricing" },
+  { id: "contact", label: "Contact" },
+];
 
 const DEFAULT_TRANSITION_MS = 720;
 const REDUCED_TRANSITION_MS = 220;
@@ -89,6 +98,7 @@ export default function App() {
 
   const totalSections = sections.length;
   const displayIndex = isTransitioning && toIndex !== null ? toIndex : activeIndex;
+  const currentNavIndex = progressNavItems.findIndex((item) => item.id === sections[displayIndex]?.id);
   const pinwheelRotation =
     (direction === "forward" ? -1 : 1) * stepProgress * STORY_WHEEL_CONSTANTS.STEP_ANGLE_DEG;
 
@@ -111,21 +121,18 @@ export default function App() {
             handleAnchorNavigation("hero");
           }}
         >
-          <span className="brand-mark__eyebrow">Stressed Out</span>
-          <span className="brand-mark__name">Advertising</span>
-          <div className="brand-mark__logo-wrap">
-            <img
-              className="brand-mark__logo"
-              src="/assets/stressed-out/images/logo.png"
-              alt="Stressed Out logo"
-            />
-          </div>
+          <img
+            className="brand-mark__logo"
+            src="/assets/stressed-out/images/logo-3.png"
+            alt="Stressed Out logo"
+          />
+          <span className="brand-mark__name">Stressed Out Advertising</span>
         </a>
 
         <div className="floating-widget-stack" aria-label="Quick actions">
           <GlassButton
             className="floating-widget"
-            href="mailto:info@stressedoutadvertising.com"
+            href="mailto:hello@stressedoutadvertising.com"
             icon={Mail}
             aria-label="Email us"
           >
@@ -155,22 +162,23 @@ export default function App() {
       >
         <div className="story-stage__progress glass-nav" aria-label="Story progress">
           <p className="story-stage__progress-label">
-            {String(displayIndex + 1).padStart(2, "0")} / {String(sections.length).padStart(2, "0")}
+            {String(currentNavIndex + 1).padStart(2, "0")} / {String(progressNavItems.length).padStart(2, "0")}
           </p>
           <div className="story-stage__progress-list">
-            {sections.map((section, index) => {
-              const isCurrent = index === displayIndex;
+            {progressNavItems.map((item, index) => {
+              const sectionIndex = sections.findIndex((section) => section.id === item.id);
+              const isCurrent = index === currentNavIndex;
               return (
                 <button
-                  key={section.id}
+                  key={item.id}
                   type="button"
                   className={`story-stage__progress-item ${isCurrent ? "is-current" : ""}`.trim()}
-                  onClick={() => navigateTo(index)}
-                  aria-label={`Go to ${section.label}`}
+                  onClick={() => navigateTo(sectionIndex)}
+                  aria-label={`Go to ${item.label}`}
                   aria-current={isCurrent ? "page" : undefined}
                 >
                   <span>{String(index + 1).padStart(2, "0")}</span>
-                  <span>{section.shortLabel}</span>
+                  <span>{item.label}</span>
                 </button>
               );
             })}
@@ -259,10 +267,6 @@ export default function App() {
           })}
         </div>
 
-        <div className="story-stage__hint glass-nav" aria-hidden="true">
-          <span>Wheel, keys, or arrows</span>
-          <ArrowRight size={16} strokeWidth={2} />
-        </div>
       </main>
     </div>
   );
