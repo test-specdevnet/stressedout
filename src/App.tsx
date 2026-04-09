@@ -1,6 +1,7 @@
 import { ArrowRight, ChevronDown, ChevronUp, Instagram, Mail } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { GlassButton } from "./components/GlassButton";
+import { useStoryScroll } from "./hooks/useStoryScroll";
 import { AboutStage } from "./sections/AboutStage";
 import { ContactStage } from "./sections/ContactStage";
 import { DynamicVideosStage } from "./sections/DynamicVideosStage";
@@ -30,42 +31,17 @@ const sections: StorySection[] = [
   { id: "testimonials", label: "Testimonials", shortLabel: "Praise", render: TestimonialsStage },
   { id: "pricing", label: "Pricing", shortLabel: "Pricing", render: PricingStage },
 ];
+const sectionIds = sections.map((section) => section.id);
 
-const WHEEL_THRESHOLD = 40;
-const WHEEL_RESET_MS = 110;
 const DEFAULT_TRANSITION_MS = 980;
 const REDUCED_TRANSITION_MS = 220;
-
-function getIndexFromHash(hash: string) {
-  const id = hash.replace(/^#/, "");
-  const index = sections.findIndex((section) => section.id === id);
-  return index >= 0 ? index : 0;
-}
-
-function wrapIndex(index: number) {
-  return ((index % sections.length) + sections.length) % sections.length;
-}
+const WHEEL_THRESHOLD = 48;
+const WHEEL_RESET_MS = 120;
+const NAVIGATION_COOLDOWN_MS = 140;
+const TOUCH_THRESHOLD = 54;
 
 export default function App() {
-  const [activeIndex, setActiveIndex] = useState(() => getIndexFromHash(window.location.hash));
-  const [previousIndex, setPreviousIndex] = useState<number | null>(null);
-  const [direction, setDirection] = useState<"forward" | "backward">("forward");
-  const [isTransitioning, setIsTransitioning] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-  const activeIndexRef = useRef(activeIndex);
-  const transitionTimerRef = useRef<number | null>(null);
-  const wheelAccumulatorRef = useRef(0);
-  const wheelResetRef = useRef<number | null>(null);
-  const isTransitioningRef = useRef(false);
-  const lastNavigationRef = useRef(0);
-
-  useEffect(() => {
-    activeIndexRef.current = activeIndex;
-  }, [activeIndex]);
-
-  useEffect(() => {
-    isTransitioningRef.current = isTransitioning;
-  }, [isTransitioning]);
 
   useEffect(() => {
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -78,169 +54,24 @@ export default function App() {
     return () => media.removeEventListener("change", update);
   }, []);
 
-  useEffect(() => {
-    document.documentElement.style.overflow = "hidden";
-    document.body.style.overflow = "hidden";
-
-    return () => {
-      document.documentElement.style.overflow = "";
-      document.body.style.overflow = "";
-    };
-  }, []);
-
-  useEffect(() => {
-    const onHashChange = () => {
-      const nextIndex = getIndexFromHash(window.location.hash);
-      if (nextIndex === activeIndexRef.current) {
-        return;
-      }
-
-      if (transitionTimerRef.current) {
-        window.clearTimeout(transitionTimerRef.current);
-      }
-
-      setPreviousIndex(null);
-      setDirection(nextIndex > activeIndexRef.current ? "forward" : "backward");
-      setActiveIndex(nextIndex);
-      setIsTransitioning(false);
-    };
-
-    window.addEventListener("hashchange", onHashChange);
-    return () => window.removeEventListener("hashchange", onHashChange);
-  }, []);
-
-  useEffect(() => {
-    const onWheel = (event: WheelEvent) => {
-      if (Math.abs(event.deltaY) < 8) {
-        return;
-      }
-
-      event.preventDefault();
-
-      if (isTransitioningRef.current) {
-        return;
-      }
-
-      const now = window.performance.now();
-      if (now - lastNavigationRef.current < 140) {
-        return;
-      }
-
-      if (wheelResetRef.current) {
-        window.clearTimeout(wheelResetRef.current);
-      }
-
-      wheelAccumulatorRef.current += event.deltaY;
-      wheelResetRef.current = window.setTimeout(() => {
-        wheelAccumulatorRef.current = 0;
-      }, WHEEL_RESET_MS);
-
-      if (Math.abs(wheelAccumulatorRef.current) < WHEEL_THRESHOLD) {
-        return;
-      }
-
-      const delta = wheelAccumulatorRef.current > 0 ? 1 : -1;
-      wheelAccumulatorRef.current = 0;
-      navigateTo(activeIndexRef.current + delta, {
-        wrap: true,
-        directionOverride: delta > 0 ? "forward" : "backward",
-      });
-    };
-
-    window.addEventListener("wheel", onWheel, { passive: false });
-    return () => window.removeEventListener("wheel", onWheel);
-  }, [prefersReducedMotion]);
-
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.altKey || event.ctrlKey || event.metaKey) {
-        return;
-      }
-
-      const target = event.target as HTMLElement | null;
-      const tagName = target?.tagName ?? "";
-      if (tagName === "INPUT" || tagName === "TEXTAREA" || target?.isContentEditable) {
-        return;
-      }
-
-      if (
-        event.key === "ArrowDown" ||
-        event.key === "PageDown" ||
-        event.key === "ArrowUp" ||
-        event.key === "PageUp" ||
-        event.key === "Home" ||
-        event.key === "End"
-      ) {
-        event.preventDefault();
-      }
-
-      if (isTransitioningRef.current) {
-        return;
-      }
-
-      if (event.key === "ArrowDown" || event.key === "PageDown") {
-        navigateTo(activeIndexRef.current + 1, { wrap: true, directionOverride: "forward" });
-      } else if (event.key === "ArrowUp" || event.key === "PageUp") {
-        navigateTo(activeIndexRef.current - 1, { wrap: true, directionOverride: "backward" });
-      } else if (event.key === "Home") {
-        navigateTo(0);
-      } else if (event.key === "End") {
-        navigateTo(sections.length - 1);
-      }
-    };
-
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [prefersReducedMotion]);
-
-  useEffect(() => {
-    return () => {
-      if (transitionTimerRef.current) {
-        window.clearTimeout(transitionTimerRef.current);
-      }
-
-      if (wheelResetRef.current) {
-        window.clearTimeout(wheelResetRef.current);
-      }
-    };
-  }, []);
-
   const transitionDuration = prefersReducedMotion ? REDUCED_TRANSITION_MS : DEFAULT_TRANSITION_MS;
-
-  function navigateTo(
-    index: number,
-    options: {
-      wrap?: boolean;
-      directionOverride?: "forward" | "backward";
-    } = {},
-  ) {
-    const nextIndex = options.wrap ? wrapIndex(index) : Math.max(0, Math.min(sections.length - 1, index));
-    const currentIndex = activeIndexRef.current;
-
-    if (nextIndex === currentIndex) {
-      return;
-    }
-
-    if (transitionTimerRef.current) {
-      window.clearTimeout(transitionTimerRef.current);
-    }
-
-    lastNavigationRef.current = window.performance.now();
-    setPreviousIndex(currentIndex);
-    setDirection(options.directionOverride ?? (nextIndex > currentIndex ? "forward" : "backward"));
-    setActiveIndex(nextIndex);
-    setIsTransitioning(true);
-
-    const nextId = sections[nextIndex]?.id;
-    if (nextId && window.location.hash !== `#${nextId}`) {
-      window.history.replaceState(null, "", `#${nextId}`);
-    }
-
-    transitionTimerRef.current = window.setTimeout(() => {
-      setPreviousIndex(null);
-      setIsTransitioning(false);
-    }, transitionDuration);
-  }
+  const {
+    activeIndex,
+    previousIndex,
+    direction,
+    isTransitioning,
+    navigateTo,
+    handleTouchStart,
+    handleTouchMove,
+    handleTouchEnd,
+  } = useStoryScroll({
+    sectionIds,
+    wheelThreshold: WHEEL_THRESHOLD,
+    wheelResetMs: WHEEL_RESET_MS,
+    navigationCooldownMs: NAVIGATION_COOLDOWN_MS,
+    transitionDuration,
+    touchThreshold: TOUCH_THRESHOLD,
+  });
 
   function handleAnchorNavigation(id: string) {
     const index = sections.findIndex((section) => section.id === id);
@@ -306,6 +137,9 @@ export default function App() {
         className={`story-stage ${isTransitioning ? "is-transitioning" : ""} ${prefersReducedMotion ? "is-reduced-motion" : ""}`.trim()}
         data-direction={direction}
         aria-live="polite"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
       >
         <div className="story-stage__progress glass-nav" aria-label="Story progress">
           <p className="story-stage__progress-label">
@@ -350,6 +184,19 @@ export default function App() {
           >
             <ChevronDown size={22} strokeWidth={2.2} />
           </button>
+        </div>
+
+        <div className="story-stage__pinwheel" aria-hidden="true">
+          <div className="story-stage__pinwheel-hub">
+            <span className="story-stage__pinwheel-ring" />
+            <span className="story-stage__pinwheel-core" />
+          </div>
+          <div className="story-stage__pinwheel-spokes">
+            <span />
+            <span />
+            <span />
+            <span />
+          </div>
         </div>
 
         <div className="story-stage__viewport">

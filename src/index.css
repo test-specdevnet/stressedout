@@ -26,12 +26,15 @@
   --motion-medium: 320ms cubic-bezier(0.22, 1, 0.36, 1);
   --motion-slow: 900ms cubic-bezier(0.2, 0.84, 0.22, 1);
   --story-arc-pivot-x: 152%;
+  --story-arc-pivot-y: 50%;
   --story-arc-enter-x: 18%;
   --story-arc-exit-x: -18%;
   --story-arc-enter-y: -12%;
   --story-arc-exit-y: 12%;
-  --story-arc-mid-x: -2%;
-  --story-arc-mid-y: 1.6%;
+  --story-arc-enter-mid-x: 7%;
+  --story-arc-enter-mid-y: -3.4%;
+  --story-arc-leave-mid-x: 7%;
+  --story-arc-leave-mid-y: 3.4%;
   --story-arc-rotate: 9deg;
   --story-rotation-sign: -1;
   --story-arc-enter-scale: 0.95;
@@ -337,6 +340,7 @@ video {
 }
 
 .story-stage__controls,
+.story-stage__pinwheel,
 .story-stage__progress,
 .story-stage__hint {
   position: fixed;
@@ -429,6 +433,94 @@ video {
 
 .story-stage__progress-item:hover {
   transform: translateX(-2px);
+}
+
+.story-stage__pinwheel {
+  right: clamp(1.9rem, 3vw, 3rem);
+  top: 50%;
+  width: clamp(8rem, 11vw, 11rem);
+  aspect-ratio: 1;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  z-index: 12;
+  filter: drop-shadow(0 28px 45px rgba(4, 8, 23, 0.42));
+}
+
+.story-stage__pinwheel::before {
+  content: "";
+  position: absolute;
+  inset: 8%;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.45), transparent 24%),
+    radial-gradient(circle, rgba(143, 52, 223, 0.3), rgba(143, 52, 223, 0.02) 58%, transparent 76%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  opacity: 0.8;
+}
+
+.story-stage__pinwheel-hub,
+.story-stage__pinwheel-spokes {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+.story-stage__pinwheel-ring,
+.story-stage__pinwheel-core {
+  position: absolute;
+  border-radius: 50%;
+}
+
+.story-stage__pinwheel-ring {
+  inset: 22%;
+  border: 1px solid rgba(140, 239, 255, 0.42);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    inset 0 0 22px rgba(140, 239, 255, 0.08);
+}
+
+.story-stage__pinwheel-core {
+  width: 1.35rem;
+  height: 1.35rem;
+  background:
+    radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.92), rgba(140, 239, 255, 0.78) 34%, rgba(143, 52, 223, 0.78) 100%);
+  box-shadow:
+    0 0 0 0.4rem rgba(140, 239, 255, 0.08),
+    0 0 28px rgba(140, 239, 255, 0.25);
+}
+
+.story-stage__pinwheel-spokes {
+  animation: pinwheelIdle 14s linear infinite;
+}
+
+.story-stage.is-transitioning[data-direction="forward"] .story-stage__pinwheel-spokes {
+  animation: pinwheelForward var(--motion-slow) both;
+}
+
+.story-stage.is-transitioning[data-direction="backward"] .story-stage__pinwheel-spokes {
+  animation: pinwheelBackward var(--motion-slow) both;
+}
+
+.story-stage__pinwheel-spokes span {
+  position: absolute;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 8%, rgba(140, 239, 255, 0.14) 32%, rgba(255, 255, 255, 0.34) 50%, rgba(231, 57, 214, 0.18) 72%, transparent 92%);
+}
+
+.story-stage__pinwheel-spokes span:nth-child(2) {
+  transform: rotate(45deg);
+}
+
+.story-stage__pinwheel-spokes span:nth-child(3) {
+  transform: rotate(90deg);
+}
+
+.story-stage__pinwheel-spokes span:nth-child(4) {
+  transform: rotate(135deg);
 }
 
 .story-stage__hint {
@@ -803,7 +895,7 @@ video {
 
 .story-panel.is-entering,
 .story-panel.is-leaving {
-  transform-origin: var(--story-arc-pivot-x) 50%;
+  transform-origin: var(--story-arc-pivot-x) var(--story-arc-pivot-y);
 }
 
 .story-stage .story-panel.is-entering {
@@ -840,11 +932,11 @@ video {
     opacity: 1;
     transform:
       translate3d(
-        var(--story-arc-mid-x),
-        calc(var(--story-arc-mid-y) * var(--story-direction-y-sign)),
+        var(--story-arc-enter-mid-x),
+        calc(var(--story-arc-enter-mid-y) * var(--story-direction-y-sign)),
         0
       )
-      rotate(calc(var(--story-arc-rotate) * var(--story-rotation-sign) * -0.12))
+      rotate(calc(var(--story-arc-rotate) * var(--story-rotation-sign) * 0.34))
       scale(0.994);
     filter: blur(0);
   }
@@ -865,11 +957,11 @@ video {
     opacity: 1;
     transform:
       translate3d(
-        var(--story-arc-mid-x),
-        calc(var(--story-arc-mid-y) * var(--story-direction-y-sign)),
+        var(--story-arc-leave-mid-x),
+        calc(var(--story-arc-leave-mid-y) * var(--story-direction-y-sign)),
         0
       )
-      rotate(calc(var(--story-arc-rotate) * var(--story-rotation-sign) * 0.14))
+      rotate(calc(var(--story-arc-rotate) * var(--story-rotation-sign) * 0.28))
       scale(0.992);
     filter: blur(0);
   }
@@ -951,13 +1043,43 @@ video {
 
   .story-stage {
     --story-arc-pivot-x: 138%;
+    --story-arc-pivot-y: 50%;
     --story-arc-enter-x: 14%;
     --story-arc-exit-x: -14%;
     --story-arc-enter-y: -9%;
     --story-arc-exit-y: 9%;
-    --story-arc-mid-x: -1.5%;
-    --story-arc-mid-y: 1.25%;
+    --story-arc-enter-mid-x: 5.5%;
+    --story-arc-enter-mid-y: -2.4%;
+    --story-arc-leave-mid-x: 5.5%;
+    --story-arc-leave-mid-y: 2.4%;
     --story-arc-rotate: 7deg;
+  }
+}
+
+@keyframes pinwheelIdle {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pinwheelForward {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(-42deg);
+  }
+}
+
+@keyframes pinwheelBackward {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(42deg);
   }
 }
 
@@ -1013,6 +1135,14 @@ video {
     left: 5.4rem;
     right: 1rem;
     width: auto;
+  }
+
+  .story-stage__pinwheel {
+    right: 0.8rem;
+    top: auto;
+    bottom: 8.7rem;
+    width: 5.6rem;
+    transform: none;
   }
 
   .story-stage__progress-list {
@@ -1074,12 +1204,15 @@ video {
 
   .story-stage {
     --story-arc-pivot-x: 124%;
+    --story-arc-pivot-y: 50%;
     --story-arc-enter-x: 9%;
     --story-arc-exit-x: -9%;
     --story-arc-enter-y: -6%;
     --story-arc-exit-y: 6%;
-    --story-arc-mid-x: -1%;
-    --story-arc-mid-y: 0.85%;
+    --story-arc-enter-mid-x: 3.5%;
+    --story-arc-enter-mid-y: -1.5%;
+    --story-arc-leave-mid-x: 3.5%;
+    --story-arc-leave-mid-y: 1.5%;
     --story-arc-rotate: 4.5deg;
     --story-arc-enter-scale: 0.97;
     --story-arc-exit-scale: 0.97;
@@ -1112,5 +1245,9 @@ video {
     animation: none;
     opacity: 0;
     transform: translate3d(0, 1.4rem, 0) scale(0.99);
+  }
+
+  .story-stage__pinwheel-spokes {
+    animation: none !important;
   }
 }
