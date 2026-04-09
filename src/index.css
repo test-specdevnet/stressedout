@@ -724,7 +724,7 @@ video {
     linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.05) 38%, rgba(255, 255, 255, 0.08)),
     linear-gradient(135deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.03) 46%, rgba(143, 52, 223, 0.18)),
     rgba(255, 255, 255, 0.045);
-  animation: aboutProcessGlow 4.4s var(--process-delay, 0s) infinite;
+  animation: aboutProcessGlow 7.2s var(--process-delay, 0s) infinite;
   will-change: box-shadow, transform;
 }
 
@@ -1123,7 +1123,7 @@ video {
 
 @keyframes aboutProcessGlow {
   0%,
-  64%,
+  58%,
   100% {
     transform: translate3d(0, 0, 0);
     border-color: var(--line-soft);
@@ -1134,19 +1134,21 @@ video {
       inset 0 -16px 24px rgba(62, 21, 108, 0.14),
       inset 0 16px 22px rgba(255, 255, 255, 0.06);
   }
-  14%,
-  28% {
-    transform: translate3d(0, -2px, 0) scale(1.01);
-    border-color: rgba(180, 238, 255, 0.52);
+  10%,
+  32% {
+    transform: translate3d(0, -3px, 0) scale(1.012);
+    border-color: rgba(198, 244, 255, 0.76);
     box-shadow:
-      0 30px 88px rgba(5, 9, 21, 0.58),
-      0 0 0 1px rgba(140, 239, 255, 0.34),
-      0 0 40px rgba(140, 239, 255, 0.26),
-      0 0 70px rgba(231, 57, 214, 0.14),
-      inset 0 1px 0 rgba(255, 255, 255, 0.72),
-      inset 0 0 24px rgba(140, 239, 255, 0.18),
-      inset 0 -18px 28px rgba(62, 21, 108, 0.18),
-      inset 0 18px 36px rgba(255, 255, 255, 0.11);
+      0 34px 104px rgba(5, 9, 21, 0.62),
+      0 0 0 1px rgba(140, 239, 255, 0.52),
+      0 0 56px rgba(140, 239, 255, 0.4),
+      0 0 96px rgba(231, 57, 214, 0.24),
+      0 0 140px rgba(140, 239, 255, 0.14),
+      inset 0 1px 0 rgba(255, 255, 255, 0.82),
+      inset 0 0 32px rgba(140, 239, 255, 0.28),
+      inset 0 0 52px rgba(231, 57, 214, 0.12),
+      inset 0 -18px 28px rgba(62, 21, 108, 0.2),
+      inset 0 18px 36px rgba(255, 255, 255, 0.14);
   }
 }
 
