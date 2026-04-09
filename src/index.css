@@ -496,7 +496,7 @@ video {
 }
 
 .story-stage__pinwheel-spokes {
-  transition: transform var(--motion-slow);
+  transition: none;
 }
 
 .story-stage__pinwheel-spokes span {
@@ -548,10 +548,7 @@ video {
   backface-visibility: hidden;
   transform-style: preserve-3d;
   will-change: transform, opacity, filter, z-index;
-  transition:
-    transform var(--motion-slow),
-    opacity var(--motion-medium),
-    filter var(--motion-medium);
+  transition: none;
 }
 
 .story-panel.is-visible {
@@ -573,7 +570,7 @@ video {
   border-radius: clamp(2rem, 4vw, 3.4rem);
   padding: clamp(1rem, 2vw, 1.4rem);
   transform: rotate(calc(var(--panel-angle, 0deg) * -0.16));
-  transition: transform var(--motion-slow), box-shadow var(--motion-medium);
+  transition: box-shadow var(--motion-medium);
   background:
     radial-gradient(circle at top right, rgba(143, 52, 223, 0.2), transparent 36%),
     radial-gradient(circle at 18% 18%, rgba(231, 57, 214, 0.16), transparent 24%),
