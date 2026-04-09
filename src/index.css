@@ -24,12 +24,15 @@
   --radius-pill: 999px;
   --motion-fast: 180ms ease;
   --motion-medium: 320ms cubic-bezier(0.22, 1, 0.36, 1);
-  --motion-slow: 940ms cubic-bezier(0.22, 0.82, 0.2, 1);
+  --motion-slow: 900ms cubic-bezier(0.2, 0.84, 0.22, 1);
   --story-arc-pivot-x: 152%;
-  --story-arc-enter-x: 20%;
-  --story-arc-exit-x: -20%;
-  --story-arc-travel-y: 11%;
-  --story-arc-rotate: 10deg;
+  --story-arc-enter-x: 18%;
+  --story-arc-exit-x: -18%;
+  --story-arc-enter-y: -12%;
+  --story-arc-exit-y: 12%;
+  --story-arc-mid-x: -2%;
+  --story-arc-mid-y: 1.6%;
+  --story-arc-rotate: 9deg;
   --story-rotation-sign: -1;
   --story-arc-enter-scale: 0.95;
   --story-arc-exit-scale: 0.95;
@@ -826,12 +829,24 @@ video {
     transform:
       translate3d(
         var(--story-arc-enter-x),
-        calc(var(--story-arc-travel-y) * var(--story-direction-y-sign)),
+        calc(var(--story-arc-enter-y) * var(--story-direction-y-sign)),
         0
       )
       rotate(calc(var(--story-arc-rotate) * var(--story-rotation-sign)))
       scale(var(--story-arc-enter-scale));
     filter: blur(var(--story-arc-enter-blur));
+  }
+  58% {
+    opacity: 1;
+    transform:
+      translate3d(
+        var(--story-arc-mid-x),
+        calc(var(--story-arc-mid-y) * var(--story-direction-y-sign)),
+        0
+      )
+      rotate(calc(var(--story-arc-rotate) * var(--story-rotation-sign) * -0.12))
+      scale(0.994);
+    filter: blur(0);
   }
   100% {
     opacity: 1;
@@ -846,12 +861,24 @@ video {
     transform: translate3d(0, 0, 0) rotate(0) scale(1);
     filter: blur(0);
   }
+  42% {
+    opacity: 1;
+    transform:
+      translate3d(
+        var(--story-arc-mid-x),
+        calc(var(--story-arc-mid-y) * var(--story-direction-y-sign)),
+        0
+      )
+      rotate(calc(var(--story-arc-rotate) * var(--story-rotation-sign) * 0.14))
+      scale(0.992);
+    filter: blur(0);
+  }
   100% {
     opacity: 0;
     transform:
       translate3d(
         var(--story-arc-exit-x),
-        calc(var(--story-arc-travel-y) * var(--story-direction-y-sign)),
+        calc(var(--story-arc-exit-y) * var(--story-direction-y-sign)),
         0
       )
       rotate(calc(var(--story-arc-rotate) * var(--story-rotation-sign)))
@@ -924,10 +951,13 @@ video {
 
   .story-stage {
     --story-arc-pivot-x: 138%;
-    --story-arc-enter-x: 16%;
-    --story-arc-exit-x: -16%;
-    --story-arc-travel-y: 9%;
-    --story-arc-rotate: 8deg;
+    --story-arc-enter-x: 14%;
+    --story-arc-exit-x: -14%;
+    --story-arc-enter-y: -9%;
+    --story-arc-exit-y: 9%;
+    --story-arc-mid-x: -1.5%;
+    --story-arc-mid-y: 1.25%;
+    --story-arc-rotate: 7deg;
   }
 }
 
@@ -1044,10 +1074,13 @@ video {
 
   .story-stage {
     --story-arc-pivot-x: 124%;
-    --story-arc-enter-x: 10%;
-    --story-arc-exit-x: -10%;
-    --story-arc-travel-y: 6%;
-    --story-arc-rotate: 5deg;
+    --story-arc-enter-x: 9%;
+    --story-arc-exit-x: -9%;
+    --story-arc-enter-y: -6%;
+    --story-arc-exit-y: 6%;
+    --story-arc-mid-x: -1%;
+    --story-arc-mid-y: 0.85%;
+    --story-arc-rotate: 4.5deg;
     --story-arc-enter-scale: 0.97;
     --story-arc-exit-scale: 0.97;
     --story-arc-enter-blur: 1px;
