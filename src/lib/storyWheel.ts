@@ -3,10 +3,10 @@ import type { StoryDirection } from "../hooks/useStoryScroll";
 
 export const STORY_WHEEL_CONSTANTS = {
   STEP_ANGLE_DEG: 15,
-  VISIBLE_SLOT_RANGE: 2.4,
+  VISIBLE_SLOT_RANGE: 1.15,
   SCALE_PER_SLOT: 0.085,
-  OPACITY_PER_SLOT: 0.32,
-  BLUR_PER_SLOT: 1.4,
+  OPACITY_PER_SLOT: 0.95,
+  BLUR_PER_SLOT: 2.2,
 };
 
 function clamp(value: number, min: number, max: number) {
@@ -59,9 +59,12 @@ export function getPanelWheelState(relativeSlot: number): PanelWheelState {
           ? `prev-${Math.abs(roundedSlot)}`
           : `next-${roundedSlot}`;
 
-  const scale = clamp(1 - distance * STORY_WHEEL_CONSTANTS.SCALE_PER_SLOT, 0.8, 1);
-  const opacity = clamp(1 - distance * STORY_WHEEL_CONSTANTS.OPACITY_PER_SLOT, 0, 1);
-  const blur = clamp(distance * STORY_WHEEL_CONSTANTS.BLUR_PER_SLOT, 0, 5);
+  const scale = clamp(1 - distance * STORY_WHEEL_CONSTANTS.SCALE_PER_SLOT, 0.86, 1);
+  const opacity =
+    distance < 0.3
+      ? 1
+      : clamp(1 - Math.pow(distance, 1.35) * STORY_WHEEL_CONSTANTS.OPACITY_PER_SLOT, 0, 1);
+  const blur = clamp(Math.pow(distance, 1.18) * STORY_WHEEL_CONSTANTS.BLUR_PER_SLOT, 0, 6);
   const zIndex = 400 - Math.round(distance * 100);
 
   return {

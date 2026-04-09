@@ -339,6 +339,7 @@ video {
   height: 100vh;
   overflow: hidden;
   perspective: 2200px;
+  isolation: isolate;
 }
 
 .story-stage__controls,
@@ -563,6 +564,7 @@ video {
 
 .story-panel:not(.is-visible) {
   opacity: 0;
+  visibility: hidden;
   filter: blur(6px);
 }
 
@@ -576,6 +578,15 @@ video {
     radial-gradient(circle at top right, rgba(143, 52, 223, 0.2), transparent 36%),
     radial-gradient(circle at 18% 18%, rgba(231, 57, 214, 0.16), transparent 24%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.03) 42%, rgba(255, 255, 255, 0.05));
+}
+
+.story-panel.is-center .story-panel__surface {
+  box-shadow:
+    0 34px 120px rgba(5, 9, 21, 0.58),
+    0 10px 30px rgba(2, 8, 20, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    inset 0 -18px 28px rgba(62, 21, 108, 0.18),
+    inset 0 18px 36px rgba(255, 255, 255, 0.08);
 }
 
 .story-panel__frame {
