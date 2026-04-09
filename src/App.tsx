@@ -32,9 +32,9 @@ const sections: StorySection[] = [
     render: DynamicVideosStage,
   },
   { id: "gallery", label: "Ad Gallery", shortLabel: "Ad Gallery", render: GalleryStage },
-  { id: "contact", label: "Contact", shortLabel: "Contact", render: ContactStage },
   { id: "testimonials", label: "Praise", shortLabel: "Praise", render: TestimonialsStage },
   { id: "pricing", label: "Pricing", shortLabel: "Pricing", render: PricingStage },
+  { id: "contact", label: "Contact", shortLabel: "Contact", render: ContactStage },
 ];
 const sectionIds = sections.map((section) => section.id);
 const progressNavItems = [

@@ -18,7 +18,7 @@ export function TestimonialsStage() {
     <div className="stage-layout stage-layout--testimonials">
       <div className="stage-copy">
         <p className="stage-kicker">Testimonials / social proof stage</p>
-        <h2 className="stage-title">A dedicated proof block that bridges contact and pricing.</h2>
+        <h2 className="stage-title">A dedicated proof block that bridges the gallery and pricing.</h2>
         <p className="stage-description">
           This stage stays intentionally lightweight for now, but it gives the storyscroll a real
           placeholder surface for praise, outcomes, and trust signals before the offer panel.

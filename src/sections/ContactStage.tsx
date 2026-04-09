@@ -34,8 +34,8 @@ export function ContactStage() {
           >
             Instagram
           </GlassButton>
-          <GlassButton href="#testimonials" icon={ArrowRight} variant="secondary">
-            Continue to testimonials
+          <GlassButton href="#hero" icon={ArrowRight} variant="secondary">
+            Return to welcome
           </GlassButton>
         </article>
       </div>
