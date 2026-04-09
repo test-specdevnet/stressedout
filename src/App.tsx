@@ -2,6 +2,11 @@ import { ArrowRight, ChevronDown, ChevronUp, Instagram, Mail } from "lucide-reac
 import { useEffect, useState } from "react";
 import { GlassButton } from "./components/GlassButton";
 import { useStoryScroll } from "./hooks/useStoryScroll";
+import {
+  getPanelWheelState,
+  getRelativeWheelSlot,
+  STORY_WHEEL_CONSTANTS,
+} from "./lib/storyWheel";
 import { AboutStage } from "./sections/AboutStage";
 import { ContactStage } from "./sections/ContactStage";
 import { DynamicVideosStage } from "./sections/DynamicVideosStage";
@@ -57,9 +62,11 @@ export default function App() {
   const transitionDuration = prefersReducedMotion ? REDUCED_TRANSITION_MS : DEFAULT_TRANSITION_MS;
   const {
     activeIndex,
-    previousIndex,
+    fromIndex,
+    toIndex,
     direction,
     isTransitioning,
+    stepProgress,
     navigateTo,
     handleTouchStart,
     handleTouchMove,
@@ -79,6 +86,11 @@ export default function App() {
       navigateTo(index);
     }
   }
+
+  const totalSections = sections.length;
+  const displayIndex = isTransitioning && toIndex !== null ? toIndex : activeIndex;
+  const pinwheelRotation =
+    (direction === "forward" ? -1 : 1) * stepProgress * STORY_WHEEL_CONSTANTS.STEP_ANGLE_DEG;
 
   return (
     <div className="site-shell">
@@ -143,11 +155,11 @@ export default function App() {
       >
         <div className="story-stage__progress glass-nav" aria-label="Story progress">
           <p className="story-stage__progress-label">
-            {String(activeIndex + 1).padStart(2, "0")} / {String(sections.length).padStart(2, "0")}
+            {String(displayIndex + 1).padStart(2, "0")} / {String(sections.length).padStart(2, "0")}
           </p>
           <div className="story-stage__progress-list">
             {sections.map((section, index) => {
-              const isCurrent = index === activeIndex;
+              const isCurrent = index === displayIndex;
               return (
                 <button
                   key={section.id}
@@ -191,7 +203,10 @@ export default function App() {
             <span className="story-stage__pinwheel-ring" />
             <span className="story-stage__pinwheel-core" />
           </div>
-          <div className="story-stage__pinwheel-spokes">
+          <div
+            className="story-stage__pinwheel-spokes"
+            style={{ transform: `rotate(${pinwheelRotation}deg)` }}
+          >
             <span />
             <span />
             <span />
@@ -201,20 +216,32 @@ export default function App() {
 
         <div className="story-stage__viewport">
           {sections.map((section, index) => {
-            const isActive = index === activeIndex;
-            const isLeaving = previousIndex === index && isTransitioning;
-            const isEntering = isActive && isTransitioning;
-            const isVisible = isActive || isLeaving;
+            const relativeSlot = getRelativeWheelSlot(
+              index,
+              activeIndex,
+              totalSections,
+              isTransitioning,
+              fromIndex,
+              stepProgress,
+              direction,
+            );
+            const panelState = getPanelWheelState(relativeSlot);
+            const isActive = !isTransitioning && index === activeIndex;
             const Stage = section.render;
 
             return (
               <section
                 key={section.id}
                 id={section.id}
-                className={`story-panel ${isActive ? "is-active" : ""} ${isLeaving ? "is-leaving" : ""} ${isEntering ? "is-entering" : ""} ${isVisible ? "is-visible" : ""}`.trim()}
-                aria-hidden={!isActive}
+                className={`story-panel ${panelState.isVisible ? "is-visible" : ""} ${panelState.isCenter ? "is-center" : ""}`.trim()}
+                aria-hidden={!panelState.isCenter}
                 data-panel-index={index}
                 data-panel-label={section.label}
+                data-slot={panelState.slotName}
+                data-active={isActive ? "true" : "false"}
+                data-transitioning={isTransitioning ? "true" : "false"}
+                data-direction={direction}
+                style={panelState.style}
               >
                 <div className="story-panel__surface glass-panel">
                   <div className="story-panel__frame">

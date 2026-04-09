@@ -27,6 +27,19 @@ function wrapIndex(index: number, total: number) {
   return ((index % total) + total) % total;
 }
 
+function getWrappedDelta(fromIndex: number, toIndex: number, total: number) {
+  const direct = toIndex - fromIndex;
+  const wrappedForward = ((direct % total) + total) % total;
+  const wrappedBackward = wrappedForward - total;
+  return Math.abs(wrappedBackward) < Math.abs(wrappedForward) ? wrappedBackward : wrappedForward;
+}
+
+function easeInOutCubic(value: number) {
+  return value < 0.5
+    ? 4 * value * value * value
+    : 1 - Math.pow(-2 * value + 2, 3) / 2;
+}
+
 export function useStoryScroll({
   sectionIds,
   wheelThreshold,
@@ -36,18 +49,20 @@ export function useStoryScroll({
   touchThreshold,
 }: UseStoryScrollOptions) {
   const [activeIndex, setActiveIndex] = useState(() => getIndexFromHash(window.location.hash, sectionIds));
-  const [previousIndex, setPreviousIndex] = useState<number | null>(null);
+  const [fromIndex, setFromIndex] = useState<number | null>(null);
+  const [toIndex, setToIndex] = useState<number | null>(null);
   const [direction, setDirection] = useState<StoryDirection>("forward");
+  const [stepProgress, setStepProgress] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
   const activeIndexRef = useRef(activeIndex);
   const isTransitioningRef = useRef(isTransitioning);
-  const transitionTimerRef = useRef<number | null>(null);
   const wheelAccumulatorRef = useRef(0);
   const wheelResetRef = useRef<number | null>(null);
   const lastNavigationRef = useRef(0);
   const touchStartYRef = useRef<number | null>(null);
   const touchLastYRef = useRef<number | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
 
   useEffect(() => {
     activeIndexRef.current = activeIndex;
@@ -74,12 +89,14 @@ export function useStoryScroll({
         return;
       }
 
-      if (transitionTimerRef.current) {
-        window.clearTimeout(transitionTimerRef.current);
+      if (animationFrameRef.current !== null) {
+        window.cancelAnimationFrame(animationFrameRef.current);
       }
 
-      setPreviousIndex(null);
-      setDirection(nextIndex > activeIndexRef.current ? "forward" : "backward");
+      setFromIndex(null);
+      setToIndex(null);
+      setStepProgress(0);
+      setDirection(getWrappedDelta(activeIndexRef.current, nextIndex, sectionIds.length) >= 0 ? "forward" : "backward");
       setActiveIndex(nextIndex);
       setIsTransitioning(false);
     };
@@ -174,8 +191,8 @@ export function useStoryScroll({
 
   useEffect(() => {
     return () => {
-      if (transitionTimerRef.current) {
-        window.clearTimeout(transitionTimerRef.current);
+      if (animationFrameRef.current !== null) {
+        window.cancelAnimationFrame(animationFrameRef.current);
       }
 
       if (wheelResetRef.current) {
@@ -184,24 +201,70 @@ export function useStoryScroll({
     };
   }, []);
 
+  function finishTransition(nextIndex: number) {
+    setActiveIndex(nextIndex);
+    setFromIndex(null);
+    setToIndex(null);
+    setStepProgress(0);
+    setIsTransitioning(false);
+    activeIndexRef.current = nextIndex;
+  }
+
+  function animateTo(nextIndex: number) {
+    const startTime = window.performance.now();
+
+    const frame = (timestamp: number) => {
+      const elapsed = timestamp - startTime;
+      const rawProgress = Math.min(elapsed / transitionDuration, 1);
+      setStepProgress(easeInOutCubic(rawProgress));
+
+      if (rawProgress < 1) {
+        animationFrameRef.current = window.requestAnimationFrame(frame);
+        return;
+      }
+
+      finishTransition(nextIndex);
+      animationFrameRef.current = null;
+    };
+
+    animationFrameRef.current = window.requestAnimationFrame(frame);
+  }
+
   function navigateTo(index: number, options: NavigateOptions = {}) {
+    const currentIndex = activeIndexRef.current;
     const nextIndex = options.wrap
       ? wrapIndex(index, sectionIds.length)
       : Math.max(0, Math.min(sectionIds.length - 1, index));
-    const currentIndex = activeIndexRef.current;
 
-    if (nextIndex === currentIndex) {
+    if (nextIndex === currentIndex || isTransitioningRef.current) {
       return;
     }
 
-    if (transitionTimerRef.current) {
-      window.clearTimeout(transitionTimerRef.current);
+    if (animationFrameRef.current !== null) {
+      window.cancelAnimationFrame(animationFrameRef.current);
+    }
+
+    const wrappedDelta = getWrappedDelta(currentIndex, nextIndex, sectionIds.length);
+    const intendedDirection =
+      options.directionOverride ??
+      (wrappedDelta >= 0 ? "forward" : "backward");
+
+    // Direct jumps should not spin through multiple wheel steps.
+    if (!options.directionOverride && Math.abs(wrappedDelta) > 1) {
+      setDirection(intendedDirection);
+      finishTransition(nextIndex);
+      const nextId = sectionIds[nextIndex];
+      if (nextId && window.location.hash !== `#${nextId}`) {
+        window.history.replaceState(null, "", `#${nextId}`);
+      }
+      return;
     }
 
     lastNavigationRef.current = window.performance.now();
-    setPreviousIndex(currentIndex);
-    setDirection(options.directionOverride ?? (nextIndex > currentIndex ? "forward" : "backward"));
-    setActiveIndex(nextIndex);
+    setFromIndex(currentIndex);
+    setToIndex(nextIndex);
+    setDirection(intendedDirection);
+    setStepProgress(0);
     setIsTransitioning(true);
 
     const nextId = sectionIds[nextIndex];
@@ -209,10 +272,7 @@ export function useStoryScroll({
       window.history.replaceState(null, "", `#${nextId}`);
     }
 
-    transitionTimerRef.current = window.setTimeout(() => {
-      setPreviousIndex(null);
-      setIsTransitioning(false);
-    }, transitionDuration);
+    animateTo(nextIndex);
   }
 
   function handleTouchStart(event: TouchEvent<HTMLElement>) {
@@ -257,9 +317,11 @@ export function useStoryScroll({
 
   return {
     activeIndex,
-    previousIndex,
+    fromIndex,
+    toIndex,
     direction,
     isTransitioning,
+    stepProgress,
     navigateTo,
     handleTouchStart,
     handleTouchMove,
