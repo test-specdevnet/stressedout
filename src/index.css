@@ -24,18 +24,17 @@
   --radius-pill: 999px;
   --motion-fast: 180ms ease;
   --motion-medium: 320ms cubic-bezier(0.22, 1, 0.36, 1);
-  --motion-slow: 980ms cubic-bezier(0.2, 0.88, 0.18, 1);
+  --motion-slow: 940ms cubic-bezier(0.22, 0.82, 0.2, 1);
   --story-arc-pivot-x: 152%;
-  --story-arc-enter-x: 28%;
-  --story-arc-exit-x: -28%;
-  --story-arc-enter-y: 15%;
-  --story-arc-exit-y: -15%;
-  --story-arc-rotate: 14deg;
+  --story-arc-enter-x: 20%;
+  --story-arc-exit-x: -20%;
+  --story-arc-travel-y: 11%;
+  --story-arc-rotate: 10deg;
   --story-rotation-sign: -1;
-  --story-arc-enter-scale: 0.88;
-  --story-arc-exit-scale: 0.88;
-  --story-arc-enter-blur: 4px;
-  --story-arc-exit-blur: 6px;
+  --story-arc-enter-scale: 0.95;
+  --story-arc-exit-scale: 0.95;
+  --story-arc-enter-blur: 2px;
+  --story-arc-exit-blur: 2px;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -451,6 +450,9 @@ video {
   opacity: 0;
   pointer-events: none;
   transform: translate3d(0, 10%, 0) scale(0.94);
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+  will-change: transform, opacity, filter;
 }
 
 .story-panel.is-visible,
@@ -810,6 +812,7 @@ video {
 .story-stage .story-panel.is-leaving {
   animation: stageArcLeave var(--motion-slow) both;
   z-index: 2;
+  pointer-events: none;
 }
 
 .story-stage.is-reduced-motion .story-panel.is-entering,
@@ -823,24 +826,12 @@ video {
     transform:
       translate3d(
         var(--story-arc-enter-x),
-        calc(var(--story-arc-enter-y) * var(--story-direction-y-sign)),
+        calc(var(--story-arc-travel-y) * var(--story-direction-y-sign)),
         0
       )
       rotate(calc(var(--story-arc-rotate) * var(--story-rotation-sign)))
       scale(var(--story-arc-enter-scale));
     filter: blur(var(--story-arc-enter-blur));
-  }
-  60% {
-    opacity: 1;
-    transform:
-      translate3d(
-        -3.5%,
-        calc(var(--story-direction-y-sign) * -1.8%),
-        0
-      )
-      rotate(calc(var(--story-rotation-sign) * -2.5deg))
-      scale(0.985);
-    filter: blur(0);
   }
   100% {
     opacity: 1;
@@ -860,7 +851,7 @@ video {
     transform:
       translate3d(
         var(--story-arc-exit-x),
-        calc(var(--story-arc-exit-y) * var(--story-direction-y-sign)),
+        calc(var(--story-arc-travel-y) * var(--story-direction-y-sign)),
         0
       )
       rotate(calc(var(--story-arc-rotate) * var(--story-rotation-sign)))
@@ -933,11 +924,10 @@ video {
 
   .story-stage {
     --story-arc-pivot-x: 138%;
-    --story-arc-enter-x: 22%;
-    --story-arc-exit-x: -22%;
-    --story-arc-enter-y: 12%;
-    --story-arc-exit-y: -12%;
-    --story-arc-rotate: 11deg;
+    --story-arc-enter-x: 16%;
+    --story-arc-exit-x: -16%;
+    --story-arc-travel-y: 9%;
+    --story-arc-rotate: 8deg;
   }
 }
 
@@ -1054,15 +1044,14 @@ video {
 
   .story-stage {
     --story-arc-pivot-x: 124%;
-    --story-arc-enter-x: 12%;
-    --story-arc-exit-x: -12%;
-    --story-arc-enter-y: 7%;
-    --story-arc-exit-y: -7%;
-    --story-arc-rotate: 7deg;
-    --story-arc-enter-scale: 0.94;
-    --story-arc-exit-scale: 0.94;
-    --story-arc-enter-blur: 2px;
-    --story-arc-exit-blur: 3px;
+    --story-arc-enter-x: 10%;
+    --story-arc-exit-x: -10%;
+    --story-arc-travel-y: 6%;
+    --story-arc-rotate: 5deg;
+    --story-arc-enter-scale: 0.97;
+    --story-arc-exit-scale: 0.97;
+    --story-arc-enter-blur: 1px;
+    --story-arc-exit-blur: 1px;
   }
 }
 
