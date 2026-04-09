@@ -32,7 +32,6 @@ export function AboutStage() {
   return (
     <div className="stage-layout stage-layout--split about-stage-layout">
       <div className="stage-copy about-copy">
-        <p className="stage-kicker">About Us / trust frame</p>
         <h2 className="stage-title about-title">Who We Are</h2>
         <p className="stage-description about-intro">
           We're a Canadian ad startup led by expert marketers with 10+ years of experience across
@@ -60,7 +59,6 @@ export function AboutStage() {
 
       <div className="stage-stack about-process-stack">
         <div className="about-process-header">
-          <p className="stage-kicker">Our Process</p>
           <h3 className="about-process-title">Our Process</h3>
         </div>
 
