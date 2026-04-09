@@ -24,7 +24,18 @@
   --radius-pill: 999px;
   --motion-fast: 180ms ease;
   --motion-medium: 320ms cubic-bezier(0.22, 1, 0.36, 1);
-  --motion-slow: 920ms cubic-bezier(0.2, 0.88, 0.18, 1);
+  --motion-slow: 980ms cubic-bezier(0.2, 0.88, 0.18, 1);
+  --story-arc-pivot-x: 152%;
+  --story-arc-enter-x: 28%;
+  --story-arc-exit-x: -28%;
+  --story-arc-enter-y: 15%;
+  --story-arc-exit-y: -15%;
+  --story-arc-rotate: 14deg;
+  --story-rotation-sign: -1;
+  --story-arc-enter-scale: 0.88;
+  --story-arc-exit-scale: 0.88;
+  --story-arc-enter-blur: 4px;
+  --story-arc-exit-blur: 6px;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -137,7 +148,6 @@ video {
 }
 
 .brand-mark,
-.header-links,
 .glass-nav,
 .glass-panel,
 .glass-media-frame,
@@ -155,7 +165,6 @@ video {
 }
 
 .brand-mark::before,
-.header-links::before,
 .glass-nav::before,
 .glass-panel::before,
 .glass-media-frame::before,
@@ -174,7 +183,6 @@ video {
 }
 
 .brand-mark::after,
-.header-links::after,
 .glass-nav::after,
 .glass-panel::after,
 .glass-media-frame::after,
@@ -207,16 +215,18 @@ video {
   inset: 1.1rem 1.25rem auto 1.25rem;
   z-index: 30;
   display: grid;
-  grid-template-columns: max-content 1fr max-content;
-  align-items: center;
+  grid-template-columns: max-content max-content;
+  justify-content: space-between;
+  align-items: start;
   gap: 1rem;
 }
 
 .brand-mark {
   display: grid;
-  gap: 0.05rem;
-  padding: 0.9rem 1.15rem;
+  gap: 0.35rem;
+  padding: 0.9rem 1rem 1rem;
   border-radius: var(--radius-lg);
+  width: min(13.5rem, calc(100vw - 7rem));
 }
 
 .brand-mark__eyebrow {
@@ -231,25 +241,37 @@ video {
   font-size: 1rem;
 }
 
-.header-links {
-  display: inline-flex;
-  justify-content: center;
-  gap: 1.1rem;
-  padding: 0.8rem 1rem;
-  border-radius: var(--radius-pill);
+.brand-mark__logo-wrap {
+  display: grid;
+  place-items: center;
+  min-height: 4.6rem;
+  padding: 0.35rem 0.15rem 0;
 }
 
-.header-links a {
-  position: relative;
-  z-index: 1;
-  color: rgba(255, 255, 255, 0.84);
-  font-size: 0.86rem;
-  transition: color var(--motion-fast), transform var(--motion-fast);
+.brand-mark__logo {
+  width: 100%;
+  max-width: 7rem;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 18px rgba(17, 10, 42, 0.35));
 }
 
-.header-links a:hover,
-.header-links a[aria-current="page"] {
-  color: #fff;
+.floating-widget-stack {
+  display: grid;
+  justify-items: end;
+  gap: 0.75rem;
+}
+
+.floating-widget {
+  min-width: 10.75rem;
+  justify-content: space-between;
+  padding-inline: 1rem 1.1rem;
+  box-shadow:
+    0 28px 60px rgba(5, 9, 21, 0.42),
+    0 10px 22px rgba(2, 8, 20, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.52),
+    inset 0 -16px 24px rgba(62, 21, 108, 0.15),
+    inset 0 16px 22px rgba(255, 255, 255, 0.06);
 }
 
 .glass-button {
@@ -289,6 +311,20 @@ video {
 .story-stage {
   position: relative;
   min-height: 100vh;
+  --story-direction-sign: 1;
+  --story-direction-y-sign: 1;
+}
+
+.story-stage[data-direction="forward"] {
+  --story-direction-sign: 1;
+  --story-direction-y-sign: 1;
+  --story-rotation-sign: -1;
+}
+
+.story-stage[data-direction="backward"] {
+  --story-direction-sign: -1;
+  --story-direction-y-sign: -1;
+  --story-rotation-sign: 1;
 }
 
 .story-stage__viewport {
@@ -311,6 +347,8 @@ video {
   transform: translateY(-50%);
   display: grid;
   gap: 0.9rem;
+  z-index: 42;
+  pointer-events: none;
 }
 
 .story-arrow {
@@ -324,8 +362,11 @@ video {
   transition:
     transform var(--motion-medium),
     border-color var(--motion-fast),
-    opacity var(--motion-fast);
+    opacity var(--motion-fast),
+    box-shadow var(--motion-fast);
   animation: pulseGlow 3.2s ease-in-out infinite;
+  pointer-events: auto;
+  touch-action: manipulation;
 }
 
 .story-arrow:hover:not(:disabled) {
@@ -427,6 +468,10 @@ video {
   height: 100%;
   border-radius: clamp(2rem, 4vw, 3.4rem);
   padding: clamp(1rem, 2vw, 1.4rem);
+  background:
+    radial-gradient(circle at top right, rgba(143, 52, 223, 0.2), transparent 36%),
+    radial-gradient(circle at 18% 18%, rgba(231, 57, 214, 0.16), transparent 24%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.03) 42%, rgba(255, 255, 255, 0.05));
 }
 
 .story-panel__frame {
@@ -437,8 +482,9 @@ video {
   border-radius: calc(var(--radius-xl) - 6px);
   padding: clamp(1.35rem, 3vw, 2.2rem);
   background:
-    radial-gradient(circle at top right, rgba(140, 239, 255, 0.08), transparent 34%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.015));
+    radial-gradient(circle at top right, rgba(140, 239, 255, 0.12), transparent 34%),
+    radial-gradient(circle at 8% 16%, rgba(143, 52, 223, 0.12), transparent 22%),
+    linear-gradient(180deg, rgba(19, 18, 44, 0.38), rgba(10, 17, 30, 0.18));
 }
 
 .story-panel__meta {
@@ -583,7 +629,8 @@ video {
 .hero-facts,
 .stage-signal-grid,
 .contact-grid,
-.pricing-stage-grid {
+.pricing-stage-grid,
+.testimonials-grid {
   display: grid;
   gap: 1rem;
 }
@@ -598,7 +645,8 @@ video {
 .workflow-step,
 .contact-card,
 .contact-actions,
-.pricing-stage-card {
+.pricing-stage-card,
+.testimonial-card {
   border-radius: var(--radius-xl);
   padding: 1.35rem;
 }
@@ -690,6 +738,35 @@ video {
   grid-column: span 1;
 }
 
+.testimonials-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.testimonial-card {
+  display: grid;
+  gap: 1rem;
+  min-height: 13rem;
+  align-content: space-between;
+}
+
+.testimonial-card__quote,
+.testimonial-card__author {
+  margin: 0;
+}
+
+.testimonial-card__quote {
+  color: var(--bg-ink);
+  font-size: 1.02rem;
+  line-height: 1.75;
+}
+
+.testimonial-card__author {
+  color: rgba(255, 255, 255, 0.66);
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
 .pricing-stage-grid {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
@@ -719,29 +796,19 @@ video {
   letter-spacing: -0.05em;
 }
 
-.story-stage[data-direction="forward"] .story-panel.is-entering {
-  transform-origin: 160% 50%;
-  animation: stageArcInForward var(--motion-slow) both;
+.story-panel.is-entering,
+.story-panel.is-leaving {
+  transform-origin: var(--story-arc-pivot-x) 50%;
+}
+
+.story-stage .story-panel.is-entering {
+  animation: stageArcEnter var(--motion-slow) both;
   z-index: 3;
   pointer-events: auto;
 }
 
-.story-stage[data-direction="forward"] .story-panel.is-leaving {
-  transform-origin: 160% 50%;
-  animation: stageArcOutForward var(--motion-slow) both;
-  z-index: 2;
-}
-
-.story-stage[data-direction="backward"] .story-panel.is-entering {
-  transform-origin: -60% 50%;
-  animation: stageArcInBackward var(--motion-slow) both;
-  z-index: 3;
-  pointer-events: auto;
-}
-
-.story-stage[data-direction="backward"] .story-panel.is-leaving {
-  transform-origin: -60% 50%;
-  animation: stageArcOutBackward var(--motion-slow) both;
+.story-stage .story-panel.is-leaving {
+  animation: stageArcLeave var(--motion-slow) both;
   z-index: 2;
 }
 
@@ -750,15 +817,29 @@ video {
   animation-duration: 220ms;
 }
 
-@keyframes stageArcInForward {
+@keyframes stageArcEnter {
   0% {
     opacity: 0;
-    transform: translate3d(30%, 16%, 0) rotate(14deg) scale(0.86);
-    filter: blur(4px);
+    transform:
+      translate3d(
+        var(--story-arc-enter-x),
+        calc(var(--story-arc-enter-y) * var(--story-direction-y-sign)),
+        0
+      )
+      rotate(calc(var(--story-arc-rotate) * var(--story-rotation-sign)))
+      scale(var(--story-arc-enter-scale));
+    filter: blur(var(--story-arc-enter-blur));
   }
   60% {
     opacity: 1;
-    transform: translate3d(-4%, 2%, 0) rotate(-3deg) scale(0.98);
+    transform:
+      translate3d(
+        -3.5%,
+        calc(var(--story-direction-y-sign) * -1.8%),
+        0
+      )
+      rotate(calc(var(--story-rotation-sign) * -2.5deg))
+      scale(0.985);
     filter: blur(0);
   }
   100% {
@@ -768,7 +849,7 @@ video {
   }
 }
 
-@keyframes stageArcOutForward {
+@keyframes stageArcLeave {
   0% {
     opacity: 1;
     transform: translate3d(0, 0, 0) rotate(0) scale(1);
@@ -776,39 +857,15 @@ video {
   }
   100% {
     opacity: 0;
-    transform: translate3d(-32%, -14%, 0) rotate(-16deg) scale(0.84);
-    filter: blur(6px);
-  }
-}
-
-@keyframes stageArcInBackward {
-  0% {
-    opacity: 0;
-    transform: translate3d(-30%, -16%, 0) rotate(-14deg) scale(0.86);
-    filter: blur(4px);
-  }
-  60% {
-    opacity: 1;
-    transform: translate3d(4%, -2%, 0) rotate(3deg) scale(0.98);
-    filter: blur(0);
-  }
-  100% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0) rotate(0) scale(1);
-    filter: blur(0);
-  }
-}
-
-@keyframes stageArcOutBackward {
-  0% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0) rotate(0) scale(1);
-    filter: blur(0);
-  }
-  100% {
-    opacity: 0;
-    transform: translate3d(32%, 14%, 0) rotate(16deg) scale(0.84);
-    filter: blur(6px);
+    transform:
+      translate3d(
+        var(--story-arc-exit-x),
+        calc(var(--story-arc-exit-y) * var(--story-direction-y-sign)),
+        0
+      )
+      rotate(calc(var(--story-arc-rotate) * var(--story-rotation-sign)))
+      scale(var(--story-arc-exit-scale));
+    filter: blur(var(--story-arc-exit-blur));
   }
 }
 
@@ -841,8 +898,8 @@ video {
     grid-template-columns: 1fr auto;
   }
 
-  .header-links {
-    display: none;
+  .brand-mark {
+    width: min(12rem, calc(100vw - 8rem));
   }
 
   .story-stage__progress {
@@ -863,6 +920,7 @@ video {
   .contact-grid,
   .hero-facts,
   .stage-signal-grid,
+  .testimonials-grid,
   .workflow-strip,
   .gallery-grid,
   .pricing-stage-grid {
@@ -873,14 +931,13 @@ video {
     grid-row: auto;
   }
 
-  .story-stage[data-direction="forward"] .story-panel.is-entering,
-  .story-stage[data-direction="forward"] .story-panel.is-leaving {
-    transform-origin: 135% 50%;
-  }
-
-  .story-stage[data-direction="backward"] .story-panel.is-entering,
-  .story-stage[data-direction="backward"] .story-panel.is-leaving {
-    transform-origin: -35% 50%;
+  .story-stage {
+    --story-arc-pivot-x: 138%;
+    --story-arc-enter-x: 22%;
+    --story-arc-exit-x: -22%;
+    --story-arc-enter-y: 12%;
+    --story-arc-exit-y: -12%;
+    --story-arc-rotate: 11deg;
   }
 }
 
@@ -895,11 +952,26 @@ video {
 
   .site-header {
     inset: 0.9rem 0.9rem auto;
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr auto;
   }
 
-  .site-header > .glass-button {
-    display: none;
+  .brand-mark {
+    width: min(10rem, calc(100vw - 7rem));
+    padding: 0.8rem 0.85rem;
+  }
+
+  .brand-mark__logo {
+    max-width: 5rem;
+  }
+
+  .floating-widget-stack {
+    gap: 0.55rem;
+  }
+
+  .floating-widget {
+    min-width: auto;
+    width: 8.75rem;
+    padding: 0.8rem 0.9rem;
   }
 
   .story-stage__controls {
@@ -908,6 +980,7 @@ video {
     bottom: 1.1rem;
     transform: none;
     grid-template-columns: repeat(2, auto);
+    z-index: 44;
   }
 
   .story-arrow {
@@ -979,64 +1052,17 @@ video {
     aspect-ratio: 5 / 4;
   }
 
-  .story-stage[data-direction="forward"] .story-panel.is-entering {
-    animation-name: stageArcInForwardMobile;
-  }
-
-  .story-stage[data-direction="forward"] .story-panel.is-leaving {
-    animation-name: stageArcOutForwardMobile;
-  }
-
-  .story-stage[data-direction="backward"] .story-panel.is-entering {
-    animation-name: stageArcInBackwardMobile;
-  }
-
-  .story-stage[data-direction="backward"] .story-panel.is-leaving {
-    animation-name: stageArcOutBackwardMobile;
-  }
-}
-
-@keyframes stageArcInForwardMobile {
-  0% {
-    opacity: 0;
-    transform: translate3d(14%, 8%, 0) rotate(8deg) scale(0.92);
-  }
-  100% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0) rotate(0) scale(1);
-  }
-}
-
-@keyframes stageArcOutForwardMobile {
-  0% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0) rotate(0) scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: translate3d(-14%, -8%, 0) rotate(-8deg) scale(0.92);
-  }
-}
-
-@keyframes stageArcInBackwardMobile {
-  0% {
-    opacity: 0;
-    transform: translate3d(-14%, -8%, 0) rotate(-8deg) scale(0.92);
-  }
-  100% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0) rotate(0) scale(1);
-  }
-}
-
-@keyframes stageArcOutBackwardMobile {
-  0% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0) rotate(0) scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: translate3d(14%, 8%, 0) rotate(8deg) scale(0.92);
+  .story-stage {
+    --story-arc-pivot-x: 124%;
+    --story-arc-enter-x: 12%;
+    --story-arc-exit-x: -12%;
+    --story-arc-enter-y: 7%;
+    --story-arc-exit-y: -7%;
+    --story-arc-rotate: 7deg;
+    --story-arc-enter-scale: 0.94;
+    --story-arc-exit-scale: 0.94;
+    --story-arc-enter-blur: 2px;
+    --story-arc-exit-blur: 3px;
   }
 }
 

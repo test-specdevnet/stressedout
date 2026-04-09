@@ -1,4 +1,4 @@
-import { ArrowRight, ChevronDown, ChevronUp, Mail } from "lucide-react";
+import { ArrowRight, ChevronDown, ChevronUp, Instagram, Mail } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { GlassButton } from "./components/GlassButton";
 import { AboutStage } from "./sections/AboutStage";
@@ -7,6 +7,7 @@ import { DynamicVideosStage } from "./sections/DynamicVideosStage";
 import { GalleryStage } from "./sections/GalleryStage";
 import { HeroStage } from "./sections/HeroStage";
 import { PricingStage } from "./sections/PricingStage";
+import { TestimonialsStage } from "./sections/TestimonialsStage";
 
 type StorySection = {
   id: string;
@@ -26,18 +27,23 @@ const sections: StorySection[] = [
   },
   { id: "gallery", label: "Ad Gallery", shortLabel: "Gallery", render: GalleryStage },
   { id: "contact", label: "Contact", shortLabel: "Contact", render: ContactStage },
+  { id: "testimonials", label: "Testimonials", shortLabel: "Praise", render: TestimonialsStage },
   { id: "pricing", label: "Pricing", shortLabel: "Pricing", render: PricingStage },
 ];
 
-const WHEEL_THRESHOLD = 72;
-const WHEEL_RESET_MS = 180;
-const DEFAULT_TRANSITION_MS = 920;
+const WHEEL_THRESHOLD = 40;
+const WHEEL_RESET_MS = 110;
+const DEFAULT_TRANSITION_MS = 980;
 const REDUCED_TRANSITION_MS = 220;
 
 function getIndexFromHash(hash: string) {
   const id = hash.replace(/^#/, "");
   const index = sections.findIndex((section) => section.id === id);
   return index >= 0 ? index : 0;
+}
+
+function wrapIndex(index: number) {
+  return ((index % sections.length) + sections.length) % sections.length;
 }
 
 export default function App() {
@@ -51,6 +57,7 @@ export default function App() {
   const wheelAccumulatorRef = useRef(0);
   const wheelResetRef = useRef<number | null>(null);
   const isTransitioningRef = useRef(false);
+  const lastNavigationRef = useRef(0);
 
   useEffect(() => {
     activeIndexRef.current = activeIndex;
@@ -114,6 +121,11 @@ export default function App() {
         return;
       }
 
+      const now = window.performance.now();
+      if (now - lastNavigationRef.current < 140) {
+        return;
+      }
+
       if (wheelResetRef.current) {
         window.clearTimeout(wheelResetRef.current);
       }
@@ -129,7 +141,10 @@ export default function App() {
 
       const delta = wheelAccumulatorRef.current > 0 ? 1 : -1;
       wheelAccumulatorRef.current = 0;
-      navigateTo(activeIndexRef.current + delta);
+      navigateTo(activeIndexRef.current + delta, {
+        wrap: true,
+        directionOverride: delta > 0 ? "forward" : "backward",
+      });
     };
 
     window.addEventListener("wheel", onWheel, { passive: false });
@@ -164,9 +179,9 @@ export default function App() {
       }
 
       if (event.key === "ArrowDown" || event.key === "PageDown") {
-        navigateTo(activeIndexRef.current + 1);
+        navigateTo(activeIndexRef.current + 1, { wrap: true, directionOverride: "forward" });
       } else if (event.key === "ArrowUp" || event.key === "PageUp") {
-        navigateTo(activeIndexRef.current - 1);
+        navigateTo(activeIndexRef.current - 1, { wrap: true, directionOverride: "backward" });
       } else if (event.key === "Home") {
         navigateTo(0);
       } else if (event.key === "End") {
@@ -192,8 +207,14 @@ export default function App() {
 
   const transitionDuration = prefersReducedMotion ? REDUCED_TRANSITION_MS : DEFAULT_TRANSITION_MS;
 
-  function navigateTo(index: number) {
-    const nextIndex = Math.max(0, Math.min(sections.length - 1, index));
+  function navigateTo(
+    index: number,
+    options: {
+      wrap?: boolean;
+      directionOverride?: "forward" | "backward";
+    } = {},
+  ) {
+    const nextIndex = options.wrap ? wrapIndex(index) : Math.max(0, Math.min(sections.length - 1, index));
     const currentIndex = activeIndexRef.current;
 
     if (nextIndex === currentIndex) {
@@ -204,8 +225,9 @@ export default function App() {
       window.clearTimeout(transitionTimerRef.current);
     }
 
+    lastNavigationRef.current = window.performance.now();
     setPreviousIndex(currentIndex);
-    setDirection(nextIndex > currentIndex ? "forward" : "backward");
+    setDirection(options.directionOverride ?? (nextIndex > currentIndex ? "forward" : "backward"));
     setActiveIndex(nextIndex);
     setIsTransitioning(true);
 
@@ -248,34 +270,36 @@ export default function App() {
         >
           <span className="brand-mark__eyebrow">Stressed Out</span>
           <span className="brand-mark__name">Advertising</span>
+          <div className="brand-mark__logo-wrap">
+            <img
+              className="brand-mark__logo"
+              src="/assets/stressed-out/images/logo.png"
+              alt="Stressed Out logo"
+            />
+          </div>
         </a>
 
-        <nav className="header-links glass-nav" aria-label="Primary">
-          {["about", "gallery", "pricing", "contact"].map((id) => {
-            const section = sections.find((entry) => entry.id === id);
-            if (!section) {
-              return null;
-            }
-
-            return (
-              <a
-                key={section.id}
-                href={`#${section.id}`}
-                aria-current={sections[activeIndex]?.id === section.id ? "page" : undefined}
-                onClick={(event) => {
-                  event.preventDefault();
-                  handleAnchorNavigation(section.id);
-                }}
-              >
-                {section.shortLabel}
-              </a>
-            );
-          })}
-        </nav>
-
-        <GlassButton href="mailto:info@stressedoutadvertising.com" icon={Mail}>
-          Email us
-        </GlassButton>
+        <div className="floating-widget-stack" aria-label="Quick actions">
+          <GlassButton
+            className="floating-widget"
+            href="mailto:info@stressedoutadvertising.com"
+            icon={Mail}
+            aria-label="Email us"
+          >
+            Email us
+          </GlassButton>
+          <GlassButton
+            className="floating-widget"
+            href="https://www.instagram.com/stressedoutadvertising?igsh=MzJxdXcybGRobTdt"
+            target="_blank"
+            rel="noreferrer"
+            icon={Instagram}
+            variant="secondary"
+            aria-label="Follow us on Instagram"
+          >
+            Follow us
+          </GlassButton>
+        </div>
       </header>
 
       <main
@@ -311,8 +335,8 @@ export default function App() {
           <button
             type="button"
             className="story-arrow glass-nav"
-            onClick={() => navigateTo(activeIndex - 1)}
-            disabled={activeIndex === 0 || isTransitioning}
+            onClick={() => navigateTo(activeIndex - 1, { wrap: true, directionOverride: "backward" })}
+            disabled={isTransitioning}
             aria-label="Go to previous section"
           >
             <ChevronUp size={22} strokeWidth={2.2} />
@@ -320,8 +344,8 @@ export default function App() {
           <button
             type="button"
             className="story-arrow glass-nav"
-            onClick={() => navigateTo(activeIndex + 1)}
-            disabled={activeIndex === sections.length - 1 || isTransitioning}
+            onClick={() => navigateTo(activeIndex + 1, { wrap: true, directionOverride: "forward" })}
+            disabled={isTransitioning}
             aria-label="Go to next section"
           >
             <ChevronDown size={22} strokeWidth={2.2} />

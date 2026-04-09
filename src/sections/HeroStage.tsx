@@ -56,7 +56,7 @@ export function HeroStage() {
         <div className="hero-facts">
           <article className="glass-panel hero-fact-card">
             <span>Full-screen stages</span>
-            <strong>06</strong>
+            <strong>07</strong>
           </article>
           <article className="glass-panel hero-fact-card">
             <span>Navigation model</span>
