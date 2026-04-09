@@ -34,10 +34,12 @@ function getWrappedDelta(fromIndex: number, toIndex: number, total: number) {
   return Math.abs(wrappedBackward) < Math.abs(wrappedForward) ? wrappedBackward : wrappedForward;
 }
 
-function easeInOutCubic(value: number) {
-  return value < 0.5
-    ? 4 * value * value * value
-    : 1 - Math.pow(-2 * value + 2, 3) / 2;
+function easeSnapProgress(value: number) {
+  const acceleratedLead = 1 - Math.pow(1 - value, 3.6);
+  const settledTail = value < 0.82
+    ? acceleratedLead
+    : 1 - Math.pow(1 - value, 2.2) * 0.12;
+  return Math.min(1, settledTail);
 }
 
 export function useStoryScroll({
@@ -216,7 +218,7 @@ export function useStoryScroll({
     const frame = (timestamp: number) => {
       const elapsed = timestamp - startTime;
       const rawProgress = Math.min(elapsed / transitionDuration, 1);
-      setStepProgress(easeInOutCubic(rawProgress));
+      setStepProgress(easeSnapProgress(rawProgress));
 
       if (rawProgress < 1) {
         animationFrameRef.current = window.requestAnimationFrame(frame);

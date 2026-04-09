@@ -38,12 +38,12 @@ const sections: StorySection[] = [
 ];
 const sectionIds = sections.map((section) => section.id);
 
-const DEFAULT_TRANSITION_MS = 860;
+const DEFAULT_TRANSITION_MS = 720;
 const REDUCED_TRANSITION_MS = 220;
-const WHEEL_THRESHOLD = 36;
-const WHEEL_RESET_MS = 90;
-const NAVIGATION_COOLDOWN_MS = 105;
-const TOUCH_THRESHOLD = 44;
+const WHEEL_THRESHOLD = 24;
+const WHEEL_RESET_MS = 72;
+const NAVIGATION_COOLDOWN_MS = 88;
+const TOUCH_THRESHOLD = 34;
 
 export default function App() {
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
