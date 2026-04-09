@@ -3,10 +3,10 @@ import type { StoryDirection } from "../hooks/useStoryScroll";
 
 export const STORY_WHEEL_CONSTANTS = {
   STEP_ANGLE_DEG: 15,
-  VISIBLE_SLOT_RANGE: 1.15,
+  VISIBLE_SLOT_RANGE: 1.02,
   SCALE_PER_SLOT: 0.085,
-  OPACITY_PER_SLOT: 0.95,
-  BLUR_PER_SLOT: 2.2,
+  OPACITY_PER_SLOT: 1.18,
+  BLUR_PER_SLOT: 2.8,
 };
 
 function clamp(value: number, min: number, max: number) {
@@ -48,7 +48,7 @@ type PanelWheelState = {
 export function getPanelWheelState(relativeSlot: number): PanelWheelState {
   const distance = Math.abs(relativeSlot);
   const isVisible = distance <= STORY_WHEEL_CONSTANTS.VISIBLE_SLOT_RANGE;
-  const isCenter = distance < 0.45;
+  const isCenter = distance < 0.36;
   const roundedSlot = Math.round(relativeSlot);
   const slotName =
     !isVisible
@@ -61,10 +61,10 @@ export function getPanelWheelState(relativeSlot: number): PanelWheelState {
 
   const scale = clamp(1 - distance * STORY_WHEEL_CONSTANTS.SCALE_PER_SLOT, 0.86, 1);
   const opacity =
-    distance < 0.3
+    distance < 0.22
       ? 1
-      : clamp(1 - Math.pow(distance, 1.35) * STORY_WHEEL_CONSTANTS.OPACITY_PER_SLOT, 0, 1);
-  const blur = clamp(Math.pow(distance, 1.18) * STORY_WHEEL_CONSTANTS.BLUR_PER_SLOT, 0, 6);
+      : clamp(1 - Math.pow(distance, 1.55) * STORY_WHEEL_CONSTANTS.OPACITY_PER_SLOT, 0, 1);
+  const blur = clamp(Math.pow(distance, 1.28) * STORY_WHEEL_CONSTANTS.BLUR_PER_SLOT, 0, 7);
   const zIndex = 400 - Math.round(distance * 100);
 
   return {
