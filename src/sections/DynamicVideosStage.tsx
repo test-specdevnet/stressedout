@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type TransformationRow = {
   label: "Coffee" | "Wine";
@@ -68,12 +68,8 @@ type DynamicVideosStageProps = {
 
 export function DynamicVideosStage(props?: DynamicVideosStageProps) {
   const isActive = props?.isActive ?? false;
+  const [activationVersion, setActivationVersion] = useState(0);
   const videoRefs = useRef<HTMLVideoElement[]>([]);
-  const isActiveRef = useRef(isActive);
-
-  useEffect(() => {
-    isActiveRef.current = isActive;
-  }, [isActive]);
 
   const playVideo = (video: HTMLVideoElement) => {
     video.muted = true;
@@ -96,29 +92,15 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
     if (videos.length === 0) return;
 
     const metadataHandlers = new Map<HTMLVideoElement, () => void>();
-    const canPlayHandlers = new Map<HTMLVideoElement, () => void>();
-    const endedHandlers = new Map<HTMLVideoElement, () => void>();
-    const pauseHandlers = new Map<HTMLVideoElement, () => void>();
+    const loadedDataHandlers = new Map<HTMLVideoElement, () => void>();
 
     for (const video of videos) {
       const handleLoadedMetadata = () => playVideo(video);
-      const handleCanPlay = () => playVideo(video);
-      const handleEnded = () => {
-        video.currentTime = 0;
-        playVideo(video);
-      };
-      const handlePause = () => {
-        if (!isActiveRef.current || document.hidden) return;
-        window.requestAnimationFrame(() => playVideo(video));
-      };
+      const handleLoadedData = () => playVideo(video);
       metadataHandlers.set(video, handleLoadedMetadata);
-      canPlayHandlers.set(video, handleCanPlay);
-      endedHandlers.set(video, handleEnded);
-      pauseHandlers.set(video, handlePause);
+      loadedDataHandlers.set(video, handleLoadedData);
       video.addEventListener("loadedmetadata", handleLoadedMetadata, { passive: true });
-      video.addEventListener("canplay", handleCanPlay, { passive: true });
-      video.addEventListener("ended", handleEnded, { passive: true });
-      video.addEventListener("pause", handlePause, { passive: true });
+      video.addEventListener("loadeddata", handleLoadedData, { passive: true });
       playVideo(video);
     }
 
@@ -134,26 +116,26 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
       for (const [video, handler] of metadataHandlers) {
         video.removeEventListener("loadedmetadata", handler);
       }
-      for (const [video, handler] of canPlayHandlers) {
-        video.removeEventListener("canplay", handler);
-      }
-      for (const [video, handler] of endedHandlers) {
-        video.removeEventListener("ended", handler);
-      }
-      for (const [video, handler] of pauseHandlers) {
-        video.removeEventListener("pause", handler);
+      for (const [video, handler] of loadedDataHandlers) {
+        video.removeEventListener("loadeddata", handler);
       }
       document.removeEventListener("visibilitychange", onVisibilityChange);
     };
-  }, []);
+  }, [activationVersion]);
+
+  useEffect(() => {
+    if (!isActive) return;
+    setActivationVersion((current) => current + 1);
+  }, [isActive]);
 
   useEffect(() => {
     if (!isActive) return;
     for (const video of videoRefs.current.filter(Boolean)) {
       video.currentTime = 0;
+      video.load();
       playVideo(video);
     }
-  }, [isActive]);
+  }, [activationVersion, isActive]);
 
   return (
     <div className="stage-layout stage-layout--workflow dynamic-stage-layout">
@@ -183,12 +165,13 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
                 <figure key={variant.video} className="glass-panel dynamic-media-panel">
                   <figcaption className="dynamic-media-label">{variant.displayLabel}</figcaption>
                   <video
+                    key={`${variant.video}-${activationVersion}`}
                     className={`dynamic-variant-video ${row.label === "Coffee" ? "dynamic-variant-video--coffee" : ""}`.trim()}
                     autoPlay
                     muted
                     loop
                     playsInline
-                    preload="metadata"
+                    preload="auto"
                     ref={(node) => {
                       if (node) {
                         videoRefs.current[variantVideoIndices[row.label][variant.label]] = node;
