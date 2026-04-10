@@ -92,14 +92,21 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
 
     const metadataHandlers = new Map<HTMLVideoElement, () => void>();
     const canPlayHandlers = new Map<HTMLVideoElement, () => void>();
+    const endedHandlers = new Map<HTMLVideoElement, () => void>();
 
     for (const video of videos) {
       const handleLoadedMetadata = () => playVideo(video);
       const handleCanPlay = () => playVideo(video);
+      const handleEnded = () => {
+        video.currentTime = 0;
+        playVideo(video);
+      };
       metadataHandlers.set(video, handleLoadedMetadata);
       canPlayHandlers.set(video, handleCanPlay);
+      endedHandlers.set(video, handleEnded);
       video.addEventListener("loadedmetadata", handleLoadedMetadata, { passive: true });
       video.addEventListener("canplay", handleCanPlay, { passive: true });
+      video.addEventListener("ended", handleEnded, { passive: true });
       playVideo(video);
     }
 
@@ -118,15 +125,31 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
       for (const [video, handler] of canPlayHandlers) {
         video.removeEventListener("canplay", handler);
       }
+      for (const [video, handler] of endedHandlers) {
+        video.removeEventListener("ended", handler);
+      }
       document.removeEventListener("visibilitychange", onVisibilityChange);
     };
   }, []);
 
   useEffect(() => {
     if (!isActive) return;
-    for (const video of videoRefs.current.filter(Boolean)) {
-      playVideo(video);
-    }
+    const videos = videoRefs.current.filter(Boolean);
+    if (videos.length === 0) return;
+
+    const replayTimers = [0, 180, 700, 1600].map((delay) =>
+      window.setTimeout(() => {
+        for (const video of videos) {
+          playVideo(video);
+        }
+      }, delay),
+    );
+
+    return () => {
+      for (const timer of replayTimers) {
+        window.clearTimeout(timer);
+      }
+    };
   }, [isActive]);
 
   return (
