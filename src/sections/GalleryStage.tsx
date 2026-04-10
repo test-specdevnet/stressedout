@@ -145,7 +145,7 @@ export function GalleryStage({ isActive = false }: GalleryStageProps = {}) {
         <p className="gallery-carousel-panel__subheader">Explore Our Ads</p>
 
         <div
-          className="gallery-carousel"
+          className={`gallery-carousel ${activeAd.orientation === "portrait" ? "is-portrait-active" : ""}`.trim()}
           tabIndex={0}
           onKeyDown={handleKeyDown}
           onTouchStart={handleTouchStart}
@@ -163,7 +163,7 @@ export function GalleryStage({ isActive = false }: GalleryStageProps = {}) {
             <ChevronLeft size={20} strokeWidth={2.4} />
           </button>
 
-          <div className="gallery-carousel__viewport">
+          <div className={`gallery-carousel__viewport ${activeAd.orientation === "portrait" ? "is-portrait-active" : ""}`.trim()}>
             <div className="gallery-carousel__ambient-glow" aria-hidden="true" />
             <div className="gallery-carousel__track">
               {galleryAds.map((ad, index) => {
