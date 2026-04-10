@@ -1423,22 +1423,27 @@ video {
 .gallery-slide.is-portrait .gallery-slide__media-stage {
   min-height: 0;
   height: 100%;
-  padding: 0.16rem 0.12rem 0.52rem;
+  padding: 0.08rem 0.05rem 0.24rem;
 }
 
 .gallery-slide.is-portrait .gallery-slide__shell {
-  width: min(100%, 12.35rem);
+  width: min(100%, 11.65rem);
   height: auto;
   aspect-ratio: 9 / 16;
 }
 
+.gallery-slide.is-portrait .gallery-slide__shell-inner {
+  padding: 0.34rem;
+}
+
 .gallery-slide.is-portrait .gallery-slide__video {
-  width: calc(100% + 0.5rem);
-  height: 100%;
+  width: calc(100% + 0.72rem);
+  height: calc(100% + 0.9rem);
   max-height: 100%;
   max-width: none;
   object-fit: contain;
-  object-position: center 42%;
+  object-position: center top;
+  transform: translateY(-0.62rem);
 }
 
 .gallery-carousel__arrow {
@@ -1982,18 +1987,23 @@ video {
   .gallery-slide.is-portrait .gallery-slide__media-stage {
     min-height: 0;
     height: 100%;
-    padding: 0.14rem 0.08rem 0.46rem;
+    padding: 0.07rem 0.04rem 0.22rem;
   }
 
   .gallery-slide.is-portrait .gallery-slide__shell {
-    width: min(100%, 9.8rem);
+    width: min(100%, 9.2rem);
+  }
+
+  .gallery-slide.is-portrait .gallery-slide__shell-inner {
+    padding: 0.24rem;
   }
 
   .gallery-slide.is-portrait .gallery-slide__video {
-    width: calc(100% + 0.36rem);
-    height: 100%;
+    width: calc(100% + 0.52rem);
+    height: calc(100% + 0.68rem);
     max-width: none;
-    object-position: center 41%;
+    object-position: center top;
+    transform: translateY(-0.48rem);
   }
 
   .gallery-carousel__caption-row {
