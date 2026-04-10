@@ -1423,22 +1423,23 @@ video {
 .gallery-slide.is-portrait .gallery-slide__media-stage {
   min-height: 0;
   height: 100%;
-  padding: 0.15rem 0 2.35rem;
+  padding: 0 0 2.6rem;
 }
 
 .gallery-slide.is-portrait .gallery-slide__shell {
-  width: min(100%, 10.8rem);
+  width: min(100%, 9.6rem);
   height: auto;
   aspect-ratio: 9 / 16;
+  transform: translateY(-0.8rem);
 }
 
 .gallery-slide.is-portrait .gallery-slide__video {
   width: auto;
   height: 100%;
-  max-height: calc(100% - 0.15rem);
+  max-height: 100%;
   max-width: 100%;
   object-fit: contain;
-  object-position: center 36%;
+  object-position: center 30%;
 }
 
 .gallery-carousel__arrow {
@@ -1982,11 +1983,12 @@ video {
   .gallery-slide.is-portrait .gallery-slide__media-stage {
     min-height: 0;
     height: 100%;
-    padding: 0.1rem 0 1.7rem;
+    padding: 0 0 1.95rem;
   }
 
   .gallery-slide.is-portrait .gallery-slide__shell {
-    width: min(100%, 8.7rem);
+    width: min(100%, 7.8rem);
+    transform: translateY(-0.55rem);
   }
 
   .gallery-slide.is-portrait .gallery-slide__video {
