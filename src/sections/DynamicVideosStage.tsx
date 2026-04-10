@@ -92,14 +92,21 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
 
     const metadataHandlers = new Map<HTMLVideoElement, () => void>();
     const canPlayHandlers = new Map<HTMLVideoElement, () => void>();
+    const endedHandlers = new Map<HTMLVideoElement, () => void>();
 
     for (const video of videos) {
       const handleLoadedMetadata = () => playVideo(video);
       const handleCanPlay = () => playVideo(video);
+      const handleEnded = () => {
+        video.currentTime = 0;
+        playVideo(video);
+      };
       metadataHandlers.set(video, handleLoadedMetadata);
       canPlayHandlers.set(video, handleCanPlay);
+      endedHandlers.set(video, handleEnded);
       video.addEventListener("loadedmetadata", handleLoadedMetadata, { passive: true });
       video.addEventListener("canplay", handleCanPlay, { passive: true });
+      video.addEventListener("ended", handleEnded, { passive: true });
       playVideo(video);
     }
 
@@ -118,6 +125,9 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
       for (const [video, handler] of canPlayHandlers) {
         video.removeEventListener("canplay", handler);
       }
+      for (const [video, handler] of endedHandlers) {
+        video.removeEventListener("ended", handler);
+      }
       document.removeEventListener("visibilitychange", onVisibilityChange);
     };
   }, []);
@@ -125,6 +135,7 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
   useEffect(() => {
     if (!isActive) return;
     for (const video of videoRefs.current.filter(Boolean)) {
+      video.currentTime = 0;
       playVideo(video);
     }
   }, [isActive]);
