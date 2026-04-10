@@ -1128,24 +1128,23 @@ video {
   height: auto;
   display: block;
   background: #04050a;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center center;
   border-radius: 0.72rem;
 }
 
 .dynamic-static-image {
-  aspect-ratio: 16 / 6.1;
+  aspect-ratio: 16 / 5.8;
 }
 
 .dynamic-variant-video {
-  aspect-ratio: 16 / 6;
+  aspect-ratio: 16 / 5.8;
 }
 
 .dynamic-variant-video--coffee {
-  object-fit: cover;
   background:
     radial-gradient(circle at center, rgba(255, 255, 255, 0.1), transparent 64%),
     #04050a;
-  object-position: center 42%;
 }
 
 .workflow-step {
