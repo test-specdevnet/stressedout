@@ -1423,11 +1423,11 @@ video {
 .gallery-slide.is-portrait .gallery-slide__media-stage {
   min-height: 0;
   height: 100%;
-  padding: 1rem 0 1.8rem;
+  padding: 1.15rem 0 2rem;
 }
 
 .gallery-slide.is-portrait .gallery-slide__shell {
-  width: min(100%, 17.75rem);
+  width: min(100%, 16.4rem);
   height: auto;
   aspect-ratio: 9 / 16;
 }
@@ -1982,11 +1982,11 @@ video {
   .gallery-slide.is-portrait .gallery-slide__media-stage {
     min-height: 0;
     height: 100%;
-    padding: 0.85rem 0 1.3rem;
+    padding: 0.95rem 0 1.45rem;
   }
 
   .gallery-slide.is-portrait .gallery-slide__shell {
-    width: min(100%, 13.2rem);
+    width: min(100%, 12.4rem);
   }
 
   .gallery-slide.is-portrait .gallery-slide__video {
