@@ -1,6 +1,4 @@
-import { ArrowRight } from "lucide-react";
 import { useEffect, useRef } from "react";
-import { GlassMediaFrame } from "../components/GlassMediaFrame";
 
 type TransformationRow = {
   label: "Coffee" | "Wine";
@@ -8,6 +6,7 @@ type TransformationRow = {
   staticAlt: string;
   variants: {
     label: "Variant 1" | "Variant 2";
+    title: string;
     video: string;
   }[];
 };
@@ -20,10 +19,12 @@ const transformationRows: TransformationRow[] = [
     variants: [
       {
         label: "Variant 1",
+        title: "Coffee - Variant 1",
         video: "/assets/stressed-out/gallery/videos/coffee-variant-a.mp4",
       },
       {
         label: "Variant 2",
+        title: "Coffee - Variant 2",
         video: "/assets/stressed-out/gallery/videos/coffee-variant-b.mp4",
       },
     ],
@@ -35,10 +36,12 @@ const transformationRows: TransformationRow[] = [
     variants: [
       {
         label: "Variant 1",
+        title: "Wine - Variant 1",
         video: "/assets/stressed-out/gallery/videos/wine-variant-a.mp4",
       },
       {
         label: "Variant 2",
+        title: "Wine - Variant 2",
         video: "/assets/stressed-out/gallery/videos/wine-variant-b.mp4",
       },
     ],
@@ -62,7 +65,6 @@ export function DynamicVideosStage() {
   useEffect(() => {
     const videos = videoRefs.current.filter(Boolean);
     if (videos.length === 0) return;
-    const metadataHandlers = new Map<HTMLVideoElement, () => void>();
 
     const playVideo = (video: HTMLVideoElement) => {
       video.muted = true;
@@ -74,6 +76,7 @@ export function DynamicVideosStage() {
       }
     };
 
+    const metadataHandlers = new Map<HTMLVideoElement, () => void>();
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
@@ -85,7 +88,7 @@ export function DynamicVideosStage() {
           }
         }
       },
-      { threshold: 0.55 }
+      { threshold: 0.35 }
     );
 
     for (const video of videos) {
@@ -107,8 +110,8 @@ export function DynamicVideosStage() {
 
     return () => {
       observer.disconnect();
-      for (const [video, handleLoadedMetadata] of metadataHandlers) {
-        video.removeEventListener("loadedmetadata", handleLoadedMetadata);
+      for (const [video, handler] of metadataHandlers) {
+        video.removeEventListener("loadedmetadata", handler);
       }
       document.removeEventListener("visibilitychange", onVisibilityChange);
     };
@@ -120,45 +123,58 @@ export function DynamicVideosStage() {
         <h2 className="stage-title dynamic-stage-title">Turn Static Images into Dynamic Videos</h2>
       </div>
 
-      <div className="dynamic-variant-stack">
+      <div className="dynamic-gallery-stack">
         {transformationRows.map((row) => (
-          <section key={row.label} className="glass-panel dynamic-variant-row" aria-label={`${row.label} transformation`}>
-            <div className="dynamic-variant-row__label">
-              <span>{row.label}</span>
+          <section key={row.label} className="glass-panel dynamic-gallery-section" aria-label={`${row.label} gallery row`}>
+            <div className="dynamic-gallery-section__head">
+              <div>
+                <h3>{row.label}</h3>
+              </div>
             </div>
 
-            <GlassMediaFrame className="dynamic-media-frame" caption="Static image">
-              <img
-                className="dynamic-static-image"
-                src={row.staticImage}
-                alt={row.staticAlt}
-                loading="lazy"
-              />
-            </GlassMediaFrame>
+            <div className="dynamic-gallery-grid">
+              <article className="dynamic-gallery-card">
+                <div className="dynamic-gallery-card__label">
+                  <div>
+                    <strong>Original Static Image</strong>
+                    <span>{row.label}</span>
+                  </div>
+                  <span className="dynamic-gallery-pill">Image</span>
+                </div>
+                <div className="dynamic-gallery-media">
+                  <img src={row.staticImage} alt={row.staticAlt} loading="lazy" className="dynamic-static-image" />
+                </div>
+              </article>
 
-            <div className="dynamic-transition" aria-hidden="true">
-              <ArrowRight size={20} strokeWidth={2.1} />
+              {row.variants.map((variant) => (
+                <article key={variant.video} className="dynamic-gallery-card">
+                  <div className="dynamic-gallery-card__label">
+                    <div>
+                      <strong>{variant.title}</strong>
+                      <span>{variant.label}</span>
+                    </div>
+                    <span className="dynamic-gallery-pill">Video</span>
+                  </div>
+                  <div className="dynamic-gallery-media dynamic-gallery-media--video">
+                    <video
+                      className="dynamic-variant-video"
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      preload="metadata"
+                      ref={(node) => {
+                        if (node) {
+                          videoRefs.current[variantVideoIndices[row.label][variant.label]] = node;
+                        }
+                      }}
+                    >
+                      <source src={variant.video} type="video/mp4" />
+                    </video>
+                  </div>
+                </article>
+              ))}
             </div>
-
-            {row.variants.map((variant) => (
-              <GlassMediaFrame key={variant.video} className="dynamic-media-frame" caption={variant.label}>
-                <video
-                  className="dynamic-variant-video"
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  preload="metadata"
-                  ref={(node) => {
-                    if (node) {
-                      videoRefs.current[variantVideoIndices[row.label][variant.label]] = node;
-                    }
-                  }}
-                >
-                  <source src={variant.video} type="video/mp4" />
-                </video>
-              </GlassMediaFrame>
-            ))}
           </section>
         ))}
       </div>
