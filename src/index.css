@@ -1067,7 +1067,7 @@ video {
 
 .dynamic-stage-layout {
   align-content: start;
-  gap: 1rem;
+  gap: 0.7rem;
 }
 
 .dynamic-stage-copy {
@@ -1076,27 +1076,28 @@ video {
 
 .dynamic-stage-title {
   max-width: none;
-  font-size: clamp(2rem, 3.2vw, 3.5rem);
-  line-height: 0.98;
+  margin-top: 0;
+  font-size: clamp(1.65rem, 2.35vw, 2.7rem);
+  line-height: 1;
 }
 
 .dynamic-gallery-stack {
   display: grid;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
 .dynamic-gallery-section {
   overflow: hidden;
   padding: 0;
-  border-radius: calc(var(--radius-xl) + 6px);
+  border-radius: calc(var(--radius-lg) + 4px);
 }
 
 .dynamic-gallery-section__head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
-  padding: 1rem 1.15rem 0.85rem;
+  gap: 0.75rem;
+  padding: 0.72rem 0.9rem 0.58rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0));
 }
@@ -1104,7 +1105,7 @@ video {
 .dynamic-gallery-section__head h3 {
   margin: 0;
   color: rgba(255, 255, 255, 0.94);
-  font-size: clamp(1.1rem, 1.6vw, 1.45rem);
+  font-size: clamp(1rem, 1.2vw, 1.2rem);
   font-weight: 600;
   letter-spacing: -0.03em;
 }
@@ -1112,13 +1113,13 @@ video {
 .dynamic-gallery-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
-  padding: 1rem 1.15rem 1.15rem;
+  gap: 0.75rem;
+  padding: 0.75rem 0.9rem 0.9rem;
 }
 
 .dynamic-gallery-card {
   min-width: 0;
-  border-radius: 1.55rem;
+  border-radius: 1.2rem;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.11);
   background:
@@ -1133,8 +1134,8 @@ video {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.9rem 1rem;
+  gap: 0.5rem;
+  padding: 0.62rem 0.78rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(255, 255, 255, 0.02);
 }
@@ -1142,38 +1143,39 @@ video {
 .dynamic-gallery-card__label strong {
   display: block;
   color: rgba(255, 255, 255, 0.94);
-  font-size: 0.94rem;
+  font-size: 0.82rem;
+  line-height: 1.15;
   letter-spacing: -0.02em;
 }
 
 .dynamic-gallery-card__label span {
   display: block;
-  margin-top: 0.22rem;
+  margin-top: 0.15rem;
   color: rgba(255, 255, 255, 0.64);
-  font-size: 0.78rem;
+  font-size: 0.68rem;
 }
 
 .dynamic-gallery-pill {
   flex-shrink: 0;
-  padding: 0.4rem 0.65rem;
+  padding: 0.3rem 0.52rem;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(255, 255, 255, 0.03);
   color: rgba(255, 255, 255, 0.72);
-  font-size: 0.68rem;
-  letter-spacing: 0.08em;
+  font-size: 0.58rem;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
 }
 
 .dynamic-gallery-media {
   position: relative;
-  aspect-ratio: 16 / 10.75;
+  aspect-ratio: 16 / 8.2;
   background: #04050a;
   overflow: hidden;
 }
 
 .dynamic-gallery-media--video {
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 16 / 7.8;
 }
 
 .dynamic-static-image,
@@ -1377,7 +1379,7 @@ video {
   }
 
   .dynamic-gallery-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .about-process-card__inner,
