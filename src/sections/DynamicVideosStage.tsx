@@ -6,7 +6,6 @@ type TransformationRow = {
   staticAlt: string;
   variants: {
     label: "Variant 1" | "Variant 2";
-    title: string;
     video: string;
   }[];
 };
@@ -19,12 +18,10 @@ const transformationRows: TransformationRow[] = [
     variants: [
       {
         label: "Variant 1",
-        title: "Coffee - Variant 1",
         video: "/assets/stressed-out/gallery/videos/coffee-variant-a.mp4",
       },
       {
         label: "Variant 2",
-        title: "Coffee - Variant 2",
         video: "/assets/stressed-out/gallery/videos/coffee-variant-b.mp4",
       },
     ],
@@ -36,12 +33,10 @@ const transformationRows: TransformationRow[] = [
     variants: [
       {
         label: "Variant 1",
-        title: "Wine - Variant 1",
         video: "/assets/stressed-out/gallery/videos/wine-variant-a.mp4",
       },
       {
         label: "Variant 2",
-        title: "Wine - Variant 2",
         video: "/assets/stressed-out/gallery/videos/wine-variant-b.mp4",
       },
     ],
@@ -120,56 +115,39 @@ export function DynamicVideosStage() {
         <h2 className="stage-title dynamic-stage-title">Turn Static Images into Dynamic Videos</h2>
       </div>
 
-      <div className="dynamic-gallery-stack">
+      <div className="dynamic-media-stack">
         {transformationRows.map((row) => (
-          <section key={row.label} className="glass-panel dynamic-gallery-section" aria-label={`${row.label} gallery row`}>
-            <div className="dynamic-gallery-section__head">
-              <div>
-                <h3>{row.label}</h3>
-              </div>
-            </div>
+          <section key={row.label} className="dynamic-media-row" aria-label={`${row.label} media row`}>
+            <div className="dynamic-media-row__label">{row.label}</div>
 
-            <div className="dynamic-gallery-grid">
-              <article className="dynamic-gallery-card">
-                <div className="dynamic-gallery-card__label">
-                  <div>
-                    <strong>Original Static Image</strong>
-                    <span>{row.label}</span>
-                  </div>
-                  <span className="dynamic-gallery-pill">Image</span>
-                </div>
-                <div className="dynamic-gallery-media">
-                  <img src={row.staticImage} alt={row.staticAlt} loading="lazy" className="dynamic-static-image" />
-                </div>
-              </article>
+            <div className="dynamic-media-grid">
+              <figure className="glass-panel dynamic-media-panel">
+                <img
+                  src={row.staticImage}
+                  alt={row.staticAlt}
+                  loading="lazy"
+                  className="dynamic-static-image"
+                />
+              </figure>
 
               {row.variants.map((variant) => (
-                <article key={variant.video} className="dynamic-gallery-card">
-                  <div className="dynamic-gallery-card__label">
-                    <div>
-                      <strong>{variant.title}</strong>
-                      <span>{variant.label}</span>
-                    </div>
-                    <span className="dynamic-gallery-pill">Video</span>
-                  </div>
-                  <div className="dynamic-gallery-media dynamic-gallery-media--video">
-                    <video
-                      className="dynamic-variant-video"
-                      autoPlay
-                      muted
-                      loop
-                      playsInline
-                      preload="metadata"
-                      ref={(node) => {
-                        if (node) {
-                          videoRefs.current[variantVideoIndices[row.label][variant.label]] = node;
-                        }
-                      }}
-                    >
-                      <source src={variant.video} type="video/mp4" />
-                    </video>
-                  </div>
-                </article>
+                <figure key={variant.video} className="glass-panel dynamic-media-panel">
+                  <video
+                    className="dynamic-variant-video"
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    preload="metadata"
+                    ref={(node) => {
+                      if (node) {
+                        videoRefs.current[variantVideoIndices[row.label][variant.label]] = node;
+                      }
+                    }}
+                  >
+                    <source src={variant.video} type="video/mp4" />
+                  </video>
+                </figure>
               ))}
             </div>
           </section>
