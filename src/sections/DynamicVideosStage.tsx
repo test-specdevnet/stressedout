@@ -69,6 +69,11 @@ type DynamicVideosStageProps = {
 export function DynamicVideosStage(props?: DynamicVideosStageProps) {
   const isActive = props?.isActive ?? false;
   const videoRefs = useRef<HTMLVideoElement[]>([]);
+  const isActiveRef = useRef(isActive);
+
+  useEffect(() => {
+    isActiveRef.current = isActive;
+  }, [isActive]);
 
   const playVideo = (video: HTMLVideoElement) => {
     video.muted = true;
@@ -93,6 +98,7 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
     const metadataHandlers = new Map<HTMLVideoElement, () => void>();
     const canPlayHandlers = new Map<HTMLVideoElement, () => void>();
     const endedHandlers = new Map<HTMLVideoElement, () => void>();
+    const pauseHandlers = new Map<HTMLVideoElement, () => void>();
 
     for (const video of videos) {
       const handleLoadedMetadata = () => playVideo(video);
@@ -101,12 +107,18 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
         video.currentTime = 0;
         playVideo(video);
       };
+      const handlePause = () => {
+        if (!isActiveRef.current || document.hidden) return;
+        window.requestAnimationFrame(() => playVideo(video));
+      };
       metadataHandlers.set(video, handleLoadedMetadata);
       canPlayHandlers.set(video, handleCanPlay);
       endedHandlers.set(video, handleEnded);
+      pauseHandlers.set(video, handlePause);
       video.addEventListener("loadedmetadata", handleLoadedMetadata, { passive: true });
       video.addEventListener("canplay", handleCanPlay, { passive: true });
       video.addEventListener("ended", handleEnded, { passive: true });
+      video.addEventListener("pause", handlePause, { passive: true });
       playVideo(video);
     }
 
@@ -127,6 +139,9 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
       }
       for (const [video, handler] of endedHandlers) {
         video.removeEventListener("ended", handler);
+      }
+      for (const [video, handler] of pauseHandlers) {
+        video.removeEventListener("pause", handler);
       }
       document.removeEventListener("visibilitychange", onVisibilityChange);
     };
