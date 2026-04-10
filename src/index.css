@@ -1089,6 +1089,7 @@ video {
 .dynamic-media-row {
   display: grid;
   gap: 0.62rem;
+  position: relative;
 }
 
 .dynamic-media-row--wine {
@@ -1109,6 +1110,34 @@ video {
   padding: 0.38rem;
   display: grid;
   gap: 0.32rem;
+}
+
+.dynamic-media-panel--static {
+  transform: translateX(-0.55rem);
+}
+
+.dynamic-media-arrows {
+  position: absolute;
+  top: 50%;
+  left: calc(33.333% + 0.36rem);
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  display: inline-grid;
+  gap: 0.55rem;
+  pointer-events: none;
+}
+
+.dynamic-media-arrow {
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  color: var(--accent-aqua);
+  box-shadow:
+    0 0 0 1px rgba(140, 239, 255, 0.16),
+    0 0 22px rgba(140, 239, 255, 0.14),
+    var(--glass-shadow);
 }
 
 .dynamic-media-label {
@@ -1622,6 +1651,10 @@ video {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
+  .dynamic-media-arrows {
+    left: calc(33.333% + 0.25rem);
+  }
+
   .about-process-card__inner,
   .about-process-card__face {
     min-height: 11.4rem;
@@ -1797,6 +1830,18 @@ video {
   .dynamic-media-grid {
     grid-template-columns: 1fr;
     gap: 0.62rem;
+  }
+
+  .dynamic-media-panel--static {
+    transform: none;
+  }
+
+  .dynamic-media-arrows {
+    position: static;
+    transform: none;
+    justify-self: center;
+    grid-auto-flow: column;
+    margin: -0.1rem 0 0.12rem;
   }
 
   .about-process-card {

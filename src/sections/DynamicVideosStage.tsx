@@ -1,3 +1,4 @@
+import { ArrowRight } from "lucide-react";
 import { useEffect, useRef } from "react";
 
 type TransformationRow = {
@@ -166,7 +167,7 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
             aria-label={`${row.label} media row`}
           >
             <div className="dynamic-media-grid">
-              <figure className="glass-panel dynamic-media-panel">
+              <figure className="glass-panel dynamic-media-panel dynamic-media-panel--static">
                 <figcaption className="dynamic-media-label">{row.staticLabel}</figcaption>
                 <img
                   src={row.staticImage}
@@ -175,6 +176,15 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
                   className="dynamic-static-image"
                 />
               </figure>
+
+              <div className="dynamic-media-arrows" aria-hidden="true">
+                <span className="dynamic-media-arrow glass-nav">
+                  <ArrowRight size={18} strokeWidth={2.4} />
+                </span>
+                <span className="dynamic-media-arrow glass-nav">
+                  <ArrowRight size={18} strokeWidth={2.4} />
+                </span>
+              </div>
 
               {row.variants.map((variant) => (
                 <figure key={variant.video} className="glass-panel dynamic-media-panel">
