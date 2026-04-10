@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Gift, Mail, Search, Video } from "lucide-react";
 
 const processSteps = [
@@ -30,18 +30,6 @@ const processSteps = [
 
 export function AboutStage() {
   const [activeCard, setActiveCard] = useState<number | null>(null);
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-
-  useEffect(() => {
-    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const update = () => {
-      setPrefersReducedMotion(media.matches);
-    };
-
-    update();
-    media.addEventListener("change", update);
-    return () => media.removeEventListener("change", update);
-  }, []);
 
   return (
     <div className="stage-layout stage-layout--split about-stage-layout">
