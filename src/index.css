@@ -1279,14 +1279,17 @@ video {
 
 .gallery-carousel-panel__subheader {
   margin: 0;
-  color: rgba(255, 255, 255, 0.74);
+  width: min(100%, 32rem);
+  justify-self: end;
+  color: var(--bg-ink);
   font-family: "Poppins", sans-serif;
-  font-size: 0.94rem;
+  font-size: clamp(1.55rem, 2.2vw, 2.1rem);
   font-weight: 700;
-  line-height: 1.1;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  padding: 0 0.18rem;
+  line-height: 1.02;
+  letter-spacing: -0.05em;
+  text-transform: none;
+  text-align: left;
+  padding: 0;
 }
 
 .gallery-carousel-panel__meta,
@@ -1406,14 +1409,16 @@ video {
 }
 
 .gallery-slide.is-portrait .gallery-slide__media-stage {
-  padding: 0.85rem 0;
+  min-height: clamp(20rem, 33vw, 24rem);
+  padding: 1rem 0 1.15rem;
 }
 
 .gallery-slide.is-portrait .gallery-slide__video {
   width: auto;
-  height: 100%;
+  height: auto;
   max-height: 100%;
-  max-width: min(100%, 18rem);
+  max-width: min(100%, 16.5rem);
+  object-position: center top;
 }
 
 .gallery-carousel__arrow {
@@ -1950,11 +1955,12 @@ video {
   }
 
   .gallery-slide.is-portrait .gallery-slide__media-stage {
-    padding: 0.65rem 0;
+    min-height: 18.5rem;
+    padding: 0.8rem 0 0.95rem;
   }
 
   .gallery-slide.is-portrait .gallery-slide__video {
-    max-width: min(100%, 13rem);
+    max-width: min(100%, 12rem);
   }
 
   .gallery-carousel__caption-row {
