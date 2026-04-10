@@ -62,28 +62,33 @@ const variantVideoIndices = {
   },
 } as const;
 
-export function DynamicVideosStage() {
+type DynamicVideosStageProps = {
+  isActive?: boolean;
+};
+
+export function DynamicVideosStage(props?: DynamicVideosStageProps) {
+  const isActive = props?.isActive ?? false;
   const videoRefs = useRef<HTMLVideoElement[]>([]);
+
+  const playVideo = (video: HTMLVideoElement) => {
+    video.muted = true;
+    video.defaultMuted = true;
+    video.autoplay = true;
+    video.loop = true;
+    video.playsInline = true;
+    video.setAttribute("muted", "");
+    video.setAttribute("autoplay", "");
+    video.setAttribute("loop", "");
+    video.setAttribute("playsinline", "");
+    const playPromise = video.play();
+    if (playPromise && typeof playPromise.catch === "function") {
+      playPromise.catch(() => {});
+    }
+  };
 
   useEffect(() => {
     const videos = videoRefs.current.filter(Boolean);
     if (videos.length === 0) return;
-
-    const playVideo = (video: HTMLVideoElement) => {
-      video.muted = true;
-      video.defaultMuted = true;
-      video.autoplay = true;
-      video.loop = true;
-      video.playsInline = true;
-      video.setAttribute("muted", "");
-      video.setAttribute("autoplay", "");
-      video.setAttribute("loop", "");
-      video.setAttribute("playsinline", "");
-      const playPromise = video.play();
-      if (playPromise && typeof playPromise.catch === "function") {
-        playPromise.catch(() => {});
-      }
-    };
 
     const metadataHandlers = new Map<HTMLVideoElement, () => void>();
     const canPlayHandlers = new Map<HTMLVideoElement, () => void>();
@@ -116,6 +121,13 @@ export function DynamicVideosStage() {
       document.removeEventListener("visibilitychange", onVisibilityChange);
     };
   }, []);
+
+  useEffect(() => {
+    if (!isActive) return;
+    for (const video of videoRefs.current.filter(Boolean)) {
+      playVideo(video);
+    }
+  }, [isActive]);
 
   return (
     <div className="stage-layout stage-layout--workflow dynamic-stage-layout">

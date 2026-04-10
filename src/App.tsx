@@ -19,7 +19,7 @@ type StorySection = {
   id: string;
   label: string;
   shortLabel: string;
-  render: () => JSX.Element;
+  render: (props?: { isActive?: boolean }) => JSX.Element;
 };
 
 const sections: StorySection[] = [
@@ -259,7 +259,7 @@ export default function App() {
                         {String(index + 1).padStart(2, "0")}
                       </span>
                     </div>
-                    <Stage />
+                      <Stage isActive={isActive} />
                   </div>
                 </div>
               </section>
