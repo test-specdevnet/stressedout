@@ -69,7 +69,13 @@ export function DynamicVideosStage() {
     const playVideo = (video: HTMLVideoElement) => {
       video.muted = true;
       video.defaultMuted = true;
+      video.autoplay = true;
+      video.loop = true;
       video.playsInline = true;
+      video.setAttribute("muted", "");
+      video.setAttribute("autoplay", "");
+      video.setAttribute("loop", "");
+      video.setAttribute("playsinline", "");
       const playPromise = video.play();
       if (playPromise && typeof playPromise.catch === "function") {
         playPromise.catch(() => {});
@@ -77,31 +83,20 @@ export function DynamicVideosStage() {
     };
 
     const metadataHandlers = new Map<HTMLVideoElement, () => void>();
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          const video = entry.target as HTMLVideoElement;
-          if (entry.isIntersecting) {
-            playVideo(video);
-          } else {
-            video.pause();
-          }
-        }
-      },
-      { threshold: 0.35 }
-    );
+    const canPlayHandlers = new Map<HTMLVideoElement, () => void>();
 
     for (const video of videos) {
-      observer.observe(video);
       const handleLoadedMetadata = () => playVideo(video);
+      const handleCanPlay = () => playVideo(video);
       metadataHandlers.set(video, handleLoadedMetadata);
+      canPlayHandlers.set(video, handleCanPlay);
       video.addEventListener("loadedmetadata", handleLoadedMetadata, { passive: true });
+      video.addEventListener("canplay", handleCanPlay, { passive: true });
+      playVideo(video);
     }
 
     const onVisibilityChange = () => {
-      if (document.hidden) {
-        for (const video of videos) video.pause();
-      } else {
+      if (!document.hidden) {
         for (const video of videos) playVideo(video);
       }
     };
@@ -109,9 +104,11 @@ export function DynamicVideosStage() {
     document.addEventListener("visibilitychange", onVisibilityChange);
 
     return () => {
-      observer.disconnect();
       for (const [video, handler] of metadataHandlers) {
         video.removeEventListener("loadedmetadata", handler);
+      }
+      for (const [video, handler] of canPlayHandlers) {
+        video.removeEventListener("canplay", handler);
       }
       document.removeEventListener("visibilitychange", onVisibilityChange);
     };
