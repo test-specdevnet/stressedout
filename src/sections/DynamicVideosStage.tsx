@@ -1,7 +1,18 @@
 import { ArrowRight } from "lucide-react";
+import { useEffect, useRef } from "react";
 import { GlassMediaFrame } from "../components/GlassMediaFrame";
 
-const transformationRows = [
+type TransformationRow = {
+  label: "Coffee" | "Wine";
+  staticImage: string;
+  staticAlt: string;
+  variants: {
+    label: "Variant 1" | "Variant 2";
+    video: string;
+  }[];
+};
+
+const transformationRows: TransformationRow[] = [
   {
     label: "Coffee",
     staticImage: "/assets/stressed-out/gallery/images/coffee-static.png",
@@ -34,10 +45,78 @@ const transformationRows = [
   },
 ];
 
+const variantVideoIndices = {
+  Coffee: {
+    "Variant 1": 0,
+    "Variant 2": 1,
+  },
+  Wine: {
+    "Variant 1": 2,
+    "Variant 2": 3,
+  },
+} as const;
+
 export function DynamicVideosStage() {
+  const videoRefs = useRef<HTMLVideoElement[]>([]);
+
+  useEffect(() => {
+    const videos = videoRefs.current.filter(Boolean);
+    if (videos.length === 0) return;
+    const metadataHandlers = new Map<HTMLVideoElement, () => void>();
+
+    const playVideo = (video: HTMLVideoElement) => {
+      video.muted = true;
+      video.defaultMuted = true;
+      video.playsInline = true;
+      const playPromise = video.play();
+      if (playPromise && typeof playPromise.catch === "function") {
+        playPromise.catch(() => {});
+      }
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const video = entry.target as HTMLVideoElement;
+          if (entry.isIntersecting) {
+            playVideo(video);
+          } else {
+            video.pause();
+          }
+        }
+      },
+      { threshold: 0.55 }
+    );
+
+    for (const video of videos) {
+      observer.observe(video);
+      const handleLoadedMetadata = () => playVideo(video);
+      metadataHandlers.set(video, handleLoadedMetadata);
+      video.addEventListener("loadedmetadata", handleLoadedMetadata, { passive: true });
+    }
+
+    const onVisibilityChange = () => {
+      if (document.hidden) {
+        for (const video of videos) video.pause();
+      } else {
+        for (const video of videos) playVideo(video);
+      }
+    };
+
+    document.addEventListener("visibilitychange", onVisibilityChange);
+
+    return () => {
+      observer.disconnect();
+      for (const [video, handleLoadedMetadata] of metadataHandlers) {
+        video.removeEventListener("loadedmetadata", handleLoadedMetadata);
+      }
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
+  }, []);
+
   return (
-    <div className="stage-layout stage-layout--workflow">
-      <div className="stage-copy dynamic-stage-copy">
+    <div className="stage-layout stage-layout--workflow dynamic-stage-layout">
+      <div className="dynamic-stage-copy">
         <h2 className="stage-title dynamic-stage-title">Turn Static Images into Dynamic Videos</h2>
       </div>
 
@@ -70,6 +149,11 @@ export function DynamicVideosStage() {
                   muted
                   playsInline
                   preload="metadata"
+                  ref={(node) => {
+                    if (node) {
+                      videoRefs.current[variantVideoIndices[row.label][variant.label]] = node;
+                    }
+                  }}
                 >
                   <source src={variant.video} type="video/mp4" />
                 </video>
