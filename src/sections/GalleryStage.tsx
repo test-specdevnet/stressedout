@@ -138,11 +138,11 @@ export function GalleryStage({ isActive = false }: GalleryStageProps = {}) {
 
       <div className="gallery-carousel-panel">
         <div className="gallery-carousel-panel__header">
-          <p className="gallery-carousel-panel__subheader">Explore Our Ads</p>
           <p className="gallery-carousel-panel__meta">
             {String(activeIndex + 1).padStart(2, "0")} / {String(galleryAds.length).padStart(2, "0")}
           </p>
         </div>
+        <p className="gallery-carousel-panel__subheader">Explore Our Ads</p>
 
         <div
           className="gallery-carousel"
