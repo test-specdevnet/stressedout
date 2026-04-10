@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import { useEffect, useState } from "react";
 import { Gift, Mail, Search, Video } from "lucide-react";
 
 const processSteps = [
@@ -29,6 +29,20 @@ const processSteps = [
 ];
 
 export function AboutStage() {
+  const [activeCard, setActiveCard] = useState<number | null>(null);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => {
+      setPrefersReducedMotion(media.matches);
+    };
+
+    update();
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
+
   return (
     <div className="stage-layout stage-layout--split about-stage-layout">
       <div className="stage-copy about-copy">
@@ -64,20 +78,33 @@ export function AboutStage() {
 
         <div className="about-process-grid">
           {processSteps.map(({ step, title, body, Icon }, index) => (
-            <article
+            <button
               key={step}
-              className="glass-panel about-process-card"
-              style={{ "--process-delay": `${index * 1.1}s` } as CSSProperties}
+              type="button"
+              className={`glass-panel about-process-card ${activeCard === index ? "is-flipped" : ""}`.trim()}
+              onClick={() => setActiveCard((current) => (current === index ? null : index))}
+              aria-pressed={activeCard === index}
+              aria-label={`${activeCard === index ? "Hide" : "Show"} step ${index + 1}: ${title}`}
             >
-              <div className="about-process-card__topline">
-                <span className="about-process-card__step">{step}</span>
-                <span className="about-process-card__icon" aria-hidden="true">
-                  <Icon size={18} strokeWidth={2} />
+              <span className="about-process-card__inner">
+                <span className="about-process-card__face about-process-card__face--front" aria-hidden={activeCard === index}>
+                  <span className="about-process-card__front-number">{index + 1}</span>
                 </span>
-              </div>
-              <h4>{title}</h4>
-              <p>{body}</p>
-            </article>
+
+                <span className="about-process-card__face about-process-card__face--back" aria-hidden={activeCard !== index}>
+                  <span className="about-process-card__topline">
+                    <span className="about-process-card__step">{step}</span>
+                    <span className="about-process-card__icon" aria-hidden="true">
+                      <Icon size={18} strokeWidth={2} />
+                    </span>
+                  </span>
+                  <span className="about-process-card__content">
+                    <span className="about-process-card__title">{title}</span>
+                    <span className="about-process-card__body">{body}</span>
+                  </span>
+                </span>
+              </span>
+            </button>
           ))}
         </div>
       </div>
