@@ -1264,9 +1264,10 @@ video {
   display: grid;
   align-content: start;
   justify-items: stretch;
-  gap: 0.55rem;
+  gap: 0.3rem;
   width: min(100%, 38rem);
   margin-left: auto;
+  transform: translateY(-1.25rem);
 }
 
 .gallery-carousel-panel__header,
@@ -1275,6 +1276,12 @@ video {
   align-items: baseline;
   justify-content: space-between;
   gap: 1rem;
+}
+
+.gallery-carousel-panel__header {
+  width: min(100%, 32rem);
+  justify-self: end;
+  justify-content: flex-start;
 }
 
 .gallery-carousel-panel__subheader {
@@ -1290,7 +1297,6 @@ video {
   text-transform: none;
   text-align: left;
   padding: 0;
-  transform: translateY(-1.35rem);
 }
 
 .gallery-carousel-panel__meta,
@@ -1307,7 +1313,6 @@ video {
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: clamp(0.65rem, 1.1vw, 0.95rem);
-  transform: translateY(-1.7rem);
 }
 
 .gallery-carousel__viewport {
@@ -1329,7 +1334,7 @@ video {
 }
 
 .gallery-carousel__viewport.is-portrait-active {
-  min-height: clamp(22rem, 36vw, 26.4rem);
+  min-height: clamp(24rem, 40vw, 29rem);
 }
 
 .gallery-carousel__ambient-glow {
@@ -1415,9 +1420,12 @@ video {
 }
 
 .gallery-slide.is-portrait .gallery-slide__media-stage {
-  min-height: clamp(20rem, 33vw, 24rem);
-  min-height: clamp(21.2rem, 34vw, 25rem);
-  padding: 0.35rem 0 2.25rem;
+  min-height: clamp(23rem, 38vw, 27.5rem);
+  padding: 0.5rem 0 1.25rem;
+}
+
+.gallery-slide.is-portrait .gallery-slide__shell {
+  width: min(100%, 24rem);
 }
 
 .gallery-slide.is-portrait .gallery-slide__video {
@@ -1921,12 +1929,12 @@ video {
   .gallery-carousel {
     grid-template-columns: minmax(0, 1fr);
     gap: 0.9rem;
-    transform: translateY(-0.95rem);
   }
 
   .gallery-carousel-panel {
     width: 100%;
     margin-left: 0;
+    transform: translateY(-0.8rem);
   }
 
   .gallery-carousel__arrow {
@@ -1956,7 +1964,7 @@ video {
   }
 
   .gallery-carousel__viewport.is-portrait-active {
-    min-height: 21rem;
+    min-height: 22.75rem;
   }
 
   .gallery-slide__shell {
@@ -1968,8 +1976,12 @@ video {
   }
 
   .gallery-slide.is-portrait .gallery-slide__media-stage {
-    min-height: 19.5rem;
-    padding: 0.35rem 0 1.7rem;
+    min-height: 21rem;
+    padding: 0.4rem 0 1rem;
+  }
+
+  .gallery-slide.is-portrait .gallery-slide__shell {
+    width: min(100%, 17rem);
   }
 
   .gallery-slide.is-portrait .gallery-slide__video {
