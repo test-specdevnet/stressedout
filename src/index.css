@@ -1065,6 +1065,90 @@ video {
   gap: 1rem;
 }
 
+.dynamic-stage-copy {
+  max-width: 46rem;
+}
+
+.dynamic-stage-title {
+  max-width: 11ch;
+}
+
+.dynamic-variant-stack {
+  display: grid;
+  gap: 1.15rem;
+}
+
+.dynamic-variant-row {
+  display: grid;
+  grid-template-columns: minmax(0, 0.22fr) minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.85rem;
+  padding: 1rem;
+}
+
+.dynamic-variant-row__label {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 100%;
+}
+
+.dynamic-variant-row__label span {
+  color: rgba(255, 255, 255, 0.88);
+  font-size: clamp(1rem, 1.4vw, 1.22rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+.dynamic-media-frame {
+  margin: 0;
+  padding: 0.78rem;
+  border-radius: 1.7rem;
+}
+
+.dynamic-media-frame .glass-media-frame__inner {
+  border-radius: 1.25rem;
+}
+
+.dynamic-media-frame .glass-media-frame__caption {
+  margin: 0.82rem 0 0;
+  text-align: center;
+  font-size: 0.82rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.dynamic-static-image,
+.dynamic-variant-video {
+  width: 100%;
+  background: #04050a;
+}
+
+.dynamic-static-image {
+  aspect-ratio: 16 / 10.75;
+  object-fit: cover;
+}
+
+.dynamic-variant-video {
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.dynamic-transition {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.9rem;
+  height: 2.9rem;
+  border-radius: 999px;
+  color: rgba(140, 239, 255, 0.92);
+  background: rgba(7, 16, 27, 0.44);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow:
+    0 18px 38px rgba(5, 9, 21, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
 .workflow-step {
   min-height: 12.5rem;
   display: grid;
@@ -1256,6 +1340,10 @@ video {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .dynamic-variant-row {
+    grid-template-columns: minmax(0, 0.24fr) minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr);
+  }
+
   .about-process-card__inner,
   .about-process-card__face {
     min-height: 11.4rem;
@@ -1406,6 +1494,20 @@ video {
 
   .about-process-grid {
     grid-template-columns: 1fr;
+  }
+
+  .dynamic-variant-row {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .dynamic-variant-row__label {
+    min-height: auto;
+  }
+
+  .dynamic-transition {
+    justify-self: center;
+    transform: rotate(90deg);
   }
 
   .about-process-card {
