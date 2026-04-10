@@ -1281,9 +1281,10 @@ video {
   margin: 0;
   color: rgba(255, 255, 255, 0.74);
   font-family: "Poppins", sans-serif;
-  font-size: 0.88rem;
-  font-weight: 600;
-  letter-spacing: 0.24em;
+  font-size: 0.94rem;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   padding: 0 0.18rem;
 }
@@ -1404,9 +1405,15 @@ video {
   background: #04050a;
 }
 
+.gallery-slide.is-portrait .gallery-slide__media-stage {
+  padding: 0.85rem 0;
+}
+
 .gallery-slide.is-portrait .gallery-slide__video {
   width: auto;
-  max-width: min(100%, 21rem);
+  height: 100%;
+  max-height: 100%;
+  max-width: min(100%, 18rem);
 }
 
 .gallery-carousel__arrow {
@@ -1942,8 +1949,12 @@ video {
     min-height: 16.75rem;
   }
 
+  .gallery-slide.is-portrait .gallery-slide__media-stage {
+    padding: 0.65rem 0;
+  }
+
   .gallery-slide.is-portrait .gallery-slide__video {
-    max-width: min(100%, 14rem);
+    max-width: min(100%, 13rem);
   }
 
   .gallery-carousel__caption-row {
