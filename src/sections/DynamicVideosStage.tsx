@@ -2,10 +2,12 @@ import { useEffect, useRef } from "react";
 
 type TransformationRow = {
   label: "Coffee" | "Wine";
+  staticLabel: string;
   staticImage: string;
   staticAlt: string;
   variants: {
     label: "Variant 1" | "Variant 2";
+    displayLabel: string;
     video: string;
   }[];
 };
@@ -13,30 +15,36 @@ type TransformationRow = {
 const transformationRows: TransformationRow[] = [
   {
     label: "Coffee",
+    staticLabel: "Coffee Static Image",
     staticImage: "/assets/stressed-out/gallery/images/coffee-static.png",
     staticAlt: "Static coffee source creative",
     variants: [
       {
         label: "Variant 1",
+        displayLabel: "Coffee Ad Variant 1",
         video: "/assets/stressed-out/gallery/videos/coffee-variant-a.mp4",
       },
       {
         label: "Variant 2",
+        displayLabel: "Coffee Ad Variant 2",
         video: "/assets/stressed-out/gallery/videos/coffee-variant-b.mp4",
       },
     ],
   },
   {
     label: "Wine",
+    staticLabel: "Wine Static Image",
     staticImage: "/assets/stressed-out/gallery/images/wine-static.png",
     staticAlt: "Static wine source creative",
     variants: [
       {
         label: "Variant 1",
+        displayLabel: "Wine Ad Variant 1",
         video: "/assets/stressed-out/gallery/videos/wine-variant-a.mp4",
       },
       {
         label: "Variant 2",
+        displayLabel: "Wine Ad Variant 2",
         video: "/assets/stressed-out/gallery/videos/wine-variant-b.mp4",
       },
     ],
@@ -117,11 +125,14 @@ export function DynamicVideosStage() {
 
       <div className="dynamic-media-stack">
         {transformationRows.map((row) => (
-          <section key={row.label} className="dynamic-media-row" aria-label={`${row.label} media row`}>
-            <div className="dynamic-media-row__label">{row.label}</div>
-
+          <section
+            key={row.label}
+            className={`dynamic-media-row ${row.label === "Wine" ? "dynamic-media-row--wine" : ""}`.trim()}
+            aria-label={`${row.label} media row`}
+          >
             <div className="dynamic-media-grid">
               <figure className="glass-panel dynamic-media-panel">
+                <figcaption className="dynamic-media-label">{row.staticLabel}</figcaption>
                 <img
                   src={row.staticImage}
                   alt={row.staticAlt}
@@ -132,8 +143,9 @@ export function DynamicVideosStage() {
 
               {row.variants.map((variant) => (
                 <figure key={variant.video} className="glass-panel dynamic-media-panel">
+                  <figcaption className="dynamic-media-label">{variant.displayLabel}</figcaption>
                   <video
-                    className="dynamic-variant-video"
+                    className={`dynamic-variant-video ${row.label === "Coffee" ? "dynamic-variant-video--coffee" : ""}`.trim()}
                     autoPlay
                     muted
                     loop
