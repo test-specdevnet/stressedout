@@ -1335,7 +1335,7 @@ video {
 }
 
 .gallery-carousel__viewport.is-portrait-active {
-  min-height: clamp(27.5rem, 44vw, 33rem);
+  min-height: clamp(24rem, 39vw, 29rem);
 }
 
 .gallery-carousel__ambient-glow {
@@ -1423,11 +1423,11 @@ video {
 .gallery-slide.is-portrait .gallery-slide__media-stage {
   min-height: 0;
   height: 100%;
-  padding: 1.15rem 0 2rem;
+  padding: 1rem 0 1.6rem;
 }
 
 .gallery-slide.is-portrait .gallery-slide__shell {
-  width: min(100%, 16.4rem);
+  width: min(100%, 14.9rem);
   height: auto;
   aspect-ratio: 9 / 16;
 }
@@ -1968,7 +1968,7 @@ video {
   }
 
   .gallery-carousel__viewport.is-portrait-active {
-    min-height: 26rem;
+    min-height: 23.5rem;
   }
 
   .gallery-slide__shell {
@@ -1982,11 +1982,11 @@ video {
   .gallery-slide.is-portrait .gallery-slide__media-stage {
     min-height: 0;
     height: 100%;
-    padding: 0.95rem 0 1.45rem;
+    padding: 0.8rem 0 1.2rem;
   }
 
   .gallery-slide.is-portrait .gallery-slide__shell {
-    width: min(100%, 12.4rem);
+    width: min(100%, 11.4rem);
   }
 
   .gallery-slide.is-portrait .gallery-slide__video {
