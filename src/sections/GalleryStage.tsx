@@ -6,22 +6,22 @@ const galleryAds = [
     id: "glasses",
     title: "Glasses Ad",
     format: "16:9 landscape",
-    description: "Precision styling, premium tone.",
-    video: "/assets/stressed-out/videos/grok_video_2026-01-28-18-39-51.mp4",
+    description: "Click or swipe to continue through the sequence.",
+    video: "/assets/stressed-out/videos/glasses-ad.mp4",
   },
   {
     id: "sneaker",
     title: "Sneaker Ad",
     format: "16:9 landscape",
-    description: "Fast pacing with clean product focus.",
-    video: "/assets/stressed-out/videos/grok_video_2026-01-28-18-40-03.mp4",
+    description: "Optimized for smooth autoplay in a static deploy.",
+    video: "/assets/stressed-out/videos/shoe-ad.mp4",
   },
   {
     id: "dog",
     title: "Dog Ad",
     format: "9:16 portrait",
-    description: "Portrait composition preserved without awkward cropping.",
-    video: "/assets/stressed-out/videos/grok_video_2026-01-28-18-41-11.mp4",
+    description: "Portrait format preserved without crop.",
+    video: "/assets/stressed-out/videos/dog-ad.mp4",
     orientation: "portrait" as const,
   },
 ];
@@ -49,13 +49,21 @@ export function GalleryStage({ isActive = false }: GalleryStageProps = {}) {
   );
 
   useEffect(() => {
+    videoRefs.current.forEach((video) => {
+      video?.load();
+    });
+  }, []);
+
+  useEffect(() => {
     videoRefs.current.forEach((video, index) => {
       if (!video) {
         return;
       }
 
       if (index === activeIndex && isActive) {
-        video.currentTime = 0;
+        if (Math.abs(video.currentTime) > 0.08) {
+          video.currentTime = 0;
+        }
         const playPromise = video.play();
         if (playPromise && typeof playPromise.catch === "function") {
           playPromise.catch(() => undefined);
@@ -130,7 +138,7 @@ export function GalleryStage({ isActive = false }: GalleryStageProps = {}) {
 
       <div className="gallery-carousel-panel">
         <div className="gallery-carousel-panel__header">
-          <h3 className="gallery-carousel-panel__title">Explore Our Ads</h3>
+          <p className="gallery-carousel-panel__subheader">Explore Our Ads</p>
           <p className="gallery-carousel-panel__meta">
             {String(activeIndex + 1).padStart(2, "0")} / {String(galleryAds.length).padStart(2, "0")}
           </p>
@@ -181,7 +189,7 @@ export function GalleryStage({ isActive = false }: GalleryStageProps = {}) {
                             className="gallery-slide__video"
                             muted
                             playsInline
-                            preload="metadata"
+                            preload="auto"
                             loop
                             controls={false}
                             aria-label={ad.title}

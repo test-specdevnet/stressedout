@@ -181,9 +181,6 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
                 <span className="dynamic-media-arrow glass-nav">
                   <ArrowRight size={18} strokeWidth={2.4} />
                 </span>
-                <span className="dynamic-media-arrow glass-nav">
-                  <ArrowRight size={18} strokeWidth={2.4} />
-                </span>
               </div>
 
               {row.variants.map((variant) => (
