@@ -1423,14 +1423,14 @@ video {
 .gallery-slide.is-portrait .gallery-slide__media-stage {
   min-height: 0;
   height: 100%;
-  padding: 0 0 2.6rem;
+  padding: 0 0 3.4rem;
 }
 
 .gallery-slide.is-portrait .gallery-slide__shell {
-  width: min(100%, 9.6rem);
+  width: min(100%, 8.2rem);
   height: auto;
   aspect-ratio: 9 / 16;
-  transform: translateY(-0.8rem);
+  transform: translateY(-1.35rem);
 }
 
 .gallery-slide.is-portrait .gallery-slide__video {
@@ -1439,7 +1439,7 @@ video {
   max-height: 100%;
   max-width: 100%;
   object-fit: contain;
-  object-position: center 30%;
+  object-position: center 22%;
 }
 
 .gallery-carousel__arrow {
