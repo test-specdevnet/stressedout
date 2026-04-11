@@ -877,10 +877,14 @@ video {
 .hero-stage-shell {
   position: relative;
   height: 100%;
-  min-height: 0;
+  min-height: clamp(28rem, 58vw, 38rem);
   border-radius: calc(var(--radius-xl) - 6px);
   overflow: hidden;
   isolation: isolate;
+  background:
+    radial-gradient(circle at 18% 30%, rgba(143, 52, 223, 0.24), transparent 24%),
+    radial-gradient(circle at 78% 72%, rgba(231, 57, 214, 0.2), transparent 28%),
+    linear-gradient(135deg, #12081f, #2d0f49 44%, #641255 100%);
 }
 
 .hero-stage-shell__background {
@@ -888,6 +892,9 @@ video {
   inset: -4%;
   pointer-events: none;
   z-index: 0;
+  background:
+    radial-gradient(circle at 18% 22%, rgba(255, 255, 255, 0.08), transparent 18%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01) 48%, rgba(255, 255, 255, 0.04));
 }
 
 .hero-stage-shell__shader,
@@ -924,6 +931,7 @@ video {
   position: relative;
   z-index: 1;
   height: 100%;
+  min-height: inherit;
 }
 
 .hero-welcome-panel {
@@ -1492,16 +1500,12 @@ video {
 }
 
 .gallery-slide.is-portrait .gallery-slide__media-stage {
-  min-height: 0;
-  height: 100%;
-  padding: clamp(0.45rem, 0.9vw, 0.72rem);
-}
-
-.gallery-slide.is-portrait .gallery-slide__shell {
   width: min(100%, 12.8rem);
   height: auto;
   aspect-ratio: 9 / 16;
-  max-height: 100%;
+  min-height: 0;
+  padding: clamp(0.45rem, 0.9vw, 0.72rem);
+  margin-inline: auto;
 }
 
 .gallery-slide.is-portrait .gallery-slide__video {
@@ -2071,23 +2075,22 @@ video {
   }
 
   .gallery-slide.is-portrait .gallery-slide__media-stage {
-    min-height: 0;
-    height: 100%;
-    padding: 0.42rem;
-  }
-
-  .gallery-slide.is-portrait .gallery-slide__shell {
     width: min(100%, 11.4rem);
     height: auto;
     aspect-ratio: 9 / 16;
-    max-height: 100%;
+    min-height: 0;
+    padding: 0.42rem;
+    margin-inline: auto;
   }
 
   .gallery-slide.is-portrait .gallery-slide__video {
-    width: 100%;
+    width: auto;
     height: 100%;
+    max-width: 100%;
+    max-height: 100%;
     object-position: center center;
-    transform: none;
+    transform: scale(0.84);
+    transform-origin: center center;
   }
 
   .gallery-carousel__caption-row {

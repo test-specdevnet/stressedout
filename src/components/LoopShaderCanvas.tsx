@@ -241,6 +241,118 @@ export function LoopShaderCanvas({
       return;
     }
 
+    const resolvedUniforms = { ...DEFAULT_UNIFORMS, ...uniforms };
+    let frameId = 0;
+    let startTime = 0;
+    let pausedAt = 0;
+    let lastWidth = 0;
+    let lastHeight = 0;
+    let destroyed = false;
+    let isDocumentVisible = document.visibilityState !== "hidden";
+
+    const updateCanvasSize = (context: WebGLRenderingContext | CanvasRenderingContext2D | null) => {
+      const rect = canvas.getBoundingClientRect();
+      const viewportArea = rect.width * rect.height;
+      const adaptiveQuality =
+        viewportArea > 900000 ? 0.82 : viewportArea > 520000 ? 0.9 : 1.0;
+      const qualityScale = Math.max(
+        0.72,
+        Math.min(1.0, resolvedUniforms.uQualityScale * adaptiveQuality),
+      );
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.6) * qualityScale;
+      const width = Math.max(1, Math.floor(rect.width * dpr));
+      const height = Math.max(1, Math.floor(rect.height * dpr));
+
+      if (width !== lastWidth || height !== lastHeight) {
+        lastWidth = width;
+        lastHeight = height;
+        canvas.width = width;
+        canvas.height = height;
+        if (context && "viewport" in context) {
+          context.viewport(0, 0, width, height);
+        }
+      }
+    };
+
+    const draw2dFallback = (ctx: CanvasRenderingContext2D, timestamp: number) => {
+      updateCanvasSize(ctx);
+      const width = canvas.width;
+      const height = canvas.height;
+      const time = (timestamp - startTime) * 0.001;
+      const cycle = (time % 6) / 6;
+      const driftX = Math.sin(cycle * Math.PI * 2) * 18 * resolvedUniforms.uParallaxStrength;
+      const driftY = Math.cos(cycle * Math.PI * 2) * 14 * resolvedUniforms.uParallaxStrength;
+      const reducedMotionMix = reducedMotion ? 0.28 : 1.0;
+
+      ctx.clearRect(0, 0, width, height);
+      const bg = ctx.createLinearGradient(0, 0, width, height);
+      bg.addColorStop(0, "#13082a");
+      bg.addColorStop(0.42, "#34105a");
+      bg.addColorStop(1, "#86176e");
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, width, height);
+
+      const ambient = ctx.createRadialGradient(width * 0.26, height * 0.52, 0, width * 0.26, height * 0.52, width * 0.34);
+      ambient.addColorStop(0, "rgba(10, 8, 26, 0.78)");
+      ambient.addColorStop(1, "rgba(10, 8, 26, 0)");
+      ctx.fillStyle = ambient;
+      ctx.fillRect(0, 0, width, height);
+
+      const tileW = width / 7.2;
+      const tileH = tileW * 0.54;
+      const skewX = tileW * 0.28;
+      const rowGap = tileH * 0.72;
+      const colGap = tileW * 0.12;
+
+      for (let row = -1; row < 7; row += 1) {
+        for (let col = -1; col < 9; col += 1) {
+          const seed = (row * 37 + col * 19) % 17;
+          const x = col * (tileW + colGap) + row * skewX - tileW * 0.3 + driftX * reducedMotionMix;
+          const y = row * rowGap + driftY * reducedMotionMix;
+          const isLarge = seed % 7 === 0;
+          const w = isLarge ? tileW * 1.18 : tileW;
+          const h = isLarge ? tileH * 1.1 : tileH;
+          const r = h * 0.24;
+          const pulse = Math.max(0, Math.sin(cycle * Math.PI * 2 + seed * 0.7)) * (seed % 3 === 0 ? 1 : 0.35);
+
+          ctx.save();
+          ctx.translate(x, y);
+
+          const baseFill = ctx.createLinearGradient(0, 0, 0, h);
+          baseFill.addColorStop(0, `rgba(${150 + seed * 4}, ${110 + seed * 2}, ${255 - seed * 2}, 0.92)`);
+          baseFill.addColorStop(1, `rgba(${38 + seed * 2}, ${18 + seed}, ${78 + seed * 3}, 0.96)`);
+          ctx.fillStyle = baseFill;
+
+          ctx.beginPath();
+          ctx.roundRect(0, 0, w, h, r);
+          ctx.fill();
+
+          ctx.strokeStyle = `rgba(255, 220, 255, ${0.12 + pulse * 0.45})`;
+          ctx.lineWidth = Math.max(1, width / 700);
+          ctx.stroke();
+
+          if (pulse > 0.18) {
+            ctx.strokeStyle = `rgba(255, 195, 255, ${0.24 + pulse * 0.38})`;
+            for (let i = 0; i < 6; i += 1) {
+              const ly = h * 0.38 + i * (h * 0.055);
+              ctx.beginPath();
+              ctx.moveTo(w * 0.08, ly);
+              ctx.lineTo(w * 0.92, ly);
+              ctx.stroke();
+            }
+          }
+
+          const glow = ctx.createRadialGradient(w * 0.5, h * 0.86, 0, w * 0.5, h * 0.86, w * 0.7);
+          glow.addColorStop(0, `rgba(255, 110, 240, ${0.16 + pulse * 0.22})`);
+          glow.addColorStop(1, "rgba(255, 110, 240, 0)");
+          ctx.fillStyle = glow;
+          ctx.fillRect(-w * 0.2, h * 0.4, w * 1.4, h);
+
+          ctx.restore();
+        }
+      }
+    };
+
     const gl = canvas.getContext("webgl", {
       alpha: true,
       antialias: false,
@@ -252,12 +364,96 @@ export function LoopShaderCanvas({
     });
 
     if (!gl) {
-      return;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        return;
+      }
+
+      const draw = (timestamp: number) => {
+        if (destroyed) {
+          return;
+        }
+
+        if (!isActive || !isDocumentVisible) {
+          pausedAt = timestamp;
+          return;
+        }
+
+        if (!startTime) {
+          startTime = timestamp;
+        } else if (pausedAt > 0) {
+          startTime += timestamp - pausedAt;
+          pausedAt = 0;
+        }
+
+        draw2dFallback(ctx, timestamp);
+        frameId = window.requestAnimationFrame(draw);
+      };
+
+      const handleVisibilityChange = () => {
+        isDocumentVisible = document.visibilityState !== "hidden";
+        if (isDocumentVisible && isActive) {
+          window.cancelAnimationFrame(frameId);
+          frameId = window.requestAnimationFrame(draw);
+        }
+      };
+
+      updateCanvasSize(ctx);
+      document.addEventListener("visibilitychange", handleVisibilityChange);
+      frameId = window.requestAnimationFrame(draw);
+
+      return () => {
+        destroyed = true;
+        document.removeEventListener("visibilitychange", handleVisibilityChange);
+        window.cancelAnimationFrame(frameId);
+      };
     }
 
     const program = createProgram(gl);
     if (!program) {
-      return;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        return;
+      }
+
+      const draw = (timestamp: number) => {
+        if (destroyed) {
+          return;
+        }
+
+        if (!isActive || !isDocumentVisible) {
+          pausedAt = timestamp;
+          return;
+        }
+
+        if (!startTime) {
+          startTime = timestamp;
+        } else if (pausedAt > 0) {
+          startTime += timestamp - pausedAt;
+          pausedAt = 0;
+        }
+
+        draw2dFallback(ctx, timestamp);
+        frameId = window.requestAnimationFrame(draw);
+      };
+
+      const handleVisibilityChange = () => {
+        isDocumentVisible = document.visibilityState !== "hidden";
+        if (isDocumentVisible && isActive) {
+          window.cancelAnimationFrame(frameId);
+          frameId = window.requestAnimationFrame(draw);
+        }
+      };
+
+      updateCanvasSize(ctx);
+      document.addEventListener("visibilitychange", handleVisibilityChange);
+      frameId = window.requestAnimationFrame(draw);
+
+      return () => {
+        destroyed = true;
+        document.removeEventListener("visibilitychange", handleVisibilityChange);
+        window.cancelAnimationFrame(frameId);
+      };
     }
 
     const positionLocation = gl.getAttribLocation(program, "a_position");
@@ -310,37 +506,6 @@ export function LoopShaderCanvas({
       gl.STATIC_DRAW,
     );
 
-    const resolvedUniforms = { ...DEFAULT_UNIFORMS, ...uniforms };
-    let frameId = 0;
-    let startTime = 0;
-    let pausedAt = 0;
-    let lastWidth = 0;
-    let lastHeight = 0;
-    let destroyed = false;
-    let isDocumentVisible = document.visibilityState !== "hidden";
-
-    const updateCanvasSize = () => {
-      const rect = canvas.getBoundingClientRect();
-      const viewportArea = rect.width * rect.height;
-      const adaptiveQuality =
-        viewportArea > 900000 ? 0.82 : viewportArea > 520000 ? 0.9 : 1.0;
-      const qualityScale = Math.max(
-        0.72,
-        Math.min(1.0, resolvedUniforms.uQualityScale * adaptiveQuality),
-      );
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.6) * qualityScale;
-      const width = Math.max(1, Math.floor(rect.width * dpr));
-      const height = Math.max(1, Math.floor(rect.height * dpr));
-
-      if (width !== lastWidth || height !== lastHeight) {
-        lastWidth = width;
-        lastHeight = height;
-        canvas.width = width;
-        canvas.height = height;
-        gl.viewport(0, 0, width, height);
-      }
-    };
-
     const draw = (timestamp: number) => {
       if (destroyed) {
         return;
@@ -358,7 +523,7 @@ export function LoopShaderCanvas({
         pausedAt = 0;
       }
 
-      updateCanvasSize();
+      updateCanvasSize(gl);
 
       gl.useProgram(program);
       gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
@@ -390,7 +555,7 @@ export function LoopShaderCanvas({
       }
     };
 
-    updateCanvasSize();
+    updateCanvasSize(gl);
     document.addEventListener("visibilitychange", handleVisibilityChange);
     frameId = window.requestAnimationFrame(draw);
 
