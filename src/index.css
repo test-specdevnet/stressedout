@@ -2038,30 +2038,15 @@ video {
   }
 
   .gallery-slide.is-portrait .gallery-slide__media-stage {
-    min-height: 0;
-    height: 100%;
-    padding: 0.03rem 0.02rem 0.08rem;
-  }
-
-  .gallery-slide.is-portrait .gallery-slide__shell {
-    width: min(100%, 8.65rem);
-  }
-
-  .gallery-slide.is-portrait .gallery-slide__shell::after {
-    inset: 0.28px;
-    padding: 0.28px;
-  }
-
-  .gallery-slide.is-portrait .gallery-slide__shell-inner {
-    padding: 0.06rem;
+    min-height: clamp(18.75rem, 68vw, 22.5rem);
+    padding: 0.5rem;
   }
 
   .gallery-slide.is-portrait .gallery-slide__video {
-    width: calc(100% + 0.78rem);
-    height: calc(100% + 0.98rem);
-    max-width: none;
-    object-position: center top;
-    transform: translateY(-0.74rem);
+    width: 100%;
+    height: 100%;
+    object-position: center center;
+    transform: none;
   }
 
   .gallery-carousel__caption-row {
