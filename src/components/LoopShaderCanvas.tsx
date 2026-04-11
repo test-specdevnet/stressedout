@@ -400,7 +400,7 @@ export function LoopShaderCanvas({
 
       updateCanvasSize(ctx);
       document.addEventListener("visibilitychange", handleVisibilityChange);
-      frameId = window.requestAnimationFrame(draw);
+      draw(performance.now());
 
       return () => {
         destroyed = true;
@@ -447,7 +447,7 @@ export function LoopShaderCanvas({
 
       updateCanvasSize(ctx);
       document.addEventListener("visibilitychange", handleVisibilityChange);
-      frameId = window.requestAnimationFrame(draw);
+      draw(performance.now());
 
       return () => {
         destroyed = true;
@@ -557,7 +557,7 @@ export function LoopShaderCanvas({
 
     updateCanvasSize(gl);
     document.addEventListener("visibilitychange", handleVisibilityChange);
-    frameId = window.requestAnimationFrame(draw);
+    draw(performance.now());
 
     return () => {
       destroyed = true;
