@@ -1492,12 +1492,16 @@ video {
 }
 
 .gallery-slide.is-portrait .gallery-slide__media-stage {
-  min-height: clamp(18.5rem, 29vw, 21.5rem);
+  min-height: 0;
+  height: 100%;
   padding: clamp(0.45rem, 0.9vw, 0.72rem);
 }
 
 .gallery-slide.is-portrait .gallery-slide__shell {
-  width: min(100%, 28rem);
+  width: min(100%, 12.8rem);
+  height: auto;
+  aspect-ratio: 9 / 16;
+  max-height: 100%;
 }
 
 .gallery-slide.is-portrait .gallery-slide__video {
@@ -2064,12 +2068,16 @@ video {
   }
 
   .gallery-slide.is-portrait .gallery-slide__media-stage {
-    min-height: clamp(16.5rem, 58vw, 19.5rem);
+    min-height: 0;
+    height: 100%;
     padding: 0.42rem;
   }
 
   .gallery-slide.is-portrait .gallery-slide__shell {
-    width: min(100%, 17.5rem);
+    width: min(100%, 11.4rem);
+    height: auto;
+    aspect-ratio: 9 / 16;
+    max-height: 100%;
   }
 
   .gallery-slide.is-portrait .gallery-slide__video {
