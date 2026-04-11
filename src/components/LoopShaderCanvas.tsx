@@ -40,7 +40,6 @@ void main() {
 `;
 
 const FRAGMENT_SHADER_SOURCE = `
-#extension GL_OES_standard_derivatives : enable
 precision mediump float;
 
 varying vec2 v_uv;
@@ -100,7 +99,7 @@ void main() {
   float roundness = mix(0.1, 0.28, clamp(uTileRoundness, 0.0, 1.0));
   float tileSdf = roundedBoxSdf(cellUv, tileSize, roundness);
 
-  float aa = fwidth(tileSdf) * 1.15 + 0.0025;
+  float aa = max(0.0035, 1.25 / min(uResolution.x, uResolution.y));
   float tileMask = 1.0 - smoothstep(-aa, aa, tileSdf);
   float tileEdge = 1.0 - smoothstep(0.0, aa * 4.0, abs(tileSdf));
 
@@ -184,6 +183,7 @@ function createShader(gl: WebGLRenderingContext, type: number, source: string) {
   gl.compileShader(shader);
 
   if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+    console.error(gl.getShaderInfoLog(shader));
     gl.deleteShader(shader);
     return null;
   }
@@ -254,8 +254,6 @@ export function LoopShaderCanvas({
     if (!gl) {
       return;
     }
-
-    gl.getExtension("OES_standard_derivatives");
 
     const program = createProgram(gl);
     if (!program) {
