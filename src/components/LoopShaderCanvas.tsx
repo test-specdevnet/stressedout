@@ -40,6 +40,7 @@ void main() {
 `;
 
 const FRAGMENT_SHADER_SOURCE = `
+#extension GL_OES_standard_derivatives : enable
 precision mediump float;
 
 varying vec2 v_uv;
@@ -253,6 +254,8 @@ export function LoopShaderCanvas({
     if (!gl) {
       return;
     }
+
+    gl.getExtension("OES_standard_derivatives");
 
     const program = createProgram(gl);
     if (!program) {
