@@ -1505,11 +1505,14 @@ video {
 }
 
 .gallery-slide.is-portrait .gallery-slide__video {
-  width: 100%;
+  width: auto;
   height: 100%;
+  max-width: 100%;
+  max-height: 100%;
   object-fit: contain;
   object-position: center center;
-  transform: none;
+  transform: scale(0.84);
+  transform-origin: center center;
 }
 
 .gallery-carousel__arrow {
