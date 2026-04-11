@@ -887,6 +887,18 @@ video {
     linear-gradient(135deg, #12081f, #2d0f49 44%, #641255 100%);
 }
 
+section#hero .story-panel__frame {
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(7, 10, 22, 0.16), rgba(7, 10, 22, 0.08) 36%, rgba(7, 10, 22, 0.18));
+}
+
+section#hero .story-panel__meta {
+  position: relative;
+  z-index: 3;
+}
+
 .hero-stage-shell__background {
   position: absolute;
   inset: -4%;
@@ -1525,12 +1537,16 @@ video {
 }
 
 .gallery-slide.is-portrait .gallery-slide__media-stage {
-  width: min(100%, 12.8rem);
+  width: min(100%, 13.9rem);
   height: auto;
   aspect-ratio: 9 / 16;
   min-height: 0;
   padding: clamp(0.18rem, 0.45vw, 0.38rem);
   margin-inline: auto;
+}
+
+.gallery-slide.is-portrait .gallery-slide__shell-inner {
+  padding: clamp(0.28rem, 0.65vw, 0.48rem);
 }
 
 .gallery-slide.is-portrait .gallery-slide__video {
@@ -1540,7 +1556,7 @@ video {
   max-height: 100%;
   object-fit: contain;
   object-position: center center;
-  transform: scale(0.84);
+  transform: scale(0.92);
   transform-origin: center center;
 }
 
