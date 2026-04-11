@@ -12,6 +12,7 @@ export function HeroStage(props?: HeroStageProps) {
   return (
     <div className="hero-stage-shell">
       <div className="hero-stage-shell__background" aria-hidden="true">
+        <div className="hero-stage-shell__fallback-grid" />
         <LoopShaderCanvas
           className="hero-stage-shell__shader"
           isActive={isActive}
