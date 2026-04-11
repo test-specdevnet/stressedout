@@ -898,16 +898,41 @@ video {
 }
 
 .hero-stage-shell__shader,
-.hero-stage-shell__overlay {
+.hero-stage-shell__overlay,
+.hero-stage-shell__fallback-grid {
   position: absolute;
   inset: 0;
+}
+
+.hero-stage-shell__fallback-grid {
+  opacity: 0.92;
+  background:
+    radial-gradient(circle at 22% 28%, rgba(255, 255, 255, 0.12), transparent 16%),
+    radial-gradient(circle at 78% 78%, rgba(255, 100, 230, 0.18), transparent 20%),
+    linear-gradient(135deg, rgba(18, 8, 31, 0.82), rgba(48, 12, 77, 0.56) 44%, rgba(118, 18, 92, 0.54)),
+    linear-gradient(150deg, rgba(255, 255, 255, 0.06) 0 8%, transparent 8% 100%);
+  background-size:
+    auto,
+    auto,
+    auto,
+    11.5rem 7rem;
+  background-position:
+    center,
+    center,
+    center,
+    0 0;
+  transform: skewY(-7deg) scale(1.14);
+  transform-origin: center;
+  mix-blend-mode: screen;
+  filter: saturate(1.08);
+  animation: heroTileFallbackDrift 12s ease-in-out infinite alternate;
 }
 
 .hero-stage-shell__shader {
   width: 100%;
   height: 100%;
   display: block;
-  opacity: 0.98;
+  opacity: 0.88;
   filter: saturate(1.02) contrast(1.04);
 }
 
@@ -943,9 +968,9 @@ video {
   padding: clamp(1.4rem, 3vw, 2rem);
   border-radius: clamp(2rem, 4vw, 3rem);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04) 34%, rgba(255, 255, 255, 0.08)),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.03) 42%, rgba(140, 239, 255, 0.1)),
-    rgba(5, 10, 22, 0.18);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.03) 34%, rgba(255, 255, 255, 0.06)),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02) 42%, rgba(140, 239, 255, 0.08)),
+    rgba(5, 10, 22, 0.12);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.18),
     inset 0 -24px 44px rgba(5, 10, 22, 0.34),
@@ -1004,8 +1029,8 @@ video {
     radial-gradient(circle at 18% 18%, rgba(255, 255, 255, 0.12), transparent 26%),
     radial-gradient(circle at 82% 16%, rgba(140, 239, 255, 0.16), transparent 28%),
     radial-gradient(circle at 50% 50%, rgba(143, 52, 223, 0.2), transparent 58%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.04) 42%, rgba(255, 255, 255, 0.08)),
-    rgba(5, 10, 22, 0.16);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.03) 42%, rgba(255, 255, 255, 0.07)),
+    rgba(5, 10, 22, 0.12);
 }
 
 .hero-logo-image {
@@ -1504,7 +1529,7 @@ video {
   height: auto;
   aspect-ratio: 9 / 16;
   min-height: 0;
-  padding: clamp(0.45rem, 0.9vw, 0.72rem);
+  padding: clamp(0.18rem, 0.45vw, 0.38rem);
   margin-inline: auto;
 }
 
@@ -1721,6 +1746,25 @@ video {
       inset 0 1px 0 rgba(255, 255, 255, 0.52),
       inset 0 -18px 28px rgba(62, 21, 108, 0.15),
       inset 0 18px 36px rgba(255, 255, 255, 0.08);
+  }
+}
+
+@keyframes heroTileFallbackDrift {
+  from {
+    background-position:
+      center,
+      center,
+      center,
+      0 0;
+    transform: skewY(-7deg) scale(1.14) translate3d(0, 0, 0);
+  }
+  to {
+    background-position:
+      center,
+      center,
+      center,
+      2.6rem 1.5rem;
+    transform: skewY(-7deg) scale(1.18) translate3d(0.8rem, -0.5rem, 0);
   }
 }
 
@@ -2079,7 +2123,7 @@ video {
     height: auto;
     aspect-ratio: 9 / 16;
     min-height: 0;
-    padding: 0.42rem;
+    padding: 0.2rem;
     margin-inline: auto;
   }
 
