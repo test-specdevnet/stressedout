@@ -561,6 +561,43 @@ video {
     linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.03) 42%, rgba(255, 255, 255, 0.05));
 }
 
+section#hero .story-panel__surface {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 18% 26%, rgba(255, 255, 255, 0.16), transparent 16%),
+    radial-gradient(circle at 82% 74%, rgba(255, 110, 235, 0.26), transparent 20%),
+    linear-gradient(135deg, rgba(17, 8, 34, 0.92), rgba(54, 12, 92, 0.86) 44%, rgba(170, 20, 114, 0.76)),
+    linear-gradient(150deg, rgba(255, 255, 255, 0.12) 0 8%, transparent 8% 100%);
+  background-size:
+    auto,
+    auto,
+    auto,
+    12rem 7.2rem;
+  background-position:
+    center,
+    center,
+    center,
+    0 0;
+}
+
+section#hero .story-panel__surface::before {
+  content: "";
+  position: absolute;
+  inset: -6%;
+  border-radius: inherit;
+  background:
+    linear-gradient(150deg, rgba(255, 255, 255, 0.08) 0 8%, transparent 8% 100%);
+  background-size: 12rem 7.2rem;
+  background-position: 0 0;
+  transform: skewY(-7deg) scale(1.16);
+  transform-origin: center;
+  opacity: 0.78;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  animation: heroTileFallbackDrift 12s ease-in-out infinite alternate;
+}
+
 .story-panel.is-center .story-panel__surface {
   box-shadow:
     0 34px 120px rgba(5, 9, 21, 0.58),
@@ -891,7 +928,7 @@ section#hero .story-panel__frame {
   position: relative;
   overflow: hidden;
   background:
-    linear-gradient(180deg, rgba(7, 10, 22, 0.16), rgba(7, 10, 22, 0.08) 36%, rgba(7, 10, 22, 0.18));
+    linear-gradient(180deg, rgba(7, 10, 22, 0.1), rgba(7, 10, 22, 0.04) 36%, rgba(7, 10, 22, 0.12));
 }
 
 section#hero .story-panel__meta {
@@ -1537,15 +1574,17 @@ section#hero .story-panel__meta {
 }
 
 .gallery-slide.is-portrait .gallery-slide__media-stage {
-  width: min(100%, 13.9rem);
-  height: auto;
+  width: auto;
+  height: 100%;
+  max-height: 100%;
   aspect-ratio: 9 / 16;
   min-height: 0;
   padding: clamp(0.18rem, 0.45vw, 0.38rem);
-  margin-inline: auto;
 }
 
 .gallery-slide.is-portrait .gallery-slide__shell-inner {
+  display: grid;
+  place-items: center;
   padding: clamp(0.28rem, 0.65vw, 0.48rem);
 }
 
