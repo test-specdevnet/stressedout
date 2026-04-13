@@ -12,13 +12,11 @@ export function HeroStage(props?: HeroStageProps) {
   return (
     <div className="hero-stage-shell">
       <div className="hero-stage-shell__background" aria-hidden="true">
-        <div className="hero-stage-shell__fallback-grid" />
         <LoopShaderCanvas
           className="hero-stage-shell__shader"
           isActive={isActive}
           reducedMotion={reducedMotion}
         />
-        <div className="hero-stage-shell__overlay hero-stage-shell__overlay--ambient" />
         <div className="hero-stage-shell__overlay hero-stage-shell__overlay--copy-safe" />
       </div>
 

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 
 type LoopShaderUniformOverrides = Partial<{
   uPulseStrength: number;
@@ -20,211 +20,184 @@ type LoopShaderCanvasProps = {
 
 const DEFAULT_UNIFORMS = {
   uPulseStrength: 0.72,
-  uGlowStrength: 0.74,
-  uParallaxStrength: 0.34,
-  uGridDensity: 7.6,
-  uTileRoundness: 0.24,
-  uContrast: 1.08,
-  uTextSafeVignette: 0.72,
+  uGlowStrength: 0.72,
+  uParallaxStrength: 0.24,
+  uGridDensity: 7.2,
+  uTileRoundness: 0.22,
+  uContrast: 1.06,
+  uTextSafeVignette: 0.74,
   uQualityScale: 1.0,
 };
 
-const VERTEX_SHADER_SOURCE = `
-attribute vec2 a_position;
-varying vec2 v_uv;
+type TileDefinition = {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  height: number;
+  phase: number;
+  contour: boolean;
+  bright: boolean;
+};
 
-void main() {
-  v_uv = a_position * 0.5 + 0.5;
-  gl_Position = vec4(a_position, 0.0, 1.0);
-}
-`;
-
-const FRAGMENT_SHADER_SOURCE = `
-precision mediump float;
-
-varying vec2 v_uv;
-
-uniform vec2 uResolution;
-uniform float uTime;
-uniform float uPulseStrength;
-uniform float uGlowStrength;
-uniform float uParallaxStrength;
-uniform float uGridDensity;
-uniform float uTileRoundness;
-uniform float uContrast;
-uniform float uTextSafeVignette;
-uniform float uQualityScale;
-uniform float uReducedMotion;
-
-float hash21(vec2 p) {
-  return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
+function clamp(value: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, value));
 }
 
-float roundedBoxSdf(vec2 p, vec2 b, float r) {
-  vec2 q = abs(p) - b + r;
-  return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - r;
+function smoothstep(edge0: number, edge1: number, x: number) {
+  const t = clamp((x - edge0) / (edge1 - edge0), 0, 1);
+  return t * t * (3 - 2 * t);
 }
 
-float smoothPulse(float t, float start, float end) {
-  float rise = smoothstep(start, mix(start, end, 0.48), t);
-  float fall = 1.0 - smoothstep(mix(start, end, 0.54), end, t);
-  return clamp(rise * fall, 0.0, 1.0);
+function roundedRectPath(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  radius: number,
+) {
+  const r = Math.min(radius, width * 0.5, height * 0.5);
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + width, y, x + width, y + height, r);
+  ctx.arcTo(x + width, y + height, x, y + height, r);
+  ctx.arcTo(x, y + height, x, y, r);
+  ctx.arcTo(x, y, x + width, y, r);
+  ctx.closePath();
 }
 
-void main() {
-  vec2 uv = v_uv;
-  vec2 aspect = vec2(uResolution.x / max(uResolution.y, 1.0), 1.0);
-  float cycle = fract(uTime / 6.0);
-  float driftWave = sin(cycle * 6.28318530718);
-  float driftWaveB = sin(cycle * 6.28318530718 + 1.57079632679);
-  float reducedMotionMix = 1.0 - 0.72 * uReducedMotion;
+function createTiles(width: number, height: number): TileDefinition[] {
+  const shortSide = Math.min(width, height);
+  const tileWidth = shortSide * 0.18;
+  const tileHeight = tileWidth * 0.72;
+  const columnStep = tileWidth * 0.88;
+  const rowStep = tileHeight * 0.9;
+  const skew = tileWidth * 0.22;
+  const tiles: TileDefinition[] = [];
 
-  vec2 sceneUv = uv - 0.5;
-  sceneUv.x *= aspect.x;
-  sceneUv += vec2(
-    driftWave * 0.026 * uParallaxStrength,
-    driftWaveB * 0.018 * uParallaxStrength
-  ) * reducedMotionMix;
+  for (let row = -1; row < 6; row += 1) {
+    for (let col = -1; col < 8; col += 1) {
+      const seed = (row * 17 + col * 29 + 101) % 13;
+      const contour = seed % 4 === 0 || (row === 2 && col === 4) || (row === 3 && col === 2);
+      const bright = seed % 5 === 0 || (row === 2 && col === 2);
+      const scale = contour ? 1.16 : bright ? 0.94 : 1;
+      const raised = contour ? 0.18 : bright ? 0.1 : 0.13;
 
-  vec2 iso = vec2(sceneUv.x + sceneUv.y * 0.58, sceneUv.y * 0.68);
-  float gridScale = mix(6.2, 9.2, clamp((uGridDensity - 5.5) / 4.5, 0.0, 1.0));
-  vec2 gridPos = iso * gridScale;
-  vec2 cellId = floor(gridPos);
-  vec2 cellUv = fract(gridPos) - 0.5;
-
-  float tileSeed = hash21(cellId);
-  float tileSeedB = hash21(cellId + vec2(19.7, 3.1));
-  float isLargeTile = step(0.82, tileSeed);
-  vec2 tileSize = mix(vec2(0.405, 0.405), vec2(0.465, 0.455), isLargeTile);
-  float roundness = mix(0.1, 0.28, clamp(uTileRoundness, 0.0, 1.0));
-  float tileSdf = roundedBoxSdf(cellUv, tileSize, roundness);
-
-  float aa = max(0.0035, 1.25 / min(uResolution.x, uResolution.y));
-  float tileMask = 1.0 - smoothstep(-aa, aa, tileSdf);
-  float tileEdge = 1.0 - smoothstep(0.0, aa * 4.0, abs(tileSdf));
-
-  float topBand = smoothstep(-0.34, 0.2, cellUv.y);
-  float leftLight = smoothstep(-0.52, 0.22, -cellUv.x + cellUv.y * 0.15);
-  float bevel = mix(0.7, 1.18, topBand) * mix(0.9, 1.12, leftLight);
-  bevel *= 0.92 + 0.08 * sin((cellUv.x - cellUv.y) * 12.0 + tileSeedB * 6.2831);
-
-  float seamX = exp(-abs(cellUv.x) * 54.0);
-  float seamY = exp(-abs(cellUv.y) * 54.0);
-  float seamField = max(seamX * 0.88, seamY);
-
-  float lanePhase = fract(cycle + tileSeed * 0.24);
-  float seamTravel = sin((cellId.x + cellId.y) * 0.92 + cycle * 6.28318530718);
-  float seamPulse = smoothPulse(lanePhase, 0.08, 0.82) * (0.5 + 0.5 * seamTravel);
-  seamPulse *= uPulseStrength * reducedMotionMix;
-
-  float activationSelector = step(0.68, tileSeedB);
-  float activationWindowA = smoothPulse(fract(cycle + tileSeed * 0.23), 0.14, 0.56);
-  float activationWindowB = smoothPulse(fract(cycle + tileSeed * 0.19 + 0.33), 0.42, 0.9);
-  float activation = max(activationWindowA, activationWindowB) * activationSelector;
-  activation *= (0.65 + 0.35 * isLargeTile) * uPulseStrength * reducedMotionMix;
-
-  float contourFreq = mix(16.0, 24.0, isLargeTile);
-  float contourOffset = fract((cellUv.y + 0.5) * contourFreq - cycle * 1.8 - tileSeed * 5.0);
-  float contourBand = smoothstep(0.0, 0.16, contourOffset) * (1.0 - smoothstep(0.24, 0.42, contourOffset));
-  float contourEnvelope = smoothstep(-0.02, 0.18, -tileSdf) * smoothstep(0.22, -0.16, tileSdf);
-  float contourEcho = contourBand * contourEnvelope * activation;
-
-  vec3 deep = vec3(0.025, 0.03, 0.09);
-  vec3 violet = vec3(0.19, 0.12, 0.48);
-  vec3 magenta = vec3(0.88, 0.13, 0.72);
-  vec3 hot = vec3(0.98, 0.82, 1.0);
-  vec3 blue = vec3(0.19, 0.35, 0.94);
-
-  float backgroundLift = 0.18 + 0.16 * driftWaveB;
-  vec3 color = mix(deep, violet, smoothstep(-0.58, 0.72, sceneUv.x + sceneUv.y * 0.36 + backgroundLift));
-  color = mix(color, magenta, smoothstep(0.0, 0.9, 0.65 - sceneUv.y + sceneUv.x * 0.42));
-
-  float seamGlow = seamField * (0.24 + seamPulse * 0.95);
-  color += mix(violet, blue, 0.55) * seamGlow * 0.45;
-
-  vec3 tileBase = mix(vec3(0.11, 0.08, 0.24), vec3(0.36, 0.29, 0.72), 0.24 + 0.42 * tileSeed);
-  vec3 activeFace = mix(vec3(0.5, 0.26, 0.78), hot, activation * 0.78);
-  vec3 tileColor = mix(tileBase, activeFace, activation * 0.72);
-  tileColor *= bevel;
-  tileColor += vec3(0.22, 0.14, 0.36) * tileEdge * 0.28;
-  tileColor += hot * contourEcho * 0.7;
-
-  float rim = exp(-abs(tileSdf) * 38.0) * tileMask;
-  float underGlow = exp(-abs(tileSdf - 0.02) * 26.0) * activation;
-  tileColor += mix(magenta, hot, 0.54) * rim * (0.32 + uGlowStrength * 0.38);
-  tileColor += mix(blue, magenta, 0.64) * underGlow * (0.2 + uGlowStrength * 0.22);
-
-  color = mix(color, tileColor, tileMask);
-  color += hot * rim * seamPulse * 0.16;
-
-  float copySafe = 1.0 - smoothstep(0.18, 0.74, distance(uv, vec2(0.28, 0.53)));
-  float copySide = 1.0 - smoothstep(0.18, 0.72, uv.x);
-  float textSafe = copySafe * copySide * uTextSafeVignette;
-  color *= 1.0 - textSafe * 0.42;
-  color = mix(color, color * 0.92 + deep * 0.08, textSafe * 0.28);
-
-  float frameVignette = smoothstep(1.18, 0.28, length(vec2((uv.x - 0.5) * aspect.x, uv.y - 0.52)));
-  color *= mix(0.88, 1.0, frameVignette);
-
-  color = pow(max(color, 0.0), vec3(0.92));
-  color = mix(vec3(0.5), color, uContrast);
-
-  gl_FragColor = vec4(color, 1.0);
-}
-`;
-
-function createShader(gl: WebGLRenderingContext, type: number, source: string) {
-  const shader = gl.createShader(type);
-  if (!shader) {
-    return null;
-  }
-
-  gl.shaderSource(shader, source);
-  gl.compileShader(shader);
-
-  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    console.error(gl.getShaderInfoLog(shader));
-    gl.deleteShader(shader);
-    return null;
-  }
-
-  return shader;
-}
-
-function createProgram(gl: WebGLRenderingContext) {
-  const vertexShader = createShader(gl, gl.VERTEX_SHADER, VERTEX_SHADER_SOURCE);
-  const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, FRAGMENT_SHADER_SOURCE);
-
-  if (!vertexShader || !fragmentShader) {
-    if (vertexShader) {
-      gl.deleteShader(vertexShader);
+      tiles.push({
+        x: col * columnStep + row * skew + width * 0.04,
+        y: row * rowStep + height * 0.12,
+        w: tileWidth * scale,
+        h: tileHeight * scale,
+        height: raised,
+        phase: seed * 0.17 + row * 0.11 + col * 0.07,
+        contour,
+        bright,
+      });
     }
-    if (fragmentShader) {
-      gl.deleteShader(fragmentShader);
+  }
+
+  return tiles;
+}
+
+function drawTile(
+  ctx: CanvasRenderingContext2D,
+  tile: TileDefinition,
+  height: number,
+  cycle: number,
+  driftX: number,
+  driftY: number,
+  uniforms: typeof DEFAULT_UNIFORMS,
+  reducedMotion: boolean,
+) {
+  const pulseBase = 0.5 + 0.5 * Math.sin(cycle * Math.PI * 2 + tile.phase * Math.PI * 2);
+  const pulse = smoothstep(0.22, 0.96, pulseBase) * uniforms.uPulseStrength;
+  const motionScale = reducedMotion ? 0.26 : 1;
+  const x = tile.x + driftX * (0.38 + tile.phase * 0.18) * motionScale;
+  const y = tile.y + driftY * (0.3 + tile.phase * 0.14) * motionScale;
+  const depth = Math.max(10, tile.h * tile.height * height * 0.0012);
+  const radius = tile.h * (0.19 + uniforms.uTileRoundness * 0.16);
+
+  const glowAlpha = (0.1 + pulse * 0.34) * uniforms.uGlowStrength;
+  const seamAlpha = 0.14 + pulse * 0.4;
+
+  const underGlow = ctx.createRadialGradient(
+    x + tile.w * 0.54,
+    y + tile.h + depth * 0.8,
+    0,
+    x + tile.w * 0.54,
+    y + tile.h + depth * 0.8,
+    tile.w * 0.92,
+  );
+  underGlow.addColorStop(0, `rgba(255, 104, 238, ${glowAlpha})`);
+  underGlow.addColorStop(0.52, `rgba(97, 65, 255, ${glowAlpha * 0.46})`);
+  underGlow.addColorStop(1, "rgba(97, 65, 255, 0)");
+  ctx.fillStyle = underGlow;
+  ctx.fillRect(x - tile.w * 0.45, y + tile.h * 0.45, tile.w * 1.8, tile.h * 1.5);
+
+  const sideGradient = ctx.createLinearGradient(x, y + depth, x + tile.w, y + tile.h + depth);
+  sideGradient.addColorStop(0, "rgba(16, 10, 44, 0.7)");
+  sideGradient.addColorStop(0.45, `rgba(54, 24, 120, ${0.5 + pulse * 0.14})`);
+  sideGradient.addColorStop(1, `rgba(255, 78, 210, ${0.24 + pulse * 0.24})`);
+
+  roundedRectPath(ctx, x, y + depth, tile.w, tile.h, radius);
+  ctx.fillStyle = sideGradient;
+  ctx.fill();
+
+  if (tile.contour) {
+    ctx.save();
+    roundedRectPath(ctx, x, y + depth, tile.w, tile.h, radius);
+    ctx.clip();
+    ctx.strokeStyle = `rgba(255, 210, 255, ${0.14 + pulse * 0.38})`;
+    ctx.lineWidth = Math.max(1, tile.h * 0.022);
+    const lineCount = 16;
+    for (let i = 0; i < lineCount; i += 1) {
+      const ly = y + depth + tile.h * (0.18 + i * 0.048);
+      ctx.beginPath();
+      ctx.moveTo(x + tile.w * 0.08, ly);
+      ctx.lineTo(x + tile.w * 0.92, ly);
+      ctx.stroke();
     }
-    return null;
+    ctx.restore();
   }
 
-  const program = gl.createProgram();
-  if (!program) {
-    gl.deleteShader(vertexShader);
-    gl.deleteShader(fragmentShader);
-    return null;
-  }
+  const faceGradient = ctx.createLinearGradient(x, y, x + tile.w, y + tile.h);
+  faceGradient.addColorStop(0, tile.bright ? "rgba(241, 225, 255, 0.98)" : "rgba(184, 142, 255, 0.94)");
+  faceGradient.addColorStop(0.45, tile.bright ? "rgba(214, 173, 255, 0.94)" : "rgba(132, 62, 222, 0.92)");
+  faceGradient.addColorStop(1, tile.bright ? "rgba(204, 86, 224, 0.9)" : "rgba(83, 28, 148, 0.94)");
 
-  gl.attachShader(program, vertexShader);
-  gl.attachShader(program, fragmentShader);
-  gl.linkProgram(program);
+  roundedRectPath(ctx, x, y, tile.w, tile.h, radius);
+  ctx.fillStyle = faceGradient;
+  ctx.fill();
 
-  gl.deleteShader(vertexShader);
-  gl.deleteShader(fragmentShader);
+  const specular = ctx.createRadialGradient(
+    x + tile.w * 0.24,
+    y + tile.h * 0.16,
+    0,
+    x + tile.w * 0.24,
+    y + tile.h * 0.16,
+    tile.w * 0.88,
+  );
+  specular.addColorStop(0, "rgba(255, 255, 255, 0.34)");
+  specular.addColorStop(0.42, "rgba(255, 255, 255, 0.08)");
+  specular.addColorStop(1, "rgba(255, 255, 255, 0)");
+  ctx.fillStyle = specular;
+  roundedRectPath(ctx, x, y, tile.w, tile.h, radius);
+  ctx.fill();
 
-  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-    gl.deleteProgram(program);
-    return null;
-  }
+  ctx.strokeStyle = `rgba(255, 228, 255, ${0.34 + pulse * 0.34})`;
+  ctx.lineWidth = Math.max(1.1, tile.h * 0.024);
+  roundedRectPath(ctx, x, y, tile.w, tile.h, radius);
+  ctx.stroke();
 
-  return program;
+  const seamGlow = ctx.createLinearGradient(x, y + tile.h, x + tile.w, y + tile.h + depth);
+  seamGlow.addColorStop(0, `rgba(141, 99, 255, ${seamAlpha * 0.28})`);
+  seamGlow.addColorStop(0.5, `rgba(255, 164, 255, ${seamAlpha})`);
+  seamGlow.addColorStop(1, `rgba(102, 132, 255, ${seamAlpha * 0.32})`);
+  ctx.strokeStyle = seamGlow;
+  ctx.lineWidth = Math.max(1, tile.h * 0.02);
+  roundedRectPath(ctx, x, y + depth, tile.w, tile.h, radius);
+  ctx.stroke();
 }
 
 export function LoopShaderCanvas({
@@ -235,9 +208,14 @@ export function LoopShaderCanvas({
 }: LoopShaderCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) {
+      return;
+    }
+
+    const ctx = canvas.getContext("2d", { alpha: true });
+    if (!ctx) {
       return;
     }
 
@@ -249,17 +227,14 @@ export function LoopShaderCanvas({
     let lastHeight = 0;
     let destroyed = false;
     let isDocumentVisible = document.visibilityState !== "hidden";
+    let tiles: TileDefinition[] = [];
 
-    const updateCanvasSize = (context: WebGLRenderingContext | CanvasRenderingContext2D | null) => {
+    const updateCanvasSize = () => {
       const rect = canvas.getBoundingClientRect();
       const viewportArea = rect.width * rect.height;
-      const adaptiveQuality =
-        viewportArea > 900000 ? 0.82 : viewportArea > 520000 ? 0.9 : 1.0;
-      const qualityScale = Math.max(
-        0.72,
-        Math.min(1.0, resolvedUniforms.uQualityScale * adaptiveQuality),
-      );
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.6) * qualityScale;
+      const adaptiveQuality = viewportArea > 900000 ? 0.82 : viewportArea > 520000 ? 0.92 : 1.0;
+      const qualityScale = Math.max(0.74, Math.min(1.0, resolvedUniforms.uQualityScale * adaptiveQuality));
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5) * qualityScale;
       const width = Math.max(1, Math.floor(rect.width * dpr));
       const height = Math.max(1, Math.floor(rect.height * dpr));
 
@@ -268,245 +243,11 @@ export function LoopShaderCanvas({
         lastHeight = height;
         canvas.width = width;
         canvas.height = height;
-        if (context && "viewport" in context) {
-          context.viewport(0, 0, width, height);
-        }
+        tiles = createTiles(width, height);
       }
     };
 
-    const draw2dFallback = (ctx: CanvasRenderingContext2D, timestamp: number) => {
-      updateCanvasSize(ctx);
-      const width = canvas.width;
-      const height = canvas.height;
-      const time = (timestamp - startTime) * 0.001;
-      const cycle = (time % 6) / 6;
-      const driftX = Math.sin(cycle * Math.PI * 2) * 18 * resolvedUniforms.uParallaxStrength;
-      const driftY = Math.cos(cycle * Math.PI * 2) * 14 * resolvedUniforms.uParallaxStrength;
-      const reducedMotionMix = reducedMotion ? 0.28 : 1.0;
-
-      ctx.clearRect(0, 0, width, height);
-      const bg = ctx.createLinearGradient(0, 0, width, height);
-      bg.addColorStop(0, "#13082a");
-      bg.addColorStop(0.42, "#34105a");
-      bg.addColorStop(1, "#86176e");
-      ctx.fillStyle = bg;
-      ctx.fillRect(0, 0, width, height);
-
-      const ambient = ctx.createRadialGradient(width * 0.26, height * 0.52, 0, width * 0.26, height * 0.52, width * 0.34);
-      ambient.addColorStop(0, "rgba(10, 8, 26, 0.78)");
-      ambient.addColorStop(1, "rgba(10, 8, 26, 0)");
-      ctx.fillStyle = ambient;
-      ctx.fillRect(0, 0, width, height);
-
-      const tileW = width / 7.2;
-      const tileH = tileW * 0.54;
-      const skewX = tileW * 0.28;
-      const rowGap = tileH * 0.72;
-      const colGap = tileW * 0.12;
-
-      for (let row = -1; row < 7; row += 1) {
-        for (let col = -1; col < 9; col += 1) {
-          const seed = (row * 37 + col * 19) % 17;
-          const x = col * (tileW + colGap) + row * skewX - tileW * 0.3 + driftX * reducedMotionMix;
-          const y = row * rowGap + driftY * reducedMotionMix;
-          const isLarge = seed % 7 === 0;
-          const w = isLarge ? tileW * 1.18 : tileW;
-          const h = isLarge ? tileH * 1.1 : tileH;
-          const r = h * 0.24;
-          const pulse = Math.max(0, Math.sin(cycle * Math.PI * 2 + seed * 0.7)) * (seed % 3 === 0 ? 1 : 0.35);
-
-          ctx.save();
-          ctx.translate(x, y);
-
-          const baseFill = ctx.createLinearGradient(0, 0, 0, h);
-          baseFill.addColorStop(0, `rgba(${150 + seed * 4}, ${110 + seed * 2}, ${255 - seed * 2}, 0.92)`);
-          baseFill.addColorStop(1, `rgba(${38 + seed * 2}, ${18 + seed}, ${78 + seed * 3}, 0.96)`);
-          ctx.fillStyle = baseFill;
-
-          ctx.beginPath();
-          ctx.roundRect(0, 0, w, h, r);
-          ctx.fill();
-
-          ctx.strokeStyle = `rgba(255, 220, 255, ${0.12 + pulse * 0.45})`;
-          ctx.lineWidth = Math.max(1, width / 700);
-          ctx.stroke();
-
-          if (pulse > 0.18) {
-            ctx.strokeStyle = `rgba(255, 195, 255, ${0.24 + pulse * 0.38})`;
-            for (let i = 0; i < 6; i += 1) {
-              const ly = h * 0.38 + i * (h * 0.055);
-              ctx.beginPath();
-              ctx.moveTo(w * 0.08, ly);
-              ctx.lineTo(w * 0.92, ly);
-              ctx.stroke();
-            }
-          }
-
-          const glow = ctx.createRadialGradient(w * 0.5, h * 0.86, 0, w * 0.5, h * 0.86, w * 0.7);
-          glow.addColorStop(0, `rgba(255, 110, 240, ${0.16 + pulse * 0.22})`);
-          glow.addColorStop(1, "rgba(255, 110, 240, 0)");
-          ctx.fillStyle = glow;
-          ctx.fillRect(-w * 0.2, h * 0.4, w * 1.4, h);
-
-          ctx.restore();
-        }
-      }
-    };
-
-    const gl = canvas.getContext("webgl", {
-      alpha: true,
-      antialias: false,
-      depth: false,
-      stencil: false,
-      preserveDrawingBuffer: false,
-      premultipliedAlpha: true,
-      powerPreference: "high-performance",
-    });
-
-    if (!gl) {
-      const ctx = canvas.getContext("2d");
-      if (!ctx) {
-        return;
-      }
-
-      const draw = (timestamp: number) => {
-        if (destroyed) {
-          return;
-        }
-
-        if (!isActive || !isDocumentVisible) {
-          pausedAt = timestamp;
-          return;
-        }
-
-        if (!startTime) {
-          startTime = timestamp;
-        } else if (pausedAt > 0) {
-          startTime += timestamp - pausedAt;
-          pausedAt = 0;
-        }
-
-        draw2dFallback(ctx, timestamp);
-        frameId = window.requestAnimationFrame(draw);
-      };
-
-      const handleVisibilityChange = () => {
-        isDocumentVisible = document.visibilityState !== "hidden";
-        if (isDocumentVisible && isActive) {
-          window.cancelAnimationFrame(frameId);
-          frameId = window.requestAnimationFrame(draw);
-        }
-      };
-
-      updateCanvasSize(ctx);
-      document.addEventListener("visibilitychange", handleVisibilityChange);
-      draw(performance.now());
-
-      return () => {
-        destroyed = true;
-        document.removeEventListener("visibilitychange", handleVisibilityChange);
-        window.cancelAnimationFrame(frameId);
-      };
-    }
-
-    const program = createProgram(gl);
-    if (!program) {
-      const ctx = canvas.getContext("2d");
-      if (!ctx) {
-        return;
-      }
-
-      const draw = (timestamp: number) => {
-        if (destroyed) {
-          return;
-        }
-
-        if (!isActive || !isDocumentVisible) {
-          pausedAt = timestamp;
-          return;
-        }
-
-        if (!startTime) {
-          startTime = timestamp;
-        } else if (pausedAt > 0) {
-          startTime += timestamp - pausedAt;
-          pausedAt = 0;
-        }
-
-        draw2dFallback(ctx, timestamp);
-        frameId = window.requestAnimationFrame(draw);
-      };
-
-      const handleVisibilityChange = () => {
-        isDocumentVisible = document.visibilityState !== "hidden";
-        if (isDocumentVisible && isActive) {
-          window.cancelAnimationFrame(frameId);
-          frameId = window.requestAnimationFrame(draw);
-        }
-      };
-
-      updateCanvasSize(ctx);
-      document.addEventListener("visibilitychange", handleVisibilityChange);
-      draw(performance.now());
-
-      return () => {
-        destroyed = true;
-        document.removeEventListener("visibilitychange", handleVisibilityChange);
-        window.cancelAnimationFrame(frameId);
-      };
-    }
-
-    const positionLocation = gl.getAttribLocation(program, "a_position");
-    const resolutionLocation = gl.getUniformLocation(program, "uResolution");
-    const timeLocation = gl.getUniformLocation(program, "uTime");
-    const pulseLocation = gl.getUniformLocation(program, "uPulseStrength");
-    const glowLocation = gl.getUniformLocation(program, "uGlowStrength");
-    const parallaxLocation = gl.getUniformLocation(program, "uParallaxStrength");
-    const gridLocation = gl.getUniformLocation(program, "uGridDensity");
-    const roundnessLocation = gl.getUniformLocation(program, "uTileRoundness");
-    const contrastLocation = gl.getUniformLocation(program, "uContrast");
-    const textSafeLocation = gl.getUniformLocation(program, "uTextSafeVignette");
-    const qualityLocation = gl.getUniformLocation(program, "uQualityScale");
-    const reducedMotionLocation = gl.getUniformLocation(program, "uReducedMotion");
-    const buffer = gl.createBuffer();
-
-    if (
-      !buffer ||
-      positionLocation < 0 ||
-      !resolutionLocation ||
-      !timeLocation ||
-      !pulseLocation ||
-      !glowLocation ||
-      !parallaxLocation ||
-      !gridLocation ||
-      !roundnessLocation ||
-      !contrastLocation ||
-      !textSafeLocation ||
-      !qualityLocation ||
-      !reducedMotionLocation
-    ) {
-      if (buffer) {
-        gl.deleteBuffer(buffer);
-      }
-      gl.deleteProgram(program);
-      return;
-    }
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.bufferData(
-      gl.ARRAY_BUFFER,
-      new Float32Array([
-        -1, -1,
-         1, -1,
-        -1,  1,
-        -1,  1,
-         1, -1,
-         1,  1,
-      ]),
-      gl.STATIC_DRAW,
-    );
-
-    const draw = (timestamp: number) => {
+    const drawFrame = (timestamp: number) => {
       if (destroyed) {
         return;
       }
@@ -523,48 +264,84 @@ export function LoopShaderCanvas({
         pausedAt = 0;
       }
 
-      updateCanvasSize(gl);
+      updateCanvasSize();
 
-      gl.useProgram(program);
-      gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-      gl.enableVertexAttribArray(positionLocation);
-      gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
-      gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
-      gl.uniform1f(timeLocation, (timestamp - startTime) * 0.001);
-      gl.uniform1f(pulseLocation, resolvedUniforms.uPulseStrength);
-      gl.uniform1f(glowLocation, resolvedUniforms.uGlowStrength);
-      gl.uniform1f(parallaxLocation, resolvedUniforms.uParallaxStrength);
-      gl.uniform1f(gridLocation, resolvedUniforms.uGridDensity);
-      gl.uniform1f(roundnessLocation, resolvedUniforms.uTileRoundness);
-      gl.uniform1f(contrastLocation, resolvedUniforms.uContrast);
-      gl.uniform1f(textSafeLocation, resolvedUniforms.uTextSafeVignette);
-      gl.uniform1f(qualityLocation, resolvedUniforms.uQualityScale);
-      gl.uniform1f(reducedMotionLocation, reducedMotion ? 1.0 : 0.0);
-      gl.clearColor(0.0, 0.0, 0.0, 0.0);
-      gl.clear(gl.COLOR_BUFFER_BIT);
-      gl.drawArrays(gl.TRIANGLES, 0, 6);
+      const width = canvas.width;
+      const height = canvas.height;
+      const time = (timestamp - startTime) * 0.001;
+      const cycle = (time % 6) / 6;
+      const motionScale = reducedMotion ? 0.26 : 1.0;
+      const driftX = Math.sin(cycle * Math.PI * 2) * width * 0.014 * resolvedUniforms.uParallaxStrength * motionScale;
+      const driftY = Math.cos(cycle * Math.PI * 2 + 0.4) * height * 0.01 * resolvedUniforms.uParallaxStrength * motionScale;
 
-      frameId = window.requestAnimationFrame(draw);
+      ctx.clearRect(0, 0, width, height);
+
+      const bg = ctx.createLinearGradient(0, 0, width, height);
+      bg.addColorStop(0, "#150723");
+      bg.addColorStop(0.36, "#32105b");
+      bg.addColorStop(0.76, "#5c146c");
+      bg.addColorStop(1, "#a7197f");
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, width, height);
+
+      const leftGlow = ctx.createRadialGradient(width * 0.1, height * 0.2, 0, width * 0.1, height * 0.2, width * 0.42);
+      leftGlow.addColorStop(0, "rgba(193, 67, 255, 0.42)");
+      leftGlow.addColorStop(0.34, "rgba(126, 47, 255, 0.16)");
+      leftGlow.addColorStop(1, "rgba(126, 47, 255, 0)");
+      ctx.fillStyle = leftGlow;
+      ctx.fillRect(0, 0, width, height);
+
+      const rightGlow = ctx.createRadialGradient(width * 0.82, height * 0.78, 0, width * 0.82, height * 0.78, width * 0.44);
+      rightGlow.addColorStop(0, "rgba(255, 46, 187, 0.44)");
+      rightGlow.addColorStop(0.36, "rgba(255, 46, 187, 0.16)");
+      rightGlow.addColorStop(1, "rgba(255, 46, 187, 0)");
+      ctx.fillStyle = rightGlow;
+      ctx.fillRect(0, 0, width, height);
+
+      ctx.strokeStyle = "rgba(255, 190, 255, 0.42)";
+      ctx.lineWidth = Math.max(1, width * 0.0016);
+      for (let i = 0; i < tiles.length; i += 1) {
+        const tile = tiles[i];
+        const x = tile.x + driftX * 0.22;
+        const y = tile.y + driftY * 0.18;
+        ctx.strokeRect(x + tile.w * 0.03, y + tile.h * 0.65, tile.w * 0.96, tile.h * 0.7);
+      }
+
+      for (const tile of tiles) {
+        drawTile(ctx, tile, height, cycle, driftX, driftY, resolvedUniforms, reducedMotion);
+      }
+
+      const textSafe = ctx.createRadialGradient(width * 0.28, height * 0.46, 0, width * 0.28, height * 0.46, width * 0.28);
+      textSafe.addColorStop(0, `rgba(9, 8, 22, ${0.54 * resolvedUniforms.uTextSafeVignette})`);
+      textSafe.addColorStop(1, "rgba(9, 8, 22, 0)");
+      ctx.fillStyle = textSafe;
+      ctx.fillRect(0, 0, width, height);
+
+      const vignette = ctx.createRadialGradient(width * 0.5, height * 0.48, width * 0.2, width * 0.5, height * 0.48, width * 0.74);
+      vignette.addColorStop(0, "rgba(0, 0, 0, 0)");
+      vignette.addColorStop(1, "rgba(4, 6, 18, 0.44)");
+      ctx.fillStyle = vignette;
+      ctx.fillRect(0, 0, width, height);
+
+      frameId = window.requestAnimationFrame(drawFrame);
     };
 
     const handleVisibilityChange = () => {
       isDocumentVisible = document.visibilityState !== "hidden";
       if (isDocumentVisible && isActive) {
         window.cancelAnimationFrame(frameId);
-        frameId = window.requestAnimationFrame(draw);
+        drawFrame(performance.now());
       }
     };
 
-    updateCanvasSize(gl);
+    updateCanvasSize();
     document.addEventListener("visibilitychange", handleVisibilityChange);
-    draw(performance.now());
+    drawFrame(performance.now());
 
     return () => {
       destroyed = true;
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       window.cancelAnimationFrame(frameId);
-      gl.deleteBuffer(buffer);
-      gl.deleteProgram(program);
     };
   }, [isActive, reducedMotion, uniforms]);
 
