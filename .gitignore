@@ -1,6 +1,13 @@
 node_modules/
 dist/
 *.tsbuildinfo
+tmp-video-frames/
+/*-live.png
+/*-local.png
+vite.config.js
+vite.config.d.ts
+tailwind.config.js
+tailwind.config.d.ts
 .DS_Store
 Thumbs.db
 .env

@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, Play } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 const galleryAds = [
@@ -213,35 +213,6 @@ export function GalleryStage({ isActive = false }: GalleryStageProps = {}) {
           >
             <ChevronRight size={20} strokeWidth={2.4} />
           </button>
-        </div>
-
-        <div className="gallery-carousel__footer">
-          <div className="gallery-carousel__caption">
-            <div className="gallery-carousel__caption-row">
-              <span className="gallery-carousel__caption-title">{activeAd.title}</span>
-              <span className="gallery-carousel__caption-format">{activeAd.format}</span>
-            </div>
-            <p className="gallery-carousel__caption-copy">{activeAd.description}</p>
-          </div>
-
-          <div className="gallery-carousel__dots" aria-label="Choose an ad">
-            {galleryAds.map((ad, index) => (
-              <button
-                key={ad.id}
-                type="button"
-                className={`gallery-carousel__dot ${index === activeIndex ? "is-active" : ""}`.trim()}
-                onClick={() => goToSlide(index)}
-                aria-label={`Show ${ad.title}`}
-                aria-pressed={index === activeIndex}
-              >
-                <span className="gallery-carousel__dot-index">{String(index + 1).padStart(2, "0")}</span>
-                <span className="gallery-carousel__dot-copy">
-                  <Play size={12} strokeWidth={2.2} />
-                  {ad.title}
-                </span>
-              </button>
-            ))}
-          </div>
         </div>
       </div>
     </div>
