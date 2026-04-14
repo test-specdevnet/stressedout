@@ -1,5 +1,5 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { GlassButton } from "../components/GlassButton";
 
@@ -83,6 +83,7 @@ const pricingCards: PricingCard[] = [
 export function PricingStage() {
   const [cardsPerPage, setCardsPerPage] = useState(3);
   const [activePage, setActivePage] = useState(0);
+  const viewportRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -126,8 +127,57 @@ export function PricingStage() {
   }, [cardsPerPage]);
 
   const safeActivePage = activePage % pages.length;
+
+  useEffect(() => {
+    const viewport = viewportRef.current;
+
+    if (!viewport) {
+      return;
+    }
+
+    viewport.scrollTo({
+      left: 0,
+      behavior: "auto",
+    });
+  }, [cardsPerPage]);
+
+  useEffect(() => {
+    const viewport = viewportRef.current;
+
+    if (!viewport) {
+      return undefined;
+    }
+
+    let animationFrame = 0;
+
+    const handleScroll = () => {
+      cancelAnimationFrame(animationFrame);
+      animationFrame = window.requestAnimationFrame(() => {
+        const nextPage = Math.round(viewport.scrollLeft / Math.max(viewport.clientWidth, 1));
+        setActivePage((currentPage) => (currentPage === nextPage ? currentPage : nextPage));
+      });
+    };
+
+    viewport.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      cancelAnimationFrame(animationFrame);
+      viewport.removeEventListener("scroll", handleScroll);
+    };
+  }, [pages.length]);
+
   function goToPage(index: number) {
-    setActivePage((index + pages.length) % pages.length);
+    const nextPage = (index + pages.length) % pages.length;
+    const viewport = viewportRef.current;
+
+    setActivePage(nextPage);
+
+    if (viewport) {
+      viewport.scrollTo({
+        left: nextPage * viewport.clientWidth,
+        behavior: "smooth",
+      });
+    }
   }
 
   function goToPreviousPage() {
@@ -154,29 +204,6 @@ export function PricingStage() {
     <div className="stage-layout stage-layout--pricing pricing-stage">
       <div className="pricing-stage__header">
         <h2 className="pricing-stage__heading">Pricing and Offerings</h2>
-        <div className="pricing-stage__controls">
-          <p className="pricing-stage__meta">
-            {String(safeActivePage + 1).padStart(2, "0")} / {String(pages.length).padStart(2, "0")}
-          </p>
-          <div className="pricing-stage__control-buttons">
-            <button
-              type="button"
-              className="gallery-carousel__arrow gallery-carousel__arrow--prev glass-nav"
-              onClick={goToPreviousPage}
-              aria-label="Show previous pricing cards"
-            >
-              <ChevronLeft size={20} strokeWidth={2.4} />
-            </button>
-            <button
-              type="button"
-              className="gallery-carousel__arrow gallery-carousel__arrow--next glass-nav"
-              onClick={goToNextPage}
-              aria-label="Show next pricing cards"
-            >
-              <ChevronRight size={20} strokeWidth={2.4} />
-            </button>
-          </div>
-        </div>
       </div>
 
       <div
@@ -195,41 +222,47 @@ export function PricingStage() {
           <ChevronLeft size={22} strokeWidth={2.5} />
         </button>
 
-        <div className="pricing-stage__viewport">
+        <div ref={viewportRef} className="pricing-stage__viewport">
           <div className="pricing-stage__track">
-            <div key={`pricing-page-${safeActivePage}`} className="pricing-stage__page is-active">
-              <div className="pricing-stage-grid">
-                {pages[safeActivePage].map((card) => (
-                  <article
-                    key={`${safeActivePage}-${card.title}`}
-                    className={`pricing-stage-card glass-panel ${card.featured ? "is-featured" : ""}`.trim()}
-                  >
-                    <span className="pricing-stage-card__badge">{card.badge}</span>
-                    <h3 className="pricing-stage-card__title">{card.title}</h3>
-                    <p className="pricing-stage-card__price">{card.price}</p>
-                    <p className="pricing-stage-card__description">{card.description}</p>
-
-                    <ul className="pricing-stage-card__bullets" aria-label={`${card.title} included features`}>
-                      {card.bullets.map((bullet) => (
-                        <li key={bullet}>{bullet}</li>
-                      ))}
-                    </ul>
-
-                    <GlassButton
-                      className="pricing-stage-card__cta"
-                      href={card.href}
-                      target="_blank"
-                      rel="noreferrer"
-                      variant="secondary"
+            {pages.map((pageCards, pageIndex) => (
+              <div
+                key={`pricing-page-${pageIndex}`}
+                className={`pricing-stage__page ${pageIndex === safeActivePage ? "is-active" : ""}`.trim()}
+                aria-hidden={pageIndex !== safeActivePage}
+              >
+                <div className="pricing-stage-grid">
+                  {pageCards.map((card) => (
+                    <article
+                      key={`${pageIndex}-${card.title}`}
+                      className={`pricing-stage-card glass-panel ${card.featured ? "is-featured" : ""}`.trim()}
                     >
-                      {card.ctaText}
-                    </GlassButton>
+                      <span className="pricing-stage-card__badge">{card.badge}</span>
+                      <h3 className="pricing-stage-card__title">{card.title}</h3>
+                      <p className="pricing-stage-card__price">{card.price}</p>
+                      <p className="pricing-stage-card__description">{card.description}</p>
 
-                    <p className="pricing-stage-card__note">{card.note}</p>
-                  </article>
-                ))}
+                      <ul className="pricing-stage-card__bullets" aria-label={`${card.title} included features`}>
+                        {card.bullets.map((bullet) => (
+                          <li key={bullet}>{bullet}</li>
+                        ))}
+                      </ul>
+
+                      <GlassButton
+                        className="pricing-stage-card__cta"
+                        href={card.href}
+                        target="_blank"
+                        rel="noreferrer"
+                        variant="secondary"
+                      >
+                        {card.ctaText}
+                      </GlassButton>
+
+                      <p className="pricing-stage-card__note">{card.note}</p>
+                    </article>
+                  ))}
+                </div>
               </div>
-            </div>
+            ))}
           </div>
         </div>
 
