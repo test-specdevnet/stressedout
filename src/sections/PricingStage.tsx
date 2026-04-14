@@ -81,7 +81,7 @@ const pricingCards: PricingCard[] = [
 ];
 
 export function PricingStage() {
-  const [cardsPerPage, setCardsPerPage] = useState(2);
+  const [cardsPerPage, setCardsPerPage] = useState(3);
   const [activePage, setActivePage] = useState(0);
 
   useEffect(() => {
@@ -92,7 +92,7 @@ export function PricingStage() {
     const mediaQuery = window.matchMedia("(max-width: 760px)");
 
     function syncCardsPerPage(event?: MediaQueryList | MediaQueryListEvent) {
-      setCardsPerPage(event?.matches ?? mediaQuery.matches ? 1 : 2);
+      setCardsPerPage(event?.matches ?? mediaQuery.matches ? 1 : 3);
     }
 
     syncCardsPerPage(mediaQuery);
@@ -110,13 +110,19 @@ export function PricingStage() {
   }, []);
 
   const pages = useMemo(() => {
-    const grouped: PricingCard[][] = [];
-
-    for (let index = 0; index < pricingCards.length; index += cardsPerPage) {
-      grouped.push(pricingCards.slice(index, index + cardsPerPage));
+    if (cardsPerPage >= pricingCards.length) {
+      return [pricingCards];
     }
 
-    return grouped;
+    if (cardsPerPage === 1) {
+      return pricingCards.map((card) => [card]);
+    }
+
+    const lastStartIndex = pricingCards.length - cardsPerPage;
+
+    return Array.from({ length: lastStartIndex + 1 }, (_, pageIndex) =>
+      pricingCards.slice(pageIndex, pageIndex + cardsPerPage),
+    );
   }, [cardsPerPage]);
 
   const safeActivePage = activePage % pages.length;
@@ -180,55 +186,61 @@ export function PricingStage() {
         aria-roledescription="carousel"
         aria-label={`Pricing carousel showing page ${safeActivePage + 1} of ${pages.length}`}
       >
+        <button
+          type="button"
+          className="pricing-stage__arrow pricing-stage__arrow--prev gallery-carousel__arrow gallery-carousel__arrow--prev glass-nav"
+          onClick={goToPreviousPage}
+          aria-label="Show previous pricing cards"
+        >
+          <ChevronLeft size={22} strokeWidth={2.5} />
+        </button>
+
         <div className="pricing-stage__viewport">
           <div className="pricing-stage__track">
-            {pages.map((pageCards, pageIndex) => {
-              const isCurrent = pageIndex === safeActivePage;
-              const offset = pageIndex - safeActivePage;
+            <div key={`pricing-page-${safeActivePage}`} className="pricing-stage__page is-active">
+              <div className="pricing-stage-grid">
+                {pages[safeActivePage].map((card) => (
+                  <article
+                    key={`${safeActivePage}-${card.title}`}
+                    className={`pricing-stage-card glass-panel ${card.featured ? "is-featured" : ""}`.trim()}
+                  >
+                    <span className="pricing-stage-card__badge">{card.badge}</span>
+                    <h3 className="pricing-stage-card__title">{card.title}</h3>
+                    <p className="pricing-stage-card__price">{card.price}</p>
+                    <p className="pricing-stage-card__description">{card.description}</p>
 
-              return (
-                <div
-                  key={`pricing-page-${pageIndex}`}
-                  className={`pricing-stage__page ${isCurrent ? "is-active" : ""}`.trim()}
-                  data-offset={offset}
-                  aria-hidden={!isCurrent}
-                >
-                  <div className="pricing-stage-grid">
-                    {pageCards.map((card) => (
-                      <article
-                        key={card.title}
-                        className={`pricing-stage-card glass-panel ${card.featured ? "is-featured" : ""}`.trim()}
-                      >
-                        <span className="pricing-stage-card__badge">{card.badge}</span>
-                        <h3 className="pricing-stage-card__title">{card.title}</h3>
-                        <p className="pricing-stage-card__price">{card.price}</p>
-                        <p className="pricing-stage-card__description">{card.description}</p>
+                    <ul className="pricing-stage-card__bullets" aria-label={`${card.title} included features`}>
+                      {card.bullets.map((bullet) => (
+                        <li key={bullet}>{bullet}</li>
+                      ))}
+                    </ul>
 
-                        <ul className="pricing-stage-card__bullets" aria-label={`${card.title} included features`}>
-                          {card.bullets.map((bullet) => (
-                            <li key={bullet}>{bullet}</li>
-                          ))}
-                        </ul>
+                    <GlassButton
+                      className="pricing-stage-card__cta"
+                      href={card.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      variant="secondary"
+                    >
+                      {card.ctaText}
+                    </GlassButton>
 
-                        <GlassButton
-                          className="pricing-stage-card__cta"
-                          href={card.href}
-                          target="_blank"
-                          rel="noreferrer"
-                          variant="secondary"
-                        >
-                          {card.ctaText}
-                        </GlassButton>
-
-                        <p className="pricing-stage-card__note">{card.note}</p>
-                      </article>
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
+                    <p className="pricing-stage-card__note">{card.note}</p>
+                  </article>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
+
+        <button
+          type="button"
+          className="pricing-stage__arrow pricing-stage__arrow--next gallery-carousel__arrow gallery-carousel__arrow--next glass-nav"
+          onClick={goToNextPage}
+          aria-label="Show next pricing cards"
+        >
+          <ChevronRight size={22} strokeWidth={2.5} />
+        </button>
 
         <div className="pricing-stage__dots" aria-hidden="true">
           {pages.map((_, pageIndex) => (
