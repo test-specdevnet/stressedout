@@ -1562,7 +1562,7 @@ section#hero .story-panel__meta {
 
 .pricing-stage-grid {
   align-items: stretch;
-  gap: 0.82rem;
+  gap: 0.76rem;
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
@@ -1608,7 +1608,7 @@ section#hero .story-panel__meta {
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
   border-radius: calc(var(--radius-xl) + 0.15rem);
-  padding: 0.14rem;
+  padding: 0.12rem;
 }
 
 .pricing-stage__viewport::-webkit-scrollbar {
@@ -1695,28 +1695,28 @@ section#hero .story-panel__meta {
 .pricing-stage-card {
   display: grid;
   align-content: start;
-  gap: 0.72rem;
+  gap: 0.64rem;
   min-height: 100%;
-  padding: 1.02rem;
+  padding: 1rem 0.98rem 0.94rem;
   border-radius: 1.5rem;
   background:
-    radial-gradient(circle at 18% 8%, rgba(255, 255, 255, 0.03), transparent 16%),
-    radial-gradient(circle at 84% 9%, rgba(140, 239, 255, 0.07), transparent 15%),
+    radial-gradient(circle at 18% 7%, rgba(255, 255, 255, 0.018), transparent 14%),
+    radial-gradient(circle at 84% 8%, rgba(140, 239, 255, 0.045), transparent 13%),
     linear-gradient(180deg, rgba(226, 216, 255, 0.88), rgba(171, 83, 255, 0.66) 32%, rgba(196, 52, 224, 0.7) 72%, rgba(173, 43, 193, 0.82)),
     rgba(255, 255, 255, 0.05);
   border-color: rgba(255, 255, 255, 0.18);
   box-shadow:
     0 24px 56px rgba(5, 9, 21, 0.36),
     0 8px 22px rgba(2, 8, 20, 0.22),
-    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
     inset 0 -18px 30px rgba(62, 21, 108, 0.16),
-    inset 0 10px 18px rgba(255, 255, 255, 0.02);
+    inset 0 8px 14px rgba(255, 255, 255, 0.012);
 }
 
 .pricing-stage-card.is-featured {
   background:
-    radial-gradient(circle at 18% 8%, rgba(255, 255, 255, 0.045), transparent 16%),
-    radial-gradient(circle at 84% 9%, rgba(140, 239, 255, 0.08), transparent 15%),
+    radial-gradient(circle at 18% 7%, rgba(255, 255, 255, 0.025), transparent 14%),
+    radial-gradient(circle at 84% 8%, rgba(140, 239, 255, 0.055), transparent 13%),
     linear-gradient(180deg, rgba(234, 225, 255, 0.92), rgba(144, 71, 255, 0.68) 30%, rgba(196, 52, 224, 0.74) 68%, rgba(145, 31, 194, 0.88)),
     rgba(255, 255, 255, 0.06);
   border-color: rgba(200, 247, 255, 0.4);
@@ -1724,16 +1724,17 @@ section#hero .story-panel__meta {
     0 28px 68px rgba(5, 9, 21, 0.42),
     0 0 0 1px rgba(140, 239, 255, 0.12),
     0 10px 26px rgba(2, 8, 20, 0.22),
-    inset 0 1px 0 rgba(255, 255, 255, 0.44),
-    inset 0 0 24px rgba(140, 239, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 0 18px rgba(140, 239, 255, 0.035),
     inset 0 -18px 30px rgba(62, 21, 108, 0.16),
-    inset 0 10px 18px rgba(255, 255, 255, 0.025);
+    inset 0 8px 14px rgba(255, 255, 255, 0.015);
 }
 
 .pricing-stage-card__badge {
   align-self: start;
   width: fit-content;
-  padding: 0.4rem 0.74rem;
+  margin-bottom: 0.08rem;
+  padding: 0.38rem 0.72rem;
   border-radius: var(--radius-pill);
   background:
     linear-gradient(180deg, rgba(245, 255, 158, 0.98), rgba(219, 255, 71, 0.96)),
@@ -1751,8 +1752,8 @@ section#hero .story-panel__meta {
 .pricing-stage-card__title {
   margin: 0;
   color: var(--bg-ink);
-  font-size: clamp(1.2rem, 1.25vw, 1.48rem);
-  line-height: 1;
+  font-size: clamp(1.18rem, 1.2vw, 1.42rem);
+  line-height: 0.98;
   letter-spacing: -0.04em;
   text-wrap: balance;
 }
@@ -1760,7 +1761,7 @@ section#hero .story-panel__meta {
 .pricing-stage-card__price {
   margin: 0;
   color: #fff;
-  font-size: clamp(2rem, 2.2vw, 2.7rem);
+  font-size: clamp(1.96rem, 2.1vw, 2.58rem);
   font-weight: 800;
   line-height: 0.9;
   letter-spacing: -0.065em;
@@ -1768,14 +1769,15 @@ section#hero .story-panel__meta {
 
 .pricing-stage-card__description {
   color: rgba(255, 255, 255, 0.9);
-  font-size: 0.84rem;
-  line-height: 1.4;
+  margin-top: 0.06rem;
+  font-size: 0.82rem;
+  line-height: 1.38;
 }
 
 .pricing-stage-card__bullets {
   display: grid;
-  gap: 0.46rem;
-  margin: 0;
+  gap: 0.42rem;
+  margin: 0.16rem 0 0;
   padding: 0;
   list-style: none;
 }
@@ -1784,8 +1786,8 @@ section#hero .story-panel__meta {
   position: relative;
   padding-left: 1rem;
   color: rgba(255, 255, 255, 0.92);
-  font-size: 0.78rem;
-  line-height: 1.34;
+  font-size: 0.77rem;
+  line-height: 1.32;
 }
 
 .pricing-stage-card__bullets li::before {
@@ -1803,7 +1805,8 @@ section#hero .story-panel__meta {
 .pricing-stage-card__cta.glass-button {
   justify-self: stretch;
   margin-top: auto;
-  padding: 0.76rem 0.88rem;
+  min-height: 3.2rem;
+  padding: 0.74rem 0.88rem;
   border: 0;
   background:
     linear-gradient(180deg, rgba(245, 255, 158, 0.98), rgba(223, 255, 74, 0.98) 48%, rgba(187, 244, 0, 0.98)),
@@ -1826,8 +1829,9 @@ section#hero .story-panel__meta {
 
 .pricing-stage-card__note {
   color: rgba(255, 255, 255, 0.82);
-  font-size: 0.72rem;
-  line-height: 1.34;
+  margin-top: 0.02rem;
+  font-size: 0.71rem;
+  line-height: 1.3;
 }
 
 @keyframes drift {
@@ -1905,8 +1909,8 @@ section#hero .story-panel__meta {
   }
 
   .pricing-stage-card {
-    padding: 1.08rem;
-    gap: 0.74rem;
+    padding: 1.02rem 0.96rem 0.92rem;
+    gap: 0.66rem;
   }
 
   .pricing-stage {
@@ -2186,8 +2190,8 @@ section#hero .story-panel__meta {
   }
 
   .pricing-stage-card {
-    padding: 1.02rem;
-    gap: 0.7rem;
+    padding: 1rem 0.94rem 0.9rem;
+    gap: 0.66rem;
     border-radius: 1.5rem;
   }
 
