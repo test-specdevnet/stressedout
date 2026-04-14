@@ -1,3 +1,6 @@
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+
 import { GlassButton } from "../components/GlassButton";
 
 type PricingCard = {
@@ -78,42 +81,167 @@ const pricingCards: PricingCard[] = [
 ];
 
 export function PricingStage() {
+  const [cardsPerPage, setCardsPerPage] = useState(2);
+  const [activePage, setActivePage] = useState(0);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return undefined;
+    }
+
+    const mediaQuery = window.matchMedia("(max-width: 760px)");
+
+    function syncCardsPerPage(event?: MediaQueryList | MediaQueryListEvent) {
+      setCardsPerPage(event?.matches ?? mediaQuery.matches ? 1 : 2);
+    }
+
+    syncCardsPerPage(mediaQuery);
+
+    const handleChange = (event: MediaQueryListEvent) => {
+      syncCardsPerPage(event);
+      setActivePage(0);
+    };
+
+    mediaQuery.addEventListener("change", handleChange);
+
+    return () => {
+      mediaQuery.removeEventListener("change", handleChange);
+    };
+  }, []);
+
+  const pages = useMemo(() => {
+    const grouped: PricingCard[][] = [];
+
+    for (let index = 0; index < pricingCards.length; index += cardsPerPage) {
+      grouped.push(pricingCards.slice(index, index + cardsPerPage));
+    }
+
+    return grouped;
+  }, [cardsPerPage]);
+
+  const safeActivePage = activePage % pages.length;
+  function goToPage(index: number) {
+    setActivePage((index + pages.length) % pages.length);
+  }
+
+  function goToPreviousPage() {
+    goToPage(safeActivePage - 1);
+  }
+
+  function goToNextPage() {
+    goToPage(safeActivePage + 1);
+  }
+
+  function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      goToNextPage();
+    }
+
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      goToPreviousPage();
+    }
+  }
+
   return (
     <div className="stage-layout stage-layout--pricing pricing-stage">
       <div className="pricing-stage__header">
         <h2 className="pricing-stage__heading">Pricing and Offerings</h2>
+        <div className="pricing-stage__controls">
+          <p className="pricing-stage__meta">
+            {String(safeActivePage + 1).padStart(2, "0")} / {String(pages.length).padStart(2, "0")}
+          </p>
+          <div className="pricing-stage__control-buttons">
+            <button
+              type="button"
+              className="gallery-carousel__arrow gallery-carousel__arrow--prev glass-nav"
+              onClick={goToPreviousPage}
+              aria-label="Show previous pricing cards"
+            >
+              <ChevronLeft size={20} strokeWidth={2.4} />
+            </button>
+            <button
+              type="button"
+              className="gallery-carousel__arrow gallery-carousel__arrow--next glass-nav"
+              onClick={goToNextPage}
+              aria-label="Show next pricing cards"
+            >
+              <ChevronRight size={20} strokeWidth={2.4} />
+            </button>
+          </div>
+        </div>
       </div>
 
-      <div className="pricing-stage-grid">
-        {pricingCards.map((card) => (
-          <article
-            key={card.title}
-            className={`pricing-stage-card glass-panel ${card.featured ? "is-featured" : ""}`.trim()}
-          >
-            <span className="pricing-stage-card__badge">{card.badge}</span>
-            <h3 className="pricing-stage-card__title">{card.title}</h3>
-            <p className="pricing-stage-card__price">{card.price}</p>
-            <p className="pricing-stage-card__description">{card.description}</p>
+      <div
+        className="pricing-stage__carousel"
+        tabIndex={0}
+        onKeyDown={handleKeyDown}
+        aria-roledescription="carousel"
+        aria-label={`Pricing carousel showing page ${safeActivePage + 1} of ${pages.length}`}
+      >
+        <div className="pricing-stage__viewport">
+          <div className="pricing-stage__track">
+            {pages.map((pageCards, pageIndex) => {
+              const isCurrent = pageIndex === safeActivePage;
+              const offset = pageIndex - safeActivePage;
 
-            <ul className="pricing-stage-card__bullets" aria-label={`${card.title} included features`}>
-              {card.bullets.map((bullet) => (
-                <li key={bullet}>{bullet}</li>
-              ))}
-            </ul>
+              return (
+                <div
+                  key={`pricing-page-${pageIndex}`}
+                  className={`pricing-stage__page ${isCurrent ? "is-active" : ""}`.trim()}
+                  data-offset={offset}
+                  aria-hidden={!isCurrent}
+                >
+                  <div className="pricing-stage-grid">
+                    {pageCards.map((card) => (
+                      <article
+                        key={card.title}
+                        className={`pricing-stage-card glass-panel ${card.featured ? "is-featured" : ""}`.trim()}
+                      >
+                        <span className="pricing-stage-card__badge">{card.badge}</span>
+                        <h3 className="pricing-stage-card__title">{card.title}</h3>
+                        <p className="pricing-stage-card__price">{card.price}</p>
+                        <p className="pricing-stage-card__description">{card.description}</p>
 
-            <GlassButton
-              className="pricing-stage-card__cta"
-              href={card.href}
-              target="_blank"
-              rel="noreferrer"
-              variant="secondary"
+                        <ul className="pricing-stage-card__bullets" aria-label={`${card.title} included features`}>
+                          {card.bullets.map((bullet) => (
+                            <li key={bullet}>{bullet}</li>
+                          ))}
+                        </ul>
+
+                        <GlassButton
+                          className="pricing-stage-card__cta"
+                          href={card.href}
+                          target="_blank"
+                          rel="noreferrer"
+                          variant="secondary"
+                        >
+                          {card.ctaText}
+                        </GlassButton>
+
+                        <p className="pricing-stage-card__note">{card.note}</p>
+                      </article>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="pricing-stage__dots" aria-hidden="true">
+          {pages.map((_, pageIndex) => (
+            <button
+              key={`pricing-dot-${pageIndex}`}
+              type="button"
+              className={`pricing-stage__dot ${pageIndex === safeActivePage ? "is-active" : ""}`.trim()}
+              onClick={() => goToPage(pageIndex)}
             >
-              {card.ctaText}
-            </GlassButton>
-
-            <p className="pricing-stage-card__note">{card.note}</p>
-          </article>
-        ))}
+              <span className="sr-only">Show pricing page {pageIndex + 1}</span>
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );
