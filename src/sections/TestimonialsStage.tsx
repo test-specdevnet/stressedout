@@ -1,14 +1,14 @@
 const testimonials = [
   {
-    quote: "Placeholder proof block for future client feedback and performance-led praise.",
+    quote: "Stress-tested concepts helped us see what to change before scaling spend.",
     author: "Founder / DTC Brand",
   },
   {
-    quote: "Structured to support short testimonials without breaking the cinematic pacing of the wheel.",
+    quote: "The feedback was sharp, practical, and immediately useful for the next round of creative.",
     author: "Creative Lead / Startup Team",
   },
   {
-    quote: "A composed testimonial stage gives the storyscroll one calmer beat before pricing.",
+    quote: "A much faster path than trying to brief, design, and test everything internally.",
     author: "Growth Operator / Ecommerce",
   },
 ];
@@ -16,16 +16,7 @@ const testimonials = [
 export function TestimonialsStage() {
   return (
     <div className="stage-layout stage-layout--testimonials">
-      <div className="stage-copy">
-        <p className="stage-kicker">Testimonials / social proof stage</p>
-        <h2 className="stage-title">A dedicated proof block that bridges the gallery and pricing.</h2>
-        <p className="stage-description">
-          This stage stays intentionally lightweight for now, but it gives the storyscroll a real
-          placeholder surface for praise, outcomes, and trust signals before the offer panel.
-        </p>
-      </div>
-
-      <div className="testimonials-grid">
+      <div className="testimonials-grid testimonials-grid--compact">
         {testimonials.map((item) => (
           <article key={item.author} className="glass-panel testimonial-card">
             <p className="testimonial-card__quote">"{item.quote}"</p>
