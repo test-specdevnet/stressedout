@@ -642,7 +642,7 @@ section#hero .story-panel__surface {
 .stage-layout--hero,
 .stage-layout--split,
 .stage-layout--contact {
-  grid-template-columns: minmax(0, 1.02fr) minmax(0, 0.98fr);
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
 }
 
 .stage-layout--hero {
@@ -1575,7 +1575,7 @@ section#hero .story-panel__meta {
   align-content: start;
   justify-items: start;
   gap: 1rem;
-  max-width: 28rem;
+  max-width: 30rem;
 }
 
 .contact-stage__title {
@@ -1586,8 +1586,8 @@ section#hero .story-panel__meta {
 }
 
 .contact-stage__logo {
-  width: min(100%, 17.5rem);
-  margin-top: 0.55rem;
+  width: min(100%, 19.25rem);
+  margin-top: 0.15rem;
   margin-left: 1.2rem;
   object-fit: contain;
   filter:
@@ -1598,6 +1598,9 @@ section#hero .story-panel__meta {
 .contact-form-shell {
   display: grid;
   align-self: stretch;
+  justify-self: start;
+  width: min(100%, 36.5rem);
+  margin-left: -0.7rem;
   border-radius: calc(var(--radius-xl) + 0.15rem);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02)),
@@ -2063,8 +2066,14 @@ section#hero .story-panel__meta {
   }
 
   .contact-stage__logo {
-    width: min(100%, 15.5rem);
-    margin-left: 0.8rem;
+    width: min(100%, 17rem);
+    margin-top: 0.1rem;
+    margin-left: 0.95rem;
+  }
+
+  .contact-form-shell {
+    width: min(100%, 34.5rem);
+    margin-left: -0.3rem;
   }
 
   .pricing-stage {
