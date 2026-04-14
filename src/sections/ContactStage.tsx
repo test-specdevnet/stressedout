@@ -1,4 +1,4 @@
-import { Mail, Phone } from "lucide-react";
+import { Mail } from "lucide-react";
 import { useState } from "react";
 
 type ContactFormState = {
@@ -17,7 +17,7 @@ const initialFormState: ContactFormState = {
   message: "",
 };
 
-const CONTACT_EMAIL = "hello@stressedoutadvertising.com";
+const CONTACT_EMAIL = "hello@stressoutadvertising.com";
 
 export function ContactStage() {
   const [formState, setFormState] = useState<ContactFormState>(initialFormState);
@@ -52,24 +52,9 @@ export function ContactStage() {
     <div className="stage-layout stage-layout--contact contact-stage">
       <div className="stage-copy contact-stage__copy">
         <h2 className="stage-title contact-stage__title">Connect with Our Team</h2>
-        <p className="stage-description contact-stage__description">
-          Tell us what you want stress-tested or built next and we&apos;ll route it to the right
-          inbox with the details already formatted.
-        </p>
-
-        <div className="contact-stage__details">
-          <a className="contact-stage__detail glass-nav" href={`mailto:${CONTACT_EMAIL}`}>
-            <Mail size={18} strokeWidth={2} />
-            <span>{CONTACT_EMAIL}</span>
-          </a>
-          <a className="contact-stage__detail glass-nav" href="tel:+16478086161">
-            <Phone size={18} strokeWidth={2} />
-            <span>+1 (647) 808-6161</span>
-          </a>
-        </div>
       </div>
 
-      <div className="glass-panel contact-form-shell">
+      <div className="contact-form-shell">
         <form className="contact-form" onSubmit={handleSubmit}>
           <label className="contact-form__field">
             <span className="sr-only">Name</span>
@@ -138,9 +123,7 @@ export function ContactStage() {
               <span>Submit</span>
               <Mail size={18} strokeWidth={2} />
             </button>
-            <p className="contact-form__helper">
-              {statusMessage || `Submitting opens your email app with a message drafted to ${CONTACT_EMAIL}.`}
-            </p>
+            {statusMessage ? <p className="contact-form__helper">{statusMessage}</p> : null}
           </div>
         </form>
       </div>
