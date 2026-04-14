@@ -52,6 +52,11 @@ export function ContactStage() {
     <div className="stage-layout stage-layout--contact contact-stage">
       <div className="stage-copy contact-stage__copy">
         <h2 className="stage-title contact-stage__title">Connect with Our Team</h2>
+        <img
+          className="contact-stage__logo"
+          src="/assets/stressed-out/images/logo-3.png"
+          alt="Stressed Out logo"
+        />
       </div>
 
       <div className="contact-form-shell">
