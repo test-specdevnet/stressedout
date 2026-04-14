@@ -1,25 +1,13 @@
-import { LoopShaderCanvas } from "../components/LoopShaderCanvas";
-
 type HeroStageProps = {
   isActive?: boolean;
   reducedMotion?: boolean;
 };
 
 export function HeroStage(props?: HeroStageProps) {
-  const isActive = props?.isActive ?? false;
-  const reducedMotion = props?.reducedMotion ?? false;
+  void props;
 
   return (
     <div className="hero-stage-shell">
-      <div className="hero-stage-shell__background" aria-hidden="true">
-        <LoopShaderCanvas
-          className="hero-stage-shell__shader"
-          isActive={isActive}
-          reducedMotion={reducedMotion}
-        />
-        <div className="hero-stage-shell__overlay hero-stage-shell__overlay--copy-safe" />
-      </div>
-
       <div className="stage-layout stage-layout--hero">
         <div className="stage-copy hero-copy">
           <div className="hero-welcome-panel glass-panel">
