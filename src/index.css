@@ -1902,15 +1902,17 @@ section#hero .story-panel__meta {
   scrollbar-width: none;
   border-radius: calc(var(--radius-xl) + 0.15rem);
   background:
-    radial-gradient(circle at 12% 0%, rgba(255, 255, 255, 0.08), transparent 0 18%),
-    radial-gradient(circle at 86% 12%, rgba(231, 57, 214, 0.1), transparent 0 18%),
-    linear-gradient(180deg, rgba(153, 112, 236, 0.12), rgba(69, 30, 129, 0.08) 72%, rgba(171, 83, 255, 0.18)),
-    rgba(39, 17, 75, 0.1);
+    radial-gradient(circle at 8% 6%, rgba(255, 255, 255, 0.08), transparent 0 14%),
+    radial-gradient(circle at 22% 18%, rgba(103, 37, 211, 0.18), transparent 0 28%),
+    radial-gradient(circle at 86% 14%, rgba(231, 57, 214, 0.14), transparent 0 24%),
+    radial-gradient(circle at 58% 84%, rgba(143, 52, 223, 0.14), transparent 0 30%),
+    linear-gradient(135deg, rgba(103, 37, 211, 0.14), rgba(143, 52, 223, 0.1) 48%, rgba(231, 57, 214, 0.14)),
+    rgba(52, 23, 98, 0.08);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.06),
-    inset 0 -18px 22px rgba(163, 61, 214, 0.1),
-    inset 0 0 24px rgba(143, 52, 223, 0.06);
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.04),
+    inset 0 -18px 22px rgba(163, 61, 214, 0.08),
+    inset 0 0 36px rgba(143, 52, 223, 0.08);
   padding: 0.12rem 0.12rem 0;
 }
 
@@ -2007,19 +2009,19 @@ section#hero .story-panel__meta {
   padding: 1rem 0.98rem 0.9rem;
   border-radius: 1.5rem;
   background:
-    radial-gradient(circle at 18% 7%, rgba(255, 255, 255, 0.06), transparent 0 14%),
-    radial-gradient(circle at 84% 8%, rgba(231, 57, 214, 0.09), transparent 0 14%),
-    linear-gradient(180deg, rgba(185, 145, 248, 0.2), rgba(121, 58, 203, 0.14) 18%, rgba(70, 32, 131, 0.1) 42%),
-    linear-gradient(135deg, rgba(103, 37, 211, 0.48), rgba(143, 52, 223, 0.42) 48%, rgba(231, 57, 214, 0.46)),
-    rgba(58, 25, 109, 0.16);
-  border-color: rgba(255, 255, 255, 0.22);
+    radial-gradient(circle at 18% 7%, rgba(255, 255, 255, 0.04), transparent 0 14%),
+    radial-gradient(circle at 84% 8%, rgba(231, 57, 214, 0.06), transparent 0 14%),
+    radial-gradient(circle at 20% 80%, rgba(103, 37, 211, 0.08), transparent 0 24%),
+    linear-gradient(180deg, rgba(155, 114, 236, 0.12), rgba(103, 48, 179, 0.08) 18%, rgba(61, 28, 116, 0.06) 42%),
+    linear-gradient(135deg, rgba(103, 37, 211, 0.24), rgba(143, 52, 223, 0.2) 48%, rgba(231, 57, 214, 0.22)),
+    rgba(64, 28, 121, 0.08);
+  border-color: rgba(255, 255, 255, 0.12);
   box-shadow:
-    0 28px 60px rgba(5, 9, 21, 0.38),
-    0 10px 24px rgba(2, 8, 20, 0.24),
-    inset 0 1px 0 rgba(255, 255, 255, 0.34),
-    inset 0 -18px 30px rgba(62, 21, 108, 0.18),
-    inset 0 8px 14px rgba(255, 255, 255, 0.03),
-    inset 0 0 28px rgba(231, 57, 214, 0.08);
+    0 18px 42px rgba(5, 9, 21, 0.22),
+    0 6px 18px rgba(2, 8, 20, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -14px 24px rgba(62, 21, 108, 0.12),
+    inset 0 0 22px rgba(231, 57, 214, 0.05);
   overflow: hidden;
   isolation: isolate;
   backdrop-filter: blur(var(--glass-blur-md)) saturate(var(--glass-sat-premium));
@@ -2037,35 +2039,35 @@ section#hero .story-panel__meta {
 
 .pricing-stage-card::before {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0.1) 16%, rgba(255, 255, 255, 0.02) 36%, transparent 64%),
-    radial-gradient(ellipse at 16% 0%, rgba(255, 255, 255, 0.22), transparent 0 42%);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.05) 16%, rgba(255, 255, 255, 0.015) 36%, transparent 64%),
+    radial-gradient(ellipse at 16% 0%, rgba(255, 255, 255, 0.12), transparent 0 42%);
   mix-blend-mode: screen;
 }
 
 .pricing-stage-card::after {
   inset: 1px;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.18),
-    inset 0 0 26px rgba(143, 52, 223, 0.1),
-    inset 0 0 48px rgba(231, 57, 214, 0.06);
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 0 20px rgba(143, 52, 223, 0.06),
+    inset 0 0 36px rgba(231, 57, 214, 0.03);
 }
 
 .pricing-stage-card.is-featured {
   background:
-    radial-gradient(circle at 18% 7%, rgba(255, 255, 255, 0.09), transparent 0 14%),
-    radial-gradient(circle at 84% 8%, rgba(231, 57, 214, 0.12), transparent 0 14%),
-    linear-gradient(180deg, rgba(200, 164, 249, 0.24), rgba(131, 63, 215, 0.16) 18%, rgba(75, 35, 139, 0.12) 42%),
-    linear-gradient(135deg, rgba(103, 37, 211, 0.56), rgba(143, 52, 223, 0.48) 48%, rgba(231, 57, 214, 0.56)),
-    rgba(69, 30, 129, 0.2);
-  border-color: rgba(238, 198, 255, 0.44);
+    radial-gradient(circle at 18% 7%, rgba(255, 255, 255, 0.06), transparent 0 14%),
+    radial-gradient(circle at 84% 8%, rgba(231, 57, 214, 0.1), transparent 0 14%),
+    radial-gradient(circle at 20% 80%, rgba(103, 37, 211, 0.1), transparent 0 24%),
+    linear-gradient(180deg, rgba(170, 130, 244, 0.14), rgba(114, 55, 194, 0.1) 18%, rgba(65, 30, 123, 0.08) 42%),
+    linear-gradient(135deg, rgba(103, 37, 211, 0.3), rgba(143, 52, 223, 0.26) 48%, rgba(231, 57, 214, 0.3)),
+    rgba(72, 32, 135, 0.1);
+  border-color: rgba(238, 198, 255, 0.22);
   box-shadow:
-    0 30px 72px rgba(5, 9, 21, 0.42),
-    0 0 0 1px rgba(231, 57, 214, 0.14),
-    0 10px 26px rgba(2, 8, 20, 0.22),
-    inset 0 1px 0 rgba(255, 255, 255, 0.38),
-    inset 0 0 20px rgba(231, 57, 214, 0.08),
-    inset 0 -18px 30px rgba(62, 21, 108, 0.18),
-    inset 0 8px 14px rgba(255, 255, 255, 0.03);
+    0 22px 50px rgba(5, 9, 21, 0.26),
+    0 0 0 1px rgba(231, 57, 214, 0.08),
+    0 8px 22px rgba(2, 8, 20, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 0 20px rgba(231, 57, 214, 0.05),
+    inset 0 -16px 26px rgba(62, 21, 108, 0.14);
 }
 
 .pricing-stage-card__badge {
