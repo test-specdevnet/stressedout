@@ -1577,74 +1577,77 @@ section#hero .story-panel__meta {
 
 .pricing-stage-grid {
   align-items: stretch;
+  gap: 0.82rem;
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .pricing-stage {
   align-content: start;
   justify-items: stretch;
-  gap: 1.1rem;
-  padding-top: 0.1rem;
+  gap: 0.82rem;
+  padding-top: 0;
 }
 
 .pricing-stage__header {
   display: flex;
   justify-content: flex-start;
+  align-items: flex-start;
 }
 
 .pricing-stage__heading {
   margin: 0;
-  max-width: 12ch;
+  max-width: none;
+  white-space: nowrap;
   color: var(--bg-ink);
   font-family: "Poppins", sans-serif;
-  font-size: clamp(2.1rem, 3.6vw, 3.75rem);
+  font-size: clamp(1.9rem, 2.8vw, 3.15rem);
   font-weight: 700;
-  line-height: 0.96;
-  letter-spacing: -0.06em;
+  line-height: 0.98;
+  letter-spacing: -0.045em;
 }
 
 .pricing-stage-card {
   display: grid;
   align-content: start;
-  gap: 0.95rem;
+  gap: 0.8rem;
   min-height: 100%;
-  padding: 1.45rem;
-  border-radius: 2rem;
+  padding: 1.2rem;
+  border-radius: 1.75rem;
   background:
-    radial-gradient(circle at 18% 12%, rgba(255, 255, 255, 0.18), transparent 20%),
-    radial-gradient(circle at 84% 10%, rgba(140, 239, 255, 0.14), transparent 18%),
+    radial-gradient(circle at 18% 10%, rgba(255, 255, 255, 0.1), transparent 18%),
+    radial-gradient(circle at 84% 10%, rgba(140, 239, 255, 0.1), transparent 16%),
     linear-gradient(180deg, rgba(226, 216, 255, 0.88), rgba(171, 83, 255, 0.66) 32%, rgba(196, 52, 224, 0.7) 72%, rgba(173, 43, 193, 0.82)),
     rgba(255, 255, 255, 0.05);
   border-color: rgba(255, 255, 255, 0.18);
   box-shadow:
-    0 28px 72px rgba(5, 9, 21, 0.42),
-    0 10px 26px rgba(2, 8, 20, 0.24),
-    inset 0 1px 0 rgba(255, 255, 255, 0.72),
+    0 24px 56px rgba(5, 9, 21, 0.36),
+    0 8px 22px rgba(2, 8, 20, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
     inset 0 -18px 30px rgba(62, 21, 108, 0.16),
-    inset 0 18px 26px rgba(255, 255, 255, 0.08);
+    inset 0 14px 20px rgba(255, 255, 255, 0.04);
 }
 
 .pricing-stage-card.is-featured {
   background:
-    radial-gradient(circle at 18% 12%, rgba(255, 255, 255, 0.2), transparent 20%),
-    radial-gradient(circle at 84% 10%, rgba(140, 239, 255, 0.16), transparent 18%),
+    radial-gradient(circle at 18% 10%, rgba(255, 255, 255, 0.12), transparent 18%),
+    radial-gradient(circle at 84% 10%, rgba(140, 239, 255, 0.12), transparent 16%),
     linear-gradient(180deg, rgba(234, 225, 255, 0.92), rgba(144, 71, 255, 0.68) 30%, rgba(196, 52, 224, 0.74) 68%, rgba(145, 31, 194, 0.88)),
     rgba(255, 255, 255, 0.06);
   border-color: rgba(200, 247, 255, 0.4);
   box-shadow:
-    0 32px 86px rgba(5, 9, 21, 0.48),
+    0 28px 68px rgba(5, 9, 21, 0.42),
     0 0 0 1px rgba(140, 239, 255, 0.12),
-    0 12px 30px rgba(2, 8, 20, 0.24),
-    inset 0 1px 0 rgba(255, 255, 255, 0.78),
-    inset 0 0 38px rgba(140, 239, 255, 0.12),
+    0 10px 26px rgba(2, 8, 20, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.66),
+    inset 0 0 28px rgba(140, 239, 255, 0.08),
     inset 0 -18px 30px rgba(62, 21, 108, 0.16),
-    inset 0 18px 26px rgba(255, 255, 255, 0.1);
+    inset 0 14px 20px rgba(255, 255, 255, 0.05);
 }
 
 .pricing-stage-card__badge {
   align-self: start;
   width: fit-content;
-  padding: 0.52rem 0.9rem;
+  padding: 0.46rem 0.82rem;
   border-radius: var(--radius-pill);
   background:
     linear-gradient(180deg, rgba(245, 255, 158, 0.98), rgba(219, 255, 71, 0.96)),
@@ -1662,29 +1665,30 @@ section#hero .story-panel__meta {
 .pricing-stage-card__title {
   margin: 0;
   color: var(--bg-ink);
-  font-size: clamp(1.55rem, 2.2vw, 2.1rem);
-  line-height: 1.02;
-  letter-spacing: -0.05em;
+  font-size: clamp(1.42rem, 1.7vw, 1.82rem);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
 }
 
 .pricing-stage-card__price {
   margin: 0;
   color: #fff;
-  font-size: clamp(2.6rem, 4vw, 4.05rem);
+  font-size: clamp(2.3rem, 3.2vw, 3.4rem);
   font-weight: 800;
   line-height: 0.92;
-  letter-spacing: -0.08em;
+  letter-spacing: -0.07em;
 }
 
 .pricing-stage-card__description {
   color: rgba(255, 255, 255, 0.9);
-  font-size: 0.98rem;
-  line-height: 1.62;
+  font-size: 0.94rem;
+  line-height: 1.5;
 }
 
 .pricing-stage-card__bullets {
   display: grid;
-  gap: 0.76rem;
+  gap: 0.62rem;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -1692,28 +1696,28 @@ section#hero .story-panel__meta {
 
 .pricing-stage-card__bullets li {
   position: relative;
-  padding-left: 1.25rem;
+  padding-left: 1.12rem;
   color: rgba(255, 255, 255, 0.92);
-  font-size: 0.94rem;
-  line-height: 1.56;
+  font-size: 0.88rem;
+  line-height: 1.46;
 }
 
 .pricing-stage-card__bullets li::before {
   content: "";
   position: absolute;
   left: 0;
-  top: 0.68rem;
-  width: 0.48rem;
-  height: 0.48rem;
+  top: 0.58rem;
+  width: 0.42rem;
+  height: 0.42rem;
   border-radius: 50%;
   background: linear-gradient(135deg, rgba(245, 255, 158, 0.98), rgba(219, 255, 71, 0.96));
-  box-shadow: 0 0 16px rgba(216, 255, 66, 0.34);
+  box-shadow: 0 0 12px rgba(216, 255, 66, 0.26);
 }
 
 .pricing-stage-card__cta.glass-button {
   justify-self: stretch;
-  margin-top: 0.1rem;
-  padding: 1rem 1.25rem;
+  margin-top: 0.06rem;
+  padding: 0.9rem 1.05rem;
   border: 0;
   background:
     linear-gradient(180deg, rgba(245, 255, 158, 0.98), rgba(223, 255, 74, 0.98) 48%, rgba(187, 244, 0, 0.98)),
@@ -1736,8 +1740,8 @@ section#hero .story-panel__meta {
 
 .pricing-stage-card__note {
   color: rgba(255, 255, 255, 0.82);
-  font-size: 0.88rem;
-  line-height: 1.58;
+  font-size: 0.8rem;
+  line-height: 1.46;
 }
 
 @keyframes drift {
@@ -1800,6 +1804,16 @@ section#hero .story-panel__meta {
 
   .pricing-stage-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .pricing-stage__heading {
+    white-space: nowrap;
+    font-size: clamp(1.78rem, 3vw, 2.55rem);
+  }
+
+  .pricing-stage-card {
+    padding: 1.08rem;
+    gap: 0.74rem;
   }
 
   .hero-copy {
@@ -2036,18 +2050,19 @@ section#hero .story-panel__meta {
   }
 
   .pricing-stage__heading {
-    max-width: 10ch;
-    font-size: clamp(1.95rem, 8vw, 3rem);
+    max-width: none;
+    white-space: normal;
+    font-size: clamp(1.72rem, 7vw, 2.55rem);
   }
 
   .pricing-stage-card {
-    padding: 1.2rem;
-    gap: 0.82rem;
-    border-radius: 1.65rem;
+    padding: 1.02rem;
+    gap: 0.7rem;
+    border-radius: 1.5rem;
   }
 
   .pricing-stage-card__title {
-    font-size: 1.45rem;
+    font-size: 1.34rem;
   }
 
   .gallery-copy-panel__title,
