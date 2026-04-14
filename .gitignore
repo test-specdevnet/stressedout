@@ -1,9 +1,14 @@
 node_modules/
 dist/
 *.tsbuildinfo
+.codex_tmp/
 tmp-video-frames/
+tmp-video-frames-2/
 /*-live.png
 /*-local.png
+/*-check*.png
+/*-pass*.png
+/*.patch
 vite.config.js
 vite.config.d.ts
 tailwind.config.js
