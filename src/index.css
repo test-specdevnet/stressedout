@@ -635,6 +635,10 @@ section#hero .story-panel__surface {
   grid-template-columns: minmax(0, 1.02fr) minmax(0, 0.98fr);
 }
 
+.stage-layout--hero {
+  align-items: start;
+}
+
 .stage-layout--workflow,
 .stage-layout--pricing,
 .stage-layout--gallery {
@@ -875,10 +879,12 @@ section#hero .story-panel__surface {
 }
 
 .hero-copy {
+  display: grid;
+  gap: 1rem;
   justify-self: start;
   align-self: start;
-  width: min(100%, 34rem);
-  padding-top: clamp(0.4rem, 2vw, 1.6rem);
+  width: min(100%, 40rem);
+  padding-top: clamp(0.75rem, 2vw, 1.55rem);
 }
 
 .hero-stage-shell {
@@ -905,29 +911,39 @@ section#hero .story-panel__meta {
   z-index: 3;
 }
 
+.hero-stage-shell__background {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: linear-gradient(180deg, rgba(8, 7, 20, 0.08), rgba(8, 7, 20, 0.02));
+}
+
+.hero-stage-shell__shader,
+.hero-stage-shell__overlay {
+  position: absolute;
+  inset: 0;
+}
+
+.hero-stage-shell__shader {
+  width: 100%;
+  height: 100%;
+  display: block;
+  opacity: 1;
+  filter: saturate(1.08) contrast(1.06);
+}
+
+.hero-stage-shell__overlay--copy-safe {
+  background:
+    radial-gradient(circle at 24% 48%, rgba(7, 6, 18, 0.34), transparent 24%),
+    linear-gradient(90deg, rgba(5, 7, 18, 0.16) 0%, rgba(5, 7, 18, 0.05) 34%, rgba(5, 7, 18, 0) 58%, rgba(5, 7, 18, 0.06) 100%),
+    linear-gradient(180deg, rgba(5, 8, 20, 0.02), transparent 22%, transparent 74%, rgba(5, 8, 20, 0.12));
+}
 .hero-stage-shell > .stage-layout {
   position: relative;
   z-index: 1;
   height: 100%;
   min-height: inherit;
-}
-
-.hero-welcome-panel {
-  position: relative;
-  isolation: isolate;
-  display: grid;
-  align-items: end;
-  min-height: clamp(22rem, 36vw, 28rem);
-  padding: clamp(1.4rem, 3vw, 2rem);
-  border-radius: clamp(2rem, 4vw, 3rem);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.016) 36%, rgba(255, 255, 255, 0.04)),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01) 42%, rgba(140, 239, 255, 0.05)),
-    rgba(7, 10, 22, 0.05);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.18),
-    inset 0 -24px 44px rgba(5, 10, 22, 0.18),
-    0 24px 64px rgba(3, 6, 18, 0.18);
 }
 
 .stage-title {
@@ -950,44 +966,21 @@ section#hero .story-panel__meta {
   max-width: 10ch;
 }
 
-.hero-subtitle {
-  margin: 0.95rem 0 0;
-  color: rgba(255, 255, 255, 0.84);
-  font-size: clamp(1.1rem, 1.7vw, 1.5rem);
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
 .hero-description {
   max-width: 30rem;
 }
 
 .hero-logo-column {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: flex-end;
+  justify-self: end;
+  padding-top: clamp(0.75rem, 2vw, 1.55rem);
   min-height: 0;
 }
 
-.hero-logo-panel {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: min(100%, 40rem);
-  min-height: clamp(22rem, 50vw, 33rem);
-  padding: clamp(1.2rem, 2.8vw, 2rem);
-  border-radius: clamp(2rem, 4vw, 3.5rem);
-  background:
-    radial-gradient(circle at 18% 18%, rgba(255, 255, 255, 0.08), transparent 26%),
-    radial-gradient(circle at 82% 16%, rgba(140, 239, 255, 0.1), transparent 28%),
-    radial-gradient(circle at 50% 50%, rgba(143, 52, 223, 0.1), transparent 58%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02) 42%, rgba(255, 255, 255, 0.04)),
-    rgba(7, 10, 22, 0.04);
-}
-
 .hero-logo-image {
-  width: min(100%, 34rem);
+  width: min(100%, 35rem);
   max-height: min(72vh, 30rem);
   object-fit: contain;
   filter:
@@ -1101,6 +1094,7 @@ section#hero .story-panel__meta {
 .stage-note-card p,
 .stage-signal-card p,
 .workflow-step p,
+.pricing-stage-card__description,
 .pricing-stage-card__note {
   margin: 0;
   color: var(--bg-muted);
@@ -1582,32 +1576,168 @@ section#hero .story-panel__meta {
 }
 
 .pricing-stage-grid {
+  align-items: stretch;
   grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.pricing-stage {
+  align-content: start;
+  justify-items: stretch;
+  gap: 1.1rem;
+  padding-top: 0.1rem;
+}
+
+.pricing-stage__header {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.pricing-stage__heading {
+  margin: 0;
+  max-width: 12ch;
+  color: var(--bg-ink);
+  font-family: "Poppins", sans-serif;
+  font-size: clamp(2.1rem, 3.6vw, 3.75rem);
+  font-weight: 700;
+  line-height: 0.96;
+  letter-spacing: -0.06em;
 }
 
 .pricing-stage-card {
   display: grid;
   align-content: start;
-  gap: 0.85rem;
+  gap: 0.95rem;
+  min-height: 100%;
+  padding: 1.45rem;
+  border-radius: 2rem;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(255, 255, 255, 0.18), transparent 20%),
+    radial-gradient(circle at 84% 10%, rgba(140, 239, 255, 0.14), transparent 18%),
+    linear-gradient(180deg, rgba(226, 216, 255, 0.88), rgba(171, 83, 255, 0.66) 32%, rgba(196, 52, 224, 0.7) 72%, rgba(173, 43, 193, 0.82)),
+    rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow:
+    0 28px 72px rgba(5, 9, 21, 0.42),
+    0 10px 26px rgba(2, 8, 20, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.72),
+    inset 0 -18px 30px rgba(62, 21, 108, 0.16),
+    inset 0 18px 26px rgba(255, 255, 255, 0.08);
 }
 
 .pricing-stage-card.is-featured {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.21), rgba(255, 255, 255, 0.06) 40%, rgba(255, 255, 255, 0.1)),
-    linear-gradient(135deg, rgba(143, 52, 223, 0.22), rgba(231, 57, 214, 0.14) 52%, rgba(140, 239, 255, 0.16)),
-    rgba(255, 255, 255, 0.05);
+    radial-gradient(circle at 18% 12%, rgba(255, 255, 255, 0.2), transparent 20%),
+    radial-gradient(circle at 84% 10%, rgba(140, 239, 255, 0.16), transparent 18%),
+    linear-gradient(180deg, rgba(234, 225, 255, 0.92), rgba(144, 71, 255, 0.68) 30%, rgba(196, 52, 224, 0.74) 68%, rgba(145, 31, 194, 0.88)),
+    rgba(255, 255, 255, 0.06);
+  border-color: rgba(200, 247, 255, 0.4);
+  box-shadow:
+    0 32px 86px rgba(5, 9, 21, 0.48),
+    0 0 0 1px rgba(140, 239, 255, 0.12),
+    0 12px 30px rgba(2, 8, 20, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.78),
+    inset 0 0 38px rgba(140, 239, 255, 0.12),
+    inset 0 -18px 30px rgba(62, 21, 108, 0.16),
+    inset 0 18px 26px rgba(255, 255, 255, 0.1);
 }
 
-.pricing-stage-card h3 {
+.pricing-stage-card__badge {
+  align-self: start;
+  width: fit-content;
+  padding: 0.52rem 0.9rem;
+  border-radius: var(--radius-pill);
+  background:
+    linear-gradient(180deg, rgba(245, 255, 158, 0.98), rgba(219, 255, 71, 0.96)),
+    rgba(255, 255, 255, 0.9);
+  color: #0b1117;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  text-transform: none;
+  box-shadow:
+    0 10px 24px rgba(216, 255, 66, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.36);
+}
+
+.pricing-stage-card__title {
   margin: 0;
-  font-size: 1.35rem;
+  color: var(--bg-ink);
+  font-size: clamp(1.55rem, 2.2vw, 2.1rem);
+  line-height: 1.02;
+  letter-spacing: -0.05em;
 }
 
 .pricing-stage-card__price {
   margin: 0;
-  font-size: 2rem;
-  font-weight: 600;
-  letter-spacing: -0.05em;
+  color: #fff;
+  font-size: clamp(2.6rem, 4vw, 4.05rem);
+  font-weight: 800;
+  line-height: 0.92;
+  letter-spacing: -0.08em;
+}
+
+.pricing-stage-card__description {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.98rem;
+  line-height: 1.62;
+}
+
+.pricing-stage-card__bullets {
+  display: grid;
+  gap: 0.76rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pricing-stage-card__bullets li {
+  position: relative;
+  padding-left: 1.25rem;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 0.94rem;
+  line-height: 1.56;
+}
+
+.pricing-stage-card__bullets li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.68rem;
+  width: 0.48rem;
+  height: 0.48rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(245, 255, 158, 0.98), rgba(219, 255, 71, 0.96));
+  box-shadow: 0 0 16px rgba(216, 255, 66, 0.34);
+}
+
+.pricing-stage-card__cta.glass-button {
+  justify-self: stretch;
+  margin-top: 0.1rem;
+  padding: 1rem 1.25rem;
+  border: 0;
+  background:
+    linear-gradient(180deg, rgba(245, 255, 158, 0.98), rgba(223, 255, 74, 0.98) 48%, rgba(187, 244, 0, 0.98)),
+    rgba(255, 255, 255, 0.88);
+  color: #081018;
+  box-shadow:
+    0 18px 40px rgba(206, 255, 60, 0.28),
+    0 0 0 1px rgba(255, 255, 255, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.44);
+}
+
+.pricing-stage-card__cta.glass-button:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow:
+    0 22px 46px rgba(206, 255, 60, 0.34),
+    0 0 0 1px rgba(255, 255, 255, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.pricing-stage-card__note {
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.88rem;
+  line-height: 1.58;
 }
 
 @keyframes drift {
@@ -1668,17 +1798,16 @@ section#hero .story-panel__meta {
     grid-template-columns: 1fr;
   }
 
+  .pricing-stage-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .hero-copy {
     width: min(100%, 38rem);
-    padding-top: 0;
   }
 
   .hero-stage-shell__background {
     inset: 0;
-  }
-
-  .hero-welcome-panel {
-    min-height: clamp(18rem, 48vw, 24rem);
   }
 
   .about-copy {
@@ -1701,11 +1830,6 @@ section#hero .story-panel__meta {
   .about-process-card__inner,
   .about-process-card__face {
     min-height: 11.4rem;
-  }
-
-  .hero-logo-panel {
-    width: min(100%, 36rem);
-    min-height: clamp(18rem, 42vw, 25rem);
   }
 
   .gallery-copy-panel {
@@ -1858,11 +1982,6 @@ section#hero .story-panel__meta {
     inset: 0;
   }
 
-  .hero-welcome-panel {
-    min-height: 15rem;
-    padding: 1rem;
-  }
-
   .about-editorial-stack {
     margin-top: 1.4rem;
   }
@@ -1904,12 +2023,7 @@ section#hero .story-panel__meta {
 
   .hero-logo-column {
     justify-content: center;
-  }
-
-  .hero-logo-panel {
-    width: 100%;
-    min-height: 14rem;
-    padding: 1rem;
+    padding-top: 0;
   }
 
   .hero-logo-image {
@@ -1917,13 +2031,23 @@ section#hero .story-panel__meta {
     max-height: 14rem;
   }
 
-  .hero-subtitle {
-    font-size: 0.96rem;
-    letter-spacing: 0.14em;
-  }
-
   .hero-brand {
     font-size: clamp(3.1rem, 18vw, 5.5rem);
+  }
+
+  .pricing-stage__heading {
+    max-width: 10ch;
+    font-size: clamp(1.95rem, 8vw, 3rem);
+  }
+
+  .pricing-stage-card {
+    padding: 1.2rem;
+    gap: 0.82rem;
+    border-radius: 1.65rem;
+  }
+
+  .pricing-stage-card__title {
+    font-size: 1.45rem;
   }
 
   .gallery-copy-panel__title,
@@ -2008,6 +2132,10 @@ section#hero .story-panel__meta {
   .hero-video,
   .work-video {
     aspect-ratio: 5 / 4;
+  }
+
+  .pricing-stage-grid {
+    grid-template-columns: 1fr;
   }
 
   .story-stage {
