@@ -958,7 +958,7 @@ section#hero .story-panel__meta {
   align-items: flex-start;
   justify-content: center;
   justify-self: stretch;
-  padding-top: clamp(0.15rem, 0.5vw, 0.4rem);
+  padding-top: 0;
   padding-right: clamp(0.4rem, 1vw, 0.8rem);
   min-height: 0;
 }
@@ -967,7 +967,7 @@ section#hero .story-panel__meta {
   width: min(100%, 49rem);
   max-height: min(80vh, 41rem);
   object-fit: contain;
-  transform: translateX(clamp(-1rem, -1.8vw, -0.45rem)) translateY(clamp(-1.6rem, -2.4vw, -0.9rem));
+  transform: translateX(clamp(-1rem, -1.8vw, -0.45rem)) translateY(clamp(-2.7rem, -4vw, -1.8rem));
   filter:
     drop-shadow(0 24px 48px rgba(0, 0, 0, 0.45))
     drop-shadow(0 0 36px rgba(140, 239, 255, 0.16));
