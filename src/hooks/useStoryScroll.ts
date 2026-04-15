@@ -50,6 +50,8 @@ export function useStoryScroll({
   transitionDuration,
   touchThreshold,
 }: UseStoryScrollOptions) {
+  const effectiveWheelResetMs = Math.max(36, Math.round(wheelResetMs * 0.55));
+  const effectiveNavigationCooldownMs = Math.max(80, Math.round(navigationCooldownMs * 0.9));
   const [activeIndex, setActiveIndex] = useState(() => getIndexFromHash(window.location.hash, sectionIds));
   const [fromIndex, setFromIndex] = useState<number | null>(null);
   const [toIndex, setToIndex] = useState<number | null>(null);
@@ -109,18 +111,19 @@ export function useStoryScroll({
 
   useEffect(() => {
     const onWheel = (event: WheelEvent) => {
-      if (Math.abs(event.deltaY) < 4) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      if (Math.abs(event.deltaY) < 2) {
         return;
       }
-
-      event.preventDefault();
 
       if (isTransitioningRef.current) {
         return;
       }
 
       const now = window.performance.now();
-      if (now - lastNavigationRef.current < navigationCooldownMs) {
+      if (now - lastNavigationRef.current < effectiveNavigationCooldownMs) {
         return;
       }
 
@@ -131,9 +134,9 @@ export function useStoryScroll({
       wheelAccumulatorRef.current += event.deltaY;
       wheelResetRef.current = window.setTimeout(() => {
         wheelAccumulatorRef.current = 0;
-      }, wheelResetMs);
+      }, effectiveWheelResetMs);
 
-      if (Math.abs(wheelAccumulatorRef.current) < wheelThreshold * 0.75) {
+      if (Math.abs(wheelAccumulatorRef.current) < wheelThreshold * 0.4) {
         return;
       }
 
@@ -147,7 +150,7 @@ export function useStoryScroll({
 
     window.addEventListener("wheel", onWheel, { passive: false });
     return () => window.removeEventListener("wheel", onWheel);
-  }, [navigationCooldownMs, wheelResetMs, wheelThreshold]);
+  }, [effectiveNavigationCooldownMs, effectiveWheelResetMs, wheelThreshold]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -161,20 +164,22 @@ export function useStoryScroll({
         return;
       }
 
+      if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+
       if (
-        event.key === "ArrowDown" ||
         event.key === "PageDown" ||
-        event.key === "ArrowUp" ||
         event.key === "PageUp" ||
         event.key === "Home" ||
         event.key === "End"
       ) {
         event.preventDefault();
-        event.stopPropagation();
       }
 
       const now = window.performance.now();
-      if (isTransitioningRef.current || now - lastNavigationRef.current < navigationCooldownMs) {
+      if (isTransitioningRef.current || now - lastNavigationRef.current < effectiveNavigationCooldownMs) {
         return;
       }
 
@@ -191,7 +196,7 @@ export function useStoryScroll({
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [sectionIds.length]);
+  }, [effectiveNavigationCooldownMs, sectionIds.length]);
 
   useEffect(() => {
     return () => {

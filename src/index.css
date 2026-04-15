@@ -461,6 +461,8 @@ video {
   overflow: hidden;
   perspective: 2200px;
   isolation: isolate;
+  scroll-behavior: smooth;
+  transform: translateZ(0);
   will-change: transform;
   backface-visibility: hidden;
 }
@@ -680,6 +682,9 @@ video {
     scale(var(--panel-scale, 0.92));
   filter: blur(var(--panel-blur, 0px));
   backface-visibility: hidden;
+  transform: translateZ(0)
+    rotate(var(--panel-angle, 0deg))
+    scale(var(--panel-scale, 0.92));
   transform-style: preserve-3d;
   will-change: transform, opacity, filter, z-index;
   transition: none;
