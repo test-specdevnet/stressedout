@@ -179,8 +179,14 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
     }
 
     for (const video of videos) {
-      if (visibleVideosRef.current.has(video)) {
-        playVideo(video, true);
+      playVideo(video, true);
+    }
+
+    const firstVideo = videos[0];
+    if (firstVideo) {
+      const playPromise = firstVideo.play();
+      if (playPromise && typeof playPromise.catch === "function") {
+        playPromise.catch(() => undefined);
       }
     }
   }, [isActive]);

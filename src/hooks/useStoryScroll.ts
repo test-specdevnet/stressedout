@@ -35,10 +35,10 @@ function getWrappedDelta(fromIndex: number, toIndex: number, total: number) {
 }
 
 function easeSnapProgress(value: number) {
-  const acceleratedLead = 1 - Math.pow(1 - value, 4.2);
+  const acceleratedLead = 1 - Math.pow(1 - value, 3.6);
   const settledTail = value < 0.82
     ? acceleratedLead
-    : 1 - Math.pow(1 - value, 1.85) * 0.08;
+    : 1 - Math.pow(1 - value, 2.2) * 0.12;
   return Math.min(1, settledTail);
 }
 
