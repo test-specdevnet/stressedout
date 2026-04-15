@@ -80,7 +80,7 @@ export function GalleryStage({ isActive = false }: GalleryStageProps = {}) {
           }
         }
       },
-      { threshold: [0, 0.5, 1] },
+      { threshold: [0, 0.5, 1], root: document.querySelector(".story-stage__viewport") },
     );
 
     videos.forEach((video) => {
