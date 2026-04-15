@@ -70,8 +70,17 @@ type DynamicVideosStageProps = {
 export function DynamicVideosStage(props?: DynamicVideosStageProps) {
   const isActive = props?.isActive ?? false;
   const videoRefs = useRef<HTMLVideoElement[]>([]);
+  const visibleVideosRef = useRef<Set<HTMLVideoElement>>(new Set());
 
   const playVideo = (video: HTMLVideoElement) => {
+    if (!visibleVideosRef.current.has(video)) {
+      video.pause();
+      if (Math.abs(video.currentTime) > 0.08) {
+        video.currentTime = 0;
+      }
+      return;
+    }
+
     video.muted = true;
     video.defaultMuted = true;
     video.autoplay = true;
@@ -94,6 +103,26 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
     const metadataHandlers = new Map<HTMLVideoElement, () => void>();
     const canPlayHandlers = new Map<HTMLVideoElement, () => void>();
     const endedHandlers = new Map<HTMLVideoElement, () => void>();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const video = entry.target as HTMLVideoElement;
+          if (entry.intersectionRatio >= 0.7) {
+            visibleVideosRef.current.add(video);
+            if (isActive) {
+              playVideo(video);
+            }
+          } else {
+            visibleVideosRef.current.delete(video);
+            video.pause();
+            if (Math.abs(video.currentTime) > 0.08) {
+              video.currentTime = 0;
+            }
+          }
+        }
+      },
+      { threshold: [0, 0.7, 1] },
+    );
 
     for (const video of videos) {
       const handleLoadedMetadata = () => playVideo(video);
@@ -108,7 +137,7 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
       video.addEventListener("loadedmetadata", handleLoadedMetadata, { passive: true });
       video.addEventListener("canplay", handleCanPlay, { passive: true });
       video.addEventListener("ended", handleEnded, { passive: true });
-      playVideo(video);
+      observer.observe(video);
     }
 
     const onVisibilityChange = () => {
@@ -129,19 +158,32 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
       for (const [video, handler] of endedHandlers) {
         video.removeEventListener("ended", handler);
       }
+      observer.disconnect();
+      visibleVideosRef.current.clear();
       document.removeEventListener("visibilitychange", onVisibilityChange);
     };
-  }, []);
+  }, [isActive]);
 
   useEffect(() => {
-    if (!isActive) return;
     const videos = videoRefs.current.filter(Boolean);
     if (videos.length === 0) return;
+
+    if (!isActive) {
+      for (const video of videos) {
+        video.pause();
+        if (Math.abs(video.currentTime) > 0.08) {
+          video.currentTime = 0;
+        }
+      }
+      return;
+    }
 
     const replayTimers = [0, 180, 700, 1600].map((delay) =>
       window.setTimeout(() => {
         for (const video of videos) {
-          playVideo(video);
+          if (visibleVideosRef.current.has(video)) {
+            playVideo(video);
+          }
         }
       }, delay),
     );
@@ -193,12 +235,15 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
                     loop
                     playsInline
                     preload="metadata"
+                    controls={false}
+                    poster={row.staticImage}
                     ref={(node) => {
                       if (node) {
                         videoRefs.current[variantVideoIndices[row.label][variant.label]] = node;
                       }
                     }}
                   >
+                    <source src={variant.video.replace(".mp4", ".webm")} type="video/webm" />
                     <source src={variant.video} type="video/mp4" />
                   </video>
                 </figure>

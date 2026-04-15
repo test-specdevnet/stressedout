@@ -8,6 +8,7 @@ const galleryAds = [
     format: "16:9 landscape",
     description: "Click or swipe to continue through the sequence.",
     video: "/assets/stressed-out/videos/glasses-ad.mp4",
+    poster: "/assets/stressed-out/images/logo-3.png",
   },
   {
     id: "sneaker",
@@ -15,6 +16,7 @@ const galleryAds = [
     format: "16:9 landscape",
     description: "Optimized for smooth autoplay in a static deploy.",
     video: "/assets/stressed-out/videos/shoe-ad.mp4",
+    poster: "/assets/stressed-out/images/logo-3.png",
   },
   {
     id: "dog",
@@ -22,6 +24,7 @@ const galleryAds = [
     format: "9:16 portrait",
     description: "Portrait format preserved without crop.",
     video: "/assets/stressed-out/videos/dog-ad.mp4",
+    poster: "/assets/stressed-out/images/logo-3.png",
     orientation: "portrait" as const,
   },
 ];
@@ -41,6 +44,7 @@ export function GalleryStage({ isActive = false }: GalleryStageProps = {}) {
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [touchDeltaX, setTouchDeltaX] = useState(0);
   const videoRefs = useRef<Array<HTMLVideoElement | null>>([]);
+  const visibleVideosRef = useRef<Set<HTMLVideoElement>>(new Set());
 
   const activeAd = galleryAds[activeIndex];
   const carouselLabel = useMemo(
@@ -49,10 +53,46 @@ export function GalleryStage({ isActive = false }: GalleryStageProps = {}) {
   );
 
   useEffect(() => {
-    videoRefs.current.forEach((video) => {
-      video?.load();
+    const videos = videoRefs.current.filter(Boolean) as HTMLVideoElement[];
+    if (videos.length === 0) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const video = entry.target as HTMLVideoElement;
+          if (entry.intersectionRatio >= 0.7) {
+            visibleVideosRef.current.add(video);
+            const index = videoRefs.current.findIndex((item) => item === video);
+            if (index === activeIndex && isActive) {
+              const playPromise = video.play();
+              if (playPromise && typeof playPromise.catch === "function") {
+                playPromise.catch(() => undefined);
+              }
+            }
+          } else {
+            visibleVideosRef.current.delete(video);
+            video.pause();
+            if (Math.abs(video.currentTime) > 0.08) {
+              video.currentTime = 0;
+            }
+          }
+        }
+      },
+      { threshold: [0, 0.7, 1] },
+    );
+
+    videos.forEach((video) => {
+      video.load();
+      observer.observe(video);
     });
-  }, []);
+
+    return () => {
+      observer.disconnect();
+      visibleVideosRef.current.clear();
+    };
+  }, [activeIndex, isActive]);
 
   useEffect(() => {
     videoRefs.current.forEach((video, index) => {
@@ -60,7 +100,7 @@ export function GalleryStage({ isActive = false }: GalleryStageProps = {}) {
         return;
       }
 
-      if (index === activeIndex && isActive) {
+      if (index === activeIndex && isActive && visibleVideosRef.current.has(video)) {
         if (Math.abs(video.currentTime) > 0.08) {
           video.currentTime = 0;
         }
@@ -189,11 +229,13 @@ export function GalleryStage({ isActive = false }: GalleryStageProps = {}) {
                             className="gallery-slide__video"
                             muted
                             playsInline
-                            preload="auto"
+                            preload="metadata"
                             loop
                             controls={false}
+                            poster={ad.poster}
                             aria-label={ad.title}
                           >
+                            <source src={ad.video.replace(".mp4", ".webm")} type="video/webm" />
                             <source src={ad.video} type="video/mp4" />
                           </video>
                         </div>
