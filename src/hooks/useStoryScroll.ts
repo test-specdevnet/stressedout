@@ -10,11 +10,9 @@ type NavigateOptions = {
 
 type UseStoryScrollOptions = {
   sectionIds: string[];
-  wheelThreshold: number;
-  wheelResetMs: number;
   navigationCooldownMs: number;
-  transitionDuration: number;
   touchThreshold: number;
+  wheelThreshold: number;
 };
 
 function getIndexFromHash(hash: string, sectionIds: string[]) {
@@ -27,44 +25,25 @@ function wrapIndex(index: number, total: number) {
   return ((index % total) + total) % total;
 }
 
-function getWrappedDelta(fromIndex: number, toIndex: number, total: number) {
-  const direct = toIndex - fromIndex;
-  const wrappedForward = ((direct % total) + total) % total;
-  const wrappedBackward = wrappedForward - total;
-  return Math.abs(wrappedBackward) < Math.abs(wrappedForward) ? wrappedBackward : wrappedForward;
-}
-
-function easeSnapProgress(value: number) {
-  const acceleratedLead = 1 - Math.pow(1 - value, 3.6);
-  const settledTail = value < 0.82
-    ? acceleratedLead
-    : 1 - Math.pow(1 - value, 2.2) * 0.12;
-  return Math.min(1, settledTail);
-}
-
 export function useStoryScroll({
   sectionIds,
-  wheelThreshold,
-  wheelResetMs,
   navigationCooldownMs,
-  transitionDuration,
   touchThreshold,
+  wheelThreshold,
 }: UseStoryScrollOptions) {
   const [activeIndex, setActiveIndex] = useState(() => getIndexFromHash(window.location.hash, sectionIds));
-  const [fromIndex, setFromIndex] = useState<number | null>(null);
-  const [toIndex, setToIndex] = useState<number | null>(null);
   const [direction, setDirection] = useState<StoryDirection>("forward");
-  const [stepProgress, setStepProgress] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
+  const containerRef = useRef<HTMLElement | null>(null);
+  const sectionRefs = useRef<Array<HTMLElement | null>>([]);
   const activeIndexRef = useRef(activeIndex);
   const isTransitioningRef = useRef(isTransitioning);
-  const wheelAccumulatorRef = useRef(0);
-  const wheelResetRef = useRef<number | null>(null);
-  const lastNavigationRef = useRef(0);
+  const cooldownTimerRef = useRef<number | null>(null);
   const touchStartYRef = useRef<number | null>(null);
   const touchLastYRef = useRef<number | null>(null);
-  const animationFrameRef = useRef<number | null>(null);
+  const wheelDeltaRef = useRef(0);
+  const wheelFrameRef = useRef<number | null>(null);
 
   useEffect(() => {
     activeIndexRef.current = activeIndex;
@@ -75,14 +54,68 @@ export function useStoryScroll({
   }, [isTransitioning]);
 
   useEffect(() => {
-    document.documentElement.style.overflow = "hidden";
-    document.body.style.overflow = "hidden";
-
     return () => {
-      document.documentElement.style.overflow = "";
-      document.body.style.overflow = "";
+      if (cooldownTimerRef.current !== null) {
+        window.clearTimeout(cooldownTimerRef.current);
+      }
+      if (wheelFrameRef.current !== null) {
+        window.cancelAnimationFrame(wheelFrameRef.current);
+      }
     };
   }, []);
+
+  useEffect(() => {
+    const root = containerRef.current;
+    const sections = sectionRefs.current.filter(Boolean) as HTMLElement[];
+    if (!root || sections.length === 0) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        let bestEntry: IntersectionObserverEntry | null = null;
+        for (const entry of entries) {
+          if (!bestEntry || entry.intersectionRatio > bestEntry.intersectionRatio) {
+            bestEntry = entry;
+          }
+        }
+
+        if (!bestEntry || bestEntry.intersectionRatio < 0.68) {
+          return;
+        }
+
+        const nextIndex = Number((bestEntry.target as HTMLElement).dataset.panelIndex ?? "-1");
+        if (Number.isNaN(nextIndex) || nextIndex < 0) {
+          return;
+        }
+
+        setActiveIndex((currentIndex) => (currentIndex === nextIndex ? currentIndex : nextIndex));
+      },
+      {
+        root,
+        threshold: [0.4, 0.68, 0.9],
+      },
+    );
+
+    for (const section of sections) {
+      observer.observe(section);
+    }
+
+    return () => observer.disconnect();
+  }, [sectionIds]);
+
+  useEffect(() => {
+    const initialIndex = getIndexFromHash(window.location.hash, sectionIds);
+    const targetSection = sectionRefs.current[initialIndex];
+    const root = containerRef.current;
+
+    if (targetSection && root) {
+      root.scrollTo({
+        top: targetSection.offsetTop,
+        behavior: "auto",
+      });
+    }
+  }, [sectionIds]);
 
   useEffect(() => {
     const onHashChange = () => {
@@ -91,63 +124,12 @@ export function useStoryScroll({
         return;
       }
 
-      if (animationFrameRef.current !== null) {
-        window.cancelAnimationFrame(animationFrameRef.current);
-      }
-
-      setFromIndex(null);
-      setToIndex(null);
-      setStepProgress(0);
-      setDirection(getWrappedDelta(activeIndexRef.current, nextIndex, sectionIds.length) >= 0 ? "forward" : "backward");
-      setActiveIndex(nextIndex);
-      setIsTransitioning(false);
+      navigateTo(nextIndex);
     };
 
     window.addEventListener("hashchange", onHashChange);
     return () => window.removeEventListener("hashchange", onHashChange);
   }, [sectionIds]);
-
-  useEffect(() => {
-    const onWheel = (event: WheelEvent) => {
-      if (Math.abs(event.deltaY) < 8) {
-        return;
-      }
-
-      event.preventDefault();
-
-      if (isTransitioningRef.current) {
-        return;
-      }
-
-      const now = window.performance.now();
-      if (now - lastNavigationRef.current < navigationCooldownMs) {
-        return;
-      }
-
-      if (wheelResetRef.current) {
-        window.clearTimeout(wheelResetRef.current);
-      }
-
-      wheelAccumulatorRef.current += event.deltaY;
-      wheelResetRef.current = window.setTimeout(() => {
-        wheelAccumulatorRef.current = 0;
-      }, wheelResetMs);
-
-      if (Math.abs(wheelAccumulatorRef.current) < wheelThreshold) {
-        return;
-      }
-
-      const delta = wheelAccumulatorRef.current > 0 ? 1 : -1;
-      wheelAccumulatorRef.current = 0;
-      navigateTo(activeIndexRef.current + delta, {
-        wrap: true,
-        directionOverride: delta > 0 ? "forward" : "backward",
-      });
-    };
-
-    window.addEventListener("wheel", onWheel, { passive: false });
-    return () => window.removeEventListener("wheel", onWheel);
-  }, [navigationCooldownMs, wheelResetMs, wheelThreshold]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -161,28 +143,17 @@ export function useStoryScroll({
         return;
       }
 
-      if (
-        event.key === "ArrowDown" ||
-        event.key === "PageDown" ||
-        event.key === "ArrowUp" ||
-        event.key === "PageUp" ||
-        event.key === "Home" ||
-        event.key === "End"
-      ) {
-        event.preventDefault();
-      }
-
-      if (isTransitioningRef.current) {
-        return;
-      }
-
       if (event.key === "ArrowDown" || event.key === "PageDown") {
+        event.preventDefault();
         navigateTo(activeIndexRef.current + 1, { wrap: true, directionOverride: "forward" });
       } else if (event.key === "ArrowUp" || event.key === "PageUp") {
+        event.preventDefault();
         navigateTo(activeIndexRef.current - 1, { wrap: true, directionOverride: "backward" });
       } else if (event.key === "Home") {
+        event.preventDefault();
         navigateTo(0);
       } else if (event.key === "End") {
+        event.preventDefault();
         navigateTo(sectionIds.length - 1);
       }
     };
@@ -192,44 +163,61 @@ export function useStoryScroll({
   }, [sectionIds.length]);
 
   useEffect(() => {
-    return () => {
-      if (animationFrameRef.current !== null) {
-        window.cancelAnimationFrame(animationFrameRef.current);
-      }
+    const root = containerRef.current;
+    if (!root) {
+      return;
+    }
 
-      if (wheelResetRef.current) {
-        window.clearTimeout(wheelResetRef.current);
-      }
-    };
-  }, []);
-
-  function finishTransition(nextIndex: number) {
-    setActiveIndex(nextIndex);
-    setFromIndex(null);
-    setToIndex(null);
-    setStepProgress(0);
-    setIsTransitioning(false);
-    activeIndexRef.current = nextIndex;
-  }
-
-  function animateTo(nextIndex: number) {
-    const startTime = window.performance.now();
-
-    const frame = (timestamp: number) => {
-      const elapsed = timestamp - startTime;
-      const rawProgress = Math.min(elapsed / transitionDuration, 1);
-      setStepProgress(easeSnapProgress(rawProgress));
-
-      if (rawProgress < 1) {
-        animationFrameRef.current = window.requestAnimationFrame(frame);
+    const onWheel = (event: WheelEvent) => {
+      if (Math.abs(event.deltaY) < 2) {
         return;
       }
 
-      finishTransition(nextIndex);
-      animationFrameRef.current = null;
+      event.preventDefault();
+      wheelDeltaRef.current += event.deltaY;
+
+      if (wheelFrameRef.current !== null) {
+        return;
+      }
+
+      wheelFrameRef.current = window.requestAnimationFrame(() => {
+        const accumulatedDelta = wheelDeltaRef.current;
+        wheelDeltaRef.current = 0;
+        wheelFrameRef.current = null;
+
+        if (Math.abs(accumulatedDelta) < wheelThreshold) {
+          return;
+        }
+
+        navigateTo(activeIndexRef.current + (accumulatedDelta > 0 ? 1 : -1), {
+          wrap: true,
+          directionOverride: accumulatedDelta > 0 ? "forward" : "backward",
+        });
+      });
     };
 
-    animationFrameRef.current = window.requestAnimationFrame(frame);
+    root.addEventListener("wheel", onWheel, { passive: false });
+    return () => root.removeEventListener("wheel", onWheel);
+  }, [wheelThreshold]);
+
+  function setContainerRef(node: HTMLElement | null) {
+    containerRef.current = node;
+  }
+
+  function registerSection(index: number) {
+    return (node: HTMLElement | null) => {
+      sectionRefs.current[index] = node;
+    };
+  }
+
+  function unlockNavigationAfterDelay() {
+    if (cooldownTimerRef.current !== null) {
+      window.clearTimeout(cooldownTimerRef.current);
+    }
+
+    cooldownTimerRef.current = window.setTimeout(() => {
+      setIsTransitioning(false);
+    }, navigationCooldownMs);
   }
 
   function navigateTo(index: number, options: NavigateOptions = {}) {
@@ -242,39 +230,28 @@ export function useStoryScroll({
       return;
     }
 
-    if (animationFrameRef.current !== null) {
-      window.cancelAnimationFrame(animationFrameRef.current);
-    }
-
-    const wrappedDelta = getWrappedDelta(currentIndex, nextIndex, sectionIds.length);
-    const intendedDirection =
-      options.directionOverride ??
-      (wrappedDelta >= 0 ? "forward" : "backward");
-
-    // Direct jumps should not spin through multiple wheel steps.
-    if (!options.directionOverride && Math.abs(wrappedDelta) > 1) {
-      setDirection(intendedDirection);
-      finishTransition(nextIndex);
-      const nextId = sectionIds[nextIndex];
-      if (nextId && window.location.hash !== `#${nextId}`) {
-        window.history.replaceState(null, "", `#${nextId}`);
-      }
+    const root = containerRef.current;
+    const nextSection = sectionRefs.current[nextIndex];
+    if (!root || !nextSection) {
       return;
     }
 
-    lastNavigationRef.current = window.performance.now();
-    setFromIndex(currentIndex);
-    setToIndex(nextIndex);
-    setDirection(intendedDirection);
-    setStepProgress(0);
+    setDirection(options.directionOverride ?? (nextIndex > currentIndex ? "forward" : "backward"));
     setIsTransitioning(true);
+    setActiveIndex(nextIndex);
+    activeIndexRef.current = nextIndex;
+
+    root.scrollTo({
+      top: nextSection.offsetTop,
+      behavior: "smooth",
+    });
 
     const nextId = sectionIds[nextIndex];
     if (nextId && window.location.hash !== `#${nextId}`) {
       window.history.replaceState(null, "", `#${nextId}`);
     }
 
-    animateTo(nextIndex);
+    unlockNavigationAfterDelay();
   }
 
   function handleTouchStart(event: TouchEvent<HTMLElement>) {
@@ -319,14 +296,13 @@ export function useStoryScroll({
 
   return {
     activeIndex,
-    fromIndex,
-    toIndex,
     direction,
     isTransitioning,
-    stepProgress,
     navigateTo,
     handleTouchStart,
     handleTouchMove,
     handleTouchEnd,
+    setContainerRef,
+    registerSection,
   };
 }
