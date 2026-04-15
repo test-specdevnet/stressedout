@@ -62,7 +62,7 @@ export function GalleryStage({ isActive = false }: GalleryStageProps = {}) {
       (entries) => {
         for (const entry of entries) {
           const video = entry.target as HTMLVideoElement;
-          if (entry.intersectionRatio >= 0.7) {
+          if (entry.intersectionRatio >= 0.5) {
             visibleVideosRef.current.add(video);
             const index = videoRefs.current.findIndex((item) => item === video);
             if (index === activeIndex && isActive) {
@@ -80,7 +80,7 @@ export function GalleryStage({ isActive = false }: GalleryStageProps = {}) {
           }
         }
       },
-      { threshold: [0, 0.5, 1], root: document.querySelector(".story-stage__viewport") },
+      { threshold: [0, 0.5, 1] },
     );
 
     videos.forEach((video) => {

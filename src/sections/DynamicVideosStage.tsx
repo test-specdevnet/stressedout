@@ -107,7 +107,7 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
       (entries) => {
         for (const entry of entries) {
           const video = entry.target as HTMLVideoElement;
-          if (entry.intersectionRatio >= 0.7) {
+          if (entry.intersectionRatio >= 0.5) {
             visibleVideosRef.current.add(video);
             if (isActive) {
               playVideo(video, true);
@@ -121,7 +121,7 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
           }
         }
       },
-      { threshold: [0, 0.5, 1], root: document.querySelector(".story-stage__viewport") },
+      { threshold: [0, 0.5, 1] },
     );
 
     for (const video of videos) {
@@ -142,7 +142,7 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
 
     const onVisibilityChange = () => {
       if (!document.hidden) {
-        for (const video of videos) playVideo(video, true);
+        for (const video of videos) playVideo(video, isActive);
       }
     };
 

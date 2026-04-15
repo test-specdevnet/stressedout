@@ -8,9 +8,6 @@ html,
 body {
   margin: 0;
   padding: 0;
-  scroll-snap-type: y mandatory;
-  scroll-behavior: smooth;
-  overscroll-behavior: contain;
 }
 
 :root {
@@ -158,6 +155,8 @@ video {
 
 .site-shell {
   position: relative;
+  height: 100vh;
+  height: 100dvh;
   min-height: 100vh;
   min-height: 100dvh;
   isolation: isolate;
@@ -444,6 +443,8 @@ video {
 
 .story-stage {
   position: relative;
+  height: 100vh;
+  height: 100dvh;
   min-height: 100vh;
   min-height: 100dvh;
   --story-direction-sign: 1;
@@ -466,18 +467,13 @@ video {
   position: relative;
   height: 100vh;
   height: 100dvh;
-  overflow-y: auto;
-  overflow-x: hidden;
-  scroll-snap-type: y mandatory;
+  overflow: hidden;
+  perspective: 2200px;
   isolation: isolate;
   scroll-behavior: smooth;
-  perspective: none;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.story-stage__viewport::-webkit-scrollbar {
-  display: none;
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
 .story-stage__controls,
@@ -681,27 +677,23 @@ video {
 }
 
 .story-panel {
-  position: relative;
-  inset: auto;
+  position: absolute;
+  inset: 0;
   display: grid;
   align-items: stretch;
-  min-height: 100vh;
-  min-height: 100dvh;
-  height: 100vh;
-  height: 100dvh;
   padding: 6.8rem 6.25rem 2.25rem 6.7rem;
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
+  opacity: var(--panel-opacity, 0);
+  visibility: hidden;
+  pointer-events: none;
   transform-origin: var(--story-wheel-pivot-x, 112%) var(--story-wheel-pivot-y, 50%);
-  transform: none;
-  filter: none;
+  transform:
+    rotate(var(--panel-angle, 0deg))
+    scale(var(--panel-scale, 0.92));
+  filter: blur(var(--panel-blur, 0px));
   backface-visibility: hidden;
   transform-style: preserve-3d;
-  will-change: auto;
+  will-change: transform, opacity, filter, z-index;
   transition: none;
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
 }
 
 .story-panel.is-visible {
@@ -713,9 +705,9 @@ video {
 }
 
 .story-panel:not(.is-visible) {
-  opacity: 1;
-  visibility: visible;
-  filter: none;
+  opacity: 0;
+  visibility: hidden;
+  filter: blur(8px);
 }
 
 .story-panel__surface {
