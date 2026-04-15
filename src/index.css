@@ -1,3 +1,15 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
 :root {
   color-scheme: dark;
   --bg: #060912;
@@ -85,11 +97,13 @@ html,
 body,
 #root {
   min-height: 100%;
+  height: 100vh;
+  height: 100dvh;
 }
 
 body {
-  margin: 0;
   min-height: 100vh;
+  min-height: 100dvh;
   background:
     radial-gradient(circle at 16% 14%, rgba(103, 37, 211, 0.18), transparent 0 24%),
     radial-gradient(circle at 84% 18%, rgba(231, 57, 214, 0.14), transparent 0 22%),
@@ -136,6 +150,7 @@ video {
 .site-shell {
   position: relative;
   min-height: 100vh;
+  min-height: 100dvh;
   isolation: isolate;
 }
 
@@ -421,6 +436,7 @@ video {
 .story-stage {
   position: relative;
   min-height: 100vh;
+  min-height: 100dvh;
   --story-direction-sign: 1;
   --story-direction-y-sign: 1;
 }
@@ -440,6 +456,7 @@ video {
 .story-stage__viewport {
   position: relative;
   height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   perspective: 2200px;
   isolation: isolate;
