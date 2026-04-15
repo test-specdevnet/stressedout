@@ -2,7 +2,11 @@ import { ChevronDown, ChevronUp, Instagram, Mail } from "lucide-react";
 import { useEffect, useState } from "react";
 import { GlassButton } from "./components/GlassButton";
 import { useStoryScroll } from "./hooks/useStoryScroll";
-import { STORY_WHEEL_CONSTANTS } from "./lib/storyWheel";
+import {
+  getPanelWheelState,
+  getRelativeWheelSlot,
+  STORY_WHEEL_CONSTANTS,
+} from "./lib/storyWheel";
 import { AboutStage } from "./sections/AboutStage";
 import { ContactStage } from "./sections/ContactStage";
 import { DynamicVideosStage } from "./sections/DynamicVideosStage";
@@ -23,8 +27,8 @@ const sections: StorySection[] = [
   { id: "about", label: "About Us", shortLabel: "About Us", render: AboutStage },
   {
     id: "dynamic-videos",
-    label: "Static to Dynamic",
-    shortLabel: "Static to Dynamic",
+    label: "Static → Dynamic",
+    shortLabel: "Static → Dynamic",
     render: DynamicVideosStage,
   },
   { id: "gallery", label: "Ad Gallery", shortLabel: "Ad Gallery", render: GalleryStage },
@@ -32,20 +36,22 @@ const sections: StorySection[] = [
   { id: "pricing", label: "Pricing", shortLabel: "Pricing", render: PricingStage },
   { id: "contact", label: "Contact", shortLabel: "Contact", render: ContactStage },
 ];
-
 const sectionIds = sections.map((section) => section.id);
 const progressNavItems = [
   { id: "hero", label: "Welcome" },
   { id: "about", label: "About Us" },
-  { id: "dynamic-videos", label: "Static to Dynamic" },
+  { id: "dynamic-videos", label: "Static → Dynamic" },
   { id: "gallery", label: "Ad Gallery" },
   { id: "testimonials", label: "Praise" },
   { id: "pricing", label: "Pricing" },
   { id: "contact", label: "Contact" },
 ];
 
+const DEFAULT_TRANSITION_MS = 720;
+const REDUCED_TRANSITION_MS = 220;
 const WHEEL_THRESHOLD = 24;
-const NAVIGATION_COOLDOWN_MS = 520;
+const WHEEL_RESET_MS = 72;
+const NAVIGATION_COOLDOWN_MS = 88;
 const TOUCH_THRESHOLD = 34;
 
 export default function App() {
@@ -62,20 +68,24 @@ export default function App() {
     return () => media.removeEventListener("change", update);
   }, []);
 
+  const transitionDuration = prefersReducedMotion ? REDUCED_TRANSITION_MS : DEFAULT_TRANSITION_MS;
   const {
     activeIndex,
+    fromIndex,
+    toIndex,
     direction,
     isTransitioning,
+    stepProgress,
     navigateTo,
     handleTouchStart,
     handleTouchMove,
     handleTouchEnd,
-    setContainerRef,
-    registerSection,
   } = useStoryScroll({
     sectionIds,
     wheelThreshold: WHEEL_THRESHOLD,
+    wheelResetMs: WHEEL_RESET_MS,
     navigationCooldownMs: NAVIGATION_COOLDOWN_MS,
+    transitionDuration,
     touchThreshold: TOUCH_THRESHOLD,
   });
 
@@ -86,9 +96,11 @@ export default function App() {
     }
   }
 
-  const currentNavIndex = progressNavItems.findIndex((item) => item.id === sections[activeIndex]?.id);
+  const totalSections = sections.length;
+  const displayIndex = isTransitioning && toIndex !== null ? toIndex : activeIndex;
+  const currentNavIndex = progressNavItems.findIndex((item) => item.id === sections[displayIndex]?.id);
   const pinwheelRotation =
-    activeIndex * STORY_WHEEL_CONSTANTS.STEP_ANGLE_DEG * (direction === "forward" ? -1 : 1);
+    (direction === "forward" ? -1 : 1) * stepProgress * STORY_WHEEL_CONSTANTS.STEP_ANGLE_DEG;
 
   return (
     <div className="site-shell">
@@ -147,7 +159,6 @@ export default function App() {
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
-        ref={setContainerRef}
       >
         <div className="story-stage__progress glass-nav" aria-label="Story progress">
           <p className="story-stage__progress-label">
@@ -213,34 +224,49 @@ export default function App() {
 
         <div className="story-stage__viewport">
           {sections.map((section, index) => {
-            const isActive = index === activeIndex;
+            const relativeSlot = getRelativeWheelSlot(
+              index,
+              activeIndex,
+              totalSections,
+              isTransitioning,
+              fromIndex,
+              stepProgress,
+              direction,
+            );
+            const panelState = getPanelWheelState(relativeSlot);
+            const isActive = !isTransitioning && index === activeIndex;
             const Stage = section.render;
 
             return (
               <section
                 key={section.id}
                 id={section.id}
-                ref={registerSection(index)}
-                className={`story-panel ${isActive ? "is-active" : ""}`.trim()}
+                className={`story-panel ${panelState.isVisible ? "is-visible" : ""} ${panelState.isCenter ? "is-center" : ""}`.trim()}
+                aria-hidden={!panelState.isCenter}
                 data-panel-index={index}
                 data-panel-label={section.label}
+                data-slot={panelState.slotName}
                 data-active={isActive ? "true" : "false"}
                 data-transitioning={isTransitioning ? "true" : "false"}
                 data-direction={direction}
+                style={panelState.style}
               >
                 <div className="story-panel__surface glass-panel">
                   <div className="story-panel__frame">
                     <div className="story-panel__meta">
                       <p className="story-panel__eyebrow">{section.label}</p>
-                      <span className="story-panel__count">{String(index + 1).padStart(2, "0")}</span>
+                      <span className="story-panel__count">
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
                     </div>
-                    <Stage isActive={isActive} reducedMotion={prefersReducedMotion} />
+                      <Stage isActive={isActive} reducedMotion={prefersReducedMotion} />
                   </div>
                 </div>
               </section>
             );
           })}
         </div>
+
       </main>
     </div>
   );

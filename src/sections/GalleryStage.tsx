@@ -1,6 +1,5 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useMemo, useState } from "react";
-import { SmartVideo } from "../components/SmartVideo";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 const galleryAds = [
   {
@@ -9,7 +8,6 @@ const galleryAds = [
     format: "16:9 landscape",
     description: "Click or swipe to continue through the sequence.",
     video: "/assets/stressed-out/videos/glasses-ad.mp4",
-    poster: "/assets/stressed-out/images/logo-3.png",
   },
   {
     id: "sneaker",
@@ -17,7 +15,6 @@ const galleryAds = [
     format: "16:9 landscape",
     description: "Optimized for smooth autoplay in a static deploy.",
     video: "/assets/stressed-out/videos/shoe-ad.mp4",
-    poster: "/assets/stressed-out/images/logo-3.png",
   },
   {
     id: "dog",
@@ -25,7 +22,6 @@ const galleryAds = [
     format: "9:16 portrait",
     description: "Portrait format preserved without crop.",
     video: "/assets/stressed-out/videos/dog-ad.mp4",
-    poster: "/assets/stressed-out/images/logo-3.png",
     orientation: "portrait" as const,
   },
 ];
@@ -44,12 +40,40 @@ export function GalleryStage({ isActive = false }: GalleryStageProps = {}) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [touchDeltaX, setTouchDeltaX] = useState(0);
+  const videoRefs = useRef<Array<HTMLVideoElement | null>>([]);
 
   const activeAd = galleryAds[activeIndex];
   const carouselLabel = useMemo(
     () => `Ad carousel showing ${activeAd.title}, slide ${activeIndex + 1} of ${galleryAds.length}`,
     [activeAd.title, activeIndex],
   );
+
+  useEffect(() => {
+    videoRefs.current.forEach((video) => {
+      video?.load();
+    });
+  }, []);
+
+  useEffect(() => {
+    videoRefs.current.forEach((video, index) => {
+      if (!video) {
+        return;
+      }
+
+      if (index === activeIndex && isActive) {
+        if (Math.abs(video.currentTime) > 0.08) {
+          video.currentTime = 0;
+        }
+        const playPromise = video.play();
+        if (playPromise && typeof playPromise.catch === "function") {
+          playPromise.catch(() => undefined);
+        }
+      } else {
+        video.pause();
+        video.currentTime = 0;
+      }
+    });
+  }, [activeIndex, isActive]);
 
   function goToSlide(index: number) {
     setActiveIndex((index + galleryAds.length) % galleryAds.length);
@@ -139,9 +163,7 @@ export function GalleryStage({ isActive = false }: GalleryStageProps = {}) {
             <ChevronLeft size={20} strokeWidth={2.4} />
           </button>
 
-          <div
-            className={`gallery-carousel__viewport ${activeAd.orientation === "portrait" ? "is-portrait-active" : ""}`.trim()}
-          >
+          <div className={`gallery-carousel__viewport ${activeAd.orientation === "portrait" ? "is-portrait-active" : ""}`.trim()}>
             <div className="gallery-carousel__ambient-glow" aria-hidden="true" />
             <div className="gallery-carousel__track">
               {galleryAds.map((ad, index) => {
@@ -160,13 +182,20 @@ export function GalleryStage({ isActive = false }: GalleryStageProps = {}) {
                     <div className="gallery-slide__shell glass-media-frame">
                       <div className="gallery-slide__shell-inner">
                         <div className="gallery-slide__media-stage">
-                          <SmartVideo
+                          <video
+                            ref={(node) => {
+                              videoRefs.current[index] = node;
+                            }}
                             className="gallery-slide__video"
-                            active={isActive && isCurrent}
-                            mp4Src={ad.video}
-                            poster={ad.poster}
-                            ariaLabel={ad.title}
-                          />
+                            muted
+                            playsInline
+                            preload="auto"
+                            loop
+                            controls={false}
+                            aria-label={ad.title}
+                          >
+                            <source src={ad.video} type="video/mp4" />
+                          </video>
                         </div>
                       </div>
                     </div>

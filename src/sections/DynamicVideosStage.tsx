@@ -1,5 +1,5 @@
 import { ArrowRight } from "lucide-react";
-import { SmartVideo } from "../components/SmartVideo";
+import { useEffect, useRef } from "react";
 
 type TransformationRow = {
   label: "Coffee" | "Wine";
@@ -10,7 +10,6 @@ type TransformationRow = {
     label: "Variant 1" | "Variant 2";
     displayLabel: string;
     video: string;
-    poster: string;
   }[];
 };
 
@@ -25,13 +24,11 @@ const transformationRows: TransformationRow[] = [
         label: "Variant 1",
         displayLabel: "Coffee Ad Variant 1",
         video: "/assets/stressed-out/gallery/videos/coffee-variant-a.mp4",
-        poster: "/assets/stressed-out/gallery/images/coffee-static.png",
       },
       {
         label: "Variant 2",
         displayLabel: "Coffee Ad Variant 2",
         video: "/assets/stressed-out/gallery/videos/coffee-variant-b.mp4",
-        poster: "/assets/stressed-out/gallery/images/coffee-static.png",
       },
     ],
   },
@@ -45,17 +42,26 @@ const transformationRows: TransformationRow[] = [
         label: "Variant 1",
         displayLabel: "Wine Ad Variant 1",
         video: "/assets/stressed-out/gallery/videos/wine-variant-a.mp4",
-        poster: "/assets/stressed-out/gallery/images/wine-static.png",
       },
       {
         label: "Variant 2",
         displayLabel: "Wine Ad Variant 2",
         video: "/assets/stressed-out/gallery/videos/wine-variant-b.mp4",
-        poster: "/assets/stressed-out/gallery/images/wine-static.png",
       },
     ],
   },
 ];
+
+const variantVideoIndices = {
+  Coffee: {
+    "Variant 1": 0,
+    "Variant 2": 1,
+  },
+  Wine: {
+    "Variant 1": 2,
+    "Variant 2": 3,
+  },
+} as const;
 
 type DynamicVideosStageProps = {
   isActive?: boolean;
@@ -63,6 +69,89 @@ type DynamicVideosStageProps = {
 
 export function DynamicVideosStage(props?: DynamicVideosStageProps) {
   const isActive = props?.isActive ?? false;
+  const videoRefs = useRef<HTMLVideoElement[]>([]);
+
+  const playVideo = (video: HTMLVideoElement) => {
+    video.muted = true;
+    video.defaultMuted = true;
+    video.autoplay = true;
+    video.loop = true;
+    video.playsInline = true;
+    video.setAttribute("muted", "");
+    video.setAttribute("autoplay", "");
+    video.setAttribute("loop", "");
+    video.setAttribute("playsinline", "");
+    const playPromise = video.play();
+    if (playPromise && typeof playPromise.catch === "function") {
+      playPromise.catch(() => {});
+    }
+  };
+
+  useEffect(() => {
+    const videos = videoRefs.current.filter(Boolean);
+    if (videos.length === 0) return;
+
+    const metadataHandlers = new Map<HTMLVideoElement, () => void>();
+    const canPlayHandlers = new Map<HTMLVideoElement, () => void>();
+    const endedHandlers = new Map<HTMLVideoElement, () => void>();
+
+    for (const video of videos) {
+      const handleLoadedMetadata = () => playVideo(video);
+      const handleCanPlay = () => playVideo(video);
+      const handleEnded = () => {
+        video.currentTime = 0;
+        playVideo(video);
+      };
+      metadataHandlers.set(video, handleLoadedMetadata);
+      canPlayHandlers.set(video, handleCanPlay);
+      endedHandlers.set(video, handleEnded);
+      video.addEventListener("loadedmetadata", handleLoadedMetadata, { passive: true });
+      video.addEventListener("canplay", handleCanPlay, { passive: true });
+      video.addEventListener("ended", handleEnded, { passive: true });
+      playVideo(video);
+    }
+
+    const onVisibilityChange = () => {
+      if (!document.hidden) {
+        for (const video of videos) playVideo(video);
+      }
+    };
+
+    document.addEventListener("visibilitychange", onVisibilityChange);
+
+    return () => {
+      for (const [video, handler] of metadataHandlers) {
+        video.removeEventListener("loadedmetadata", handler);
+      }
+      for (const [video, handler] of canPlayHandlers) {
+        video.removeEventListener("canplay", handler);
+      }
+      for (const [video, handler] of endedHandlers) {
+        video.removeEventListener("ended", handler);
+      }
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isActive) return;
+    const videos = videoRefs.current.filter(Boolean);
+    if (videos.length === 0) return;
+
+    const replayTimers = [0, 180, 700, 1600].map((delay) =>
+      window.setTimeout(() => {
+        for (const video of videos) {
+          playVideo(video);
+        }
+      }, delay),
+    );
+
+    return () => {
+      for (const timer of replayTimers) {
+        window.clearTimeout(timer);
+      }
+    };
+  }, [isActive]);
 
   return (
     <div className="stage-layout stage-layout--workflow dynamic-stage-layout">
@@ -84,7 +173,6 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
                   src={row.staticImage}
                   alt={row.staticAlt}
                   loading="lazy"
-                  decoding="async"
                   className="dynamic-static-image"
                 />
               </figure>
@@ -98,13 +186,21 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
               {row.variants.map((variant) => (
                 <figure key={variant.video} className="glass-panel dynamic-media-panel">
                   <figcaption className="dynamic-media-label">{variant.displayLabel}</figcaption>
-                  <SmartVideo
+                  <video
                     className={`dynamic-variant-video ${row.label === "Coffee" ? "dynamic-variant-video--coffee" : ""}`.trim()}
-                    active={isActive}
-                    mp4Src={variant.video}
-                    poster={variant.poster}
-                    ariaLabel={variant.displayLabel}
-                  />
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    preload="metadata"
+                    ref={(node) => {
+                      if (node) {
+                        videoRefs.current[variantVideoIndices[row.label][variant.label]] = node;
+                      }
+                    }}
+                  >
+                    <source src={variant.video} type="video/mp4" />
+                  </video>
                 </figure>
               ))}
             </div>
