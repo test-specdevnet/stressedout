@@ -109,7 +109,7 @@ export function useStoryScroll({
 
   useEffect(() => {
     const onWheel = (event: WheelEvent) => {
-      if (Math.abs(event.deltaY) < 8) {
+      if (Math.abs(event.deltaY) < 4) {
         return;
       }
 
@@ -133,7 +133,7 @@ export function useStoryScroll({
         wheelAccumulatorRef.current = 0;
       }, wheelResetMs);
 
-      if (Math.abs(wheelAccumulatorRef.current) < wheelThreshold) {
+      if (Math.abs(wheelAccumulatorRef.current) < wheelThreshold * 0.75) {
         return;
       }
 
@@ -170,9 +170,11 @@ export function useStoryScroll({
         event.key === "End"
       ) {
         event.preventDefault();
+        event.stopPropagation();
       }
 
-      if (isTransitioningRef.current) {
+      const now = window.performance.now();
+      if (isTransitioningRef.current || now - lastNavigationRef.current < navigationCooldownMs) {
         return;
       }
 

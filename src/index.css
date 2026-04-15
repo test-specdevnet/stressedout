@@ -99,6 +99,7 @@ body,
   min-height: 100%;
   height: 100vh;
   height: 100dvh;
+  overscroll-behavior: none;
 }
 
 body {
@@ -460,6 +461,8 @@ video {
   overflow: hidden;
   perspective: 2200px;
   isolation: isolate;
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
 .story-stage__controls,
@@ -680,6 +683,7 @@ video {
   transform-style: preserve-3d;
   will-change: transform, opacity, filter, z-index;
   transition: none;
+  will-change: transform;
 }
 
 .story-panel.is-visible {
