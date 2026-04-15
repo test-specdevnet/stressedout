@@ -72,8 +72,8 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
   const videoRefs = useRef<HTMLVideoElement[]>([]);
   const visibleVideosRef = useRef<Set<HTMLVideoElement>>(new Set());
 
-  const playVideo = (video: HTMLVideoElement) => {
-    if (!visibleVideosRef.current.has(video)) {
+  const playVideo = (video: HTMLVideoElement, force = false) => {
+    if (!force && !visibleVideosRef.current.has(video)) {
       video.pause();
       if (Math.abs(video.currentTime) > 0.08) {
         video.currentTime = 0;
@@ -110,7 +110,7 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
           if (entry.intersectionRatio >= 0.7) {
             visibleVideosRef.current.add(video);
             if (isActive) {
-              playVideo(video);
+              playVideo(video, true);
             }
           } else {
             visibleVideosRef.current.delete(video);
@@ -121,15 +121,15 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
           }
         }
       },
-      { threshold: [0, 0.7, 1] },
+      { threshold: [0, 0.5, 1] },
     );
 
     for (const video of videos) {
-      const handleLoadedMetadata = () => playVideo(video);
-      const handleCanPlay = () => playVideo(video);
+      const handleLoadedMetadata = () => playVideo(video, isActive);
+      const handleCanPlay = () => playVideo(video, isActive);
       const handleEnded = () => {
         video.currentTime = 0;
-        playVideo(video);
+        playVideo(video, isActive);
       };
       metadataHandlers.set(video, handleLoadedMetadata);
       canPlayHandlers.set(video, handleCanPlay);
@@ -178,21 +178,11 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
       return;
     }
 
-    const replayTimers = [0, 180, 700, 1600].map((delay) =>
-      window.setTimeout(() => {
-        for (const video of videos) {
-          if (visibleVideosRef.current.has(video)) {
-            playVideo(video);
-          }
-        }
-      }, delay),
-    );
-
-    return () => {
-      for (const timer of replayTimers) {
-        window.clearTimeout(timer);
+    for (const video of videos) {
+      if (visibleVideosRef.current.has(video)) {
+        playVideo(video, true);
       }
-    };
+    }
   }, [isActive]);
 
   return (
@@ -236,7 +226,6 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
                     playsInline
                     preload="metadata"
                     controls={false}
-                    poster={row.staticImage}
                     ref={(node) => {
                       if (node) {
                         videoRefs.current[variantVideoIndices[row.label][variant.label]] = node;

@@ -80,7 +80,7 @@ export function GalleryStage({ isActive = false }: GalleryStageProps = {}) {
           }
         }
       },
-      { threshold: [0, 0.7, 1] },
+      { threshold: [0, 0.5, 1] },
     );
 
     videos.forEach((video) => {
@@ -111,6 +111,23 @@ export function GalleryStage({ isActive = false }: GalleryStageProps = {}) {
       } else {
         video.pause();
         video.currentTime = 0;
+      }
+    });
+  }, [activeIndex, isActive]);
+
+  useEffect(() => {
+    if (!isActive) {
+      return;
+    }
+
+    videoRefs.current.forEach((video, index) => {
+      if (!video || index !== activeIndex || !visibleVideosRef.current.has(video)) {
+        return;
+      }
+
+      const playPromise = video.play();
+      if (playPromise && typeof playPromise.catch === "function") {
+        playPromise.catch(() => undefined);
       }
     });
   }, [activeIndex, isActive]);
@@ -232,7 +249,6 @@ export function GalleryStage({ isActive = false }: GalleryStageProps = {}) {
                             preload="metadata"
                             loop
                             controls={false}
-                            poster={ad.poster}
                             aria-label={ad.title}
                           >
                             <source src={ad.video.replace(".mp4", ".webm")} type="video/webm" />
