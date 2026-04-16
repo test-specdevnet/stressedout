@@ -1939,8 +1939,8 @@ section#hero .story-panel__meta {
 
 .pricing-stage-grid {
   align-items: stretch;
-  gap: 1.5rem;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.75rem;
+  grid-template-columns: repeat(3, minmax(18.5rem, 1fr));
 }
 
 .pricing-stage {
@@ -2091,7 +2091,7 @@ section#hero .story-panel__meta {
   gap: 0.64rem;
   min-height: 100%;
   width: 100%;
-  padding: 1.05rem 1.08rem 0.95rem;
+  padding: 1.14rem 1.2rem 1.02rem;
   border-radius: 1.5rem;
   background:
     radial-gradient(circle at 18% 7%, rgba(255, 255, 255, 0.04), transparent 0 14%),
