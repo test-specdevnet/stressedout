@@ -879,7 +879,7 @@ section#hero .story-panel__surface {
 
 .about-copy {
   max-width: 40rem;
-  padding-top: clamp(0.75rem, 2vw, 1.55rem);
+  padding-top: clamp(0.35rem, 1.4vw, 1rem);
 }
 
 .about-title {
@@ -888,6 +888,7 @@ section#hero .story-panel__surface {
 
 .about-intro {
   max-width: 31rem;
+  font-size: clamp(1.12rem, 1.35vw, 1.28rem);
 }
 
 .about-editorial-stack {
@@ -1147,6 +1148,7 @@ section#hero .story-panel__meta {
 .hero-title {
   max-width: 9ch;
   margin-top: 0;
+  font-size: clamp(4rem, 6vw, 5.35rem);
   transform: translateX(clamp(0.55rem, 1.3vw, 0.95rem));
 }
 
@@ -1155,7 +1157,7 @@ section#hero .story-panel__meta {
   max-width: none;
   color: rgba(230, 238, 255, 0.92);
   font-family: "Poppins", sans-serif;
-  font-size: clamp(1.24rem, 1.85vw, 1.62rem);
+  font-size: clamp(1.42rem, 2.1vw, 1.88rem);
   font-weight: 600;
   line-height: 1.14;
   letter-spacing: -0.03em;
@@ -1166,6 +1168,7 @@ section#hero .story-panel__meta {
 .hero-description {
   max-width: 28rem;
   margin-top: 0.55rem;
+  font-size: clamp(1.12rem, 1.35vw, 1.28rem);
   transform: translateX(clamp(0.6rem, 1.35vw, 1rem));
 }
 
@@ -1180,7 +1183,7 @@ section#hero .story-panel__meta {
 }
 
 .hero-logo-image {
-  width: min(100%, 53rem);
+  width: min(100%, 58rem);
   max-height: min(83vh, 44rem);
   object-fit: contain;
   transform: translateX(clamp(-2.15rem, -2.95vw, -1.2rem)) translateY(clamp(-5.2rem, -7vw, -3.8rem));
@@ -1329,7 +1332,7 @@ section#hero .story-panel__meta {
 .dynamic-stage-title {
   max-width: none;
   margin-top: 0;
-  font-size: clamp(1.5rem, 2.1vw, 2.35rem);
+  font-size: clamp(2rem, 3vw, 3.25rem);
   line-height: 1;
 }
 
@@ -1362,6 +1365,7 @@ section#hero .story-panel__meta {
   padding: 0.38rem;
   display: grid;
   gap: 0.32rem;
+  min-height: clamp(18.5rem, 22vw, 21.25rem);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)),
     radial-gradient(circle at 86% 12%, rgba(231, 57, 214, 0.12), transparent 0 20%);
@@ -1409,10 +1413,17 @@ section#hero .story-panel__meta {
   text-transform: uppercase;
 }
 
+.dynamic-variant-video-shell {
+  position: relative;
+  height: 100%;
+  border-radius: 0.72rem;
+  overflow: hidden;
+}
+
 .dynamic-static-image,
 .dynamic-variant-video {
   width: 100%;
-  height: auto;
+  height: 100%;
   display: block;
   background: #04050a;
   object-fit: contain;

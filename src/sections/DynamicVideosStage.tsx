@@ -1,4 +1,4 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Play } from "lucide-react";
 import { useEffect, useRef } from "react";
 
 type TransformationRow = {
@@ -232,23 +232,27 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
               {row.variants.map((variant) => (
                 <figure key={variant.video} className="glass-panel dynamic-media-panel">
                   <figcaption className="dynamic-media-label">{variant.displayLabel}</figcaption>
-                  <video
-                    className={`dynamic-variant-video ${row.label === "Coffee" ? "dynamic-variant-video--coffee" : ""}`.trim()}
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    preload="metadata"
-                    controls={false}
-                    ref={(node) => {
-                      if (node) {
-                        videoRefs.current[variantVideoIndices[row.label][variant.label]] = node;
-                      }
-                    }}
-                  >
-                    <source src={variant.video.replace(".mp4", ".webm")} type="video/webm" />
-                    <source src={variant.video} type="video/mp4" />
-                  </video>
+                  <div className="dynamic-variant-video-shell group">
+                    <video
+                      className={`dynamic-variant-video ${row.label === "Coffee" ? "dynamic-variant-video--coffee" : ""}`.trim()}
+                      muted
+                      loop
+                      playsInline
+                      preload="metadata"
+                      controls={false}
+                      ref={(node) => {
+                        if (node) {
+                          videoRefs.current[variantVideoIndices[row.label][variant.label]] = node;
+                        }
+                      }}
+                    >
+                      <source src={variant.video.replace(".mp4", ".webm")} type="video/webm" />
+                      <source src={variant.video} type="video/mp4" />
+                    </video>
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/30 transition-colors group-hover:bg-black/20 rounded-xl cursor-pointer">
+                      <Play className="h-16 w-16 text-white" />
+                    </div>
+                  </div>
                 </figure>
               ))}
             </div>
