@@ -479,6 +479,9 @@ video {
   overscroll-behavior: contain;
   scroll-padding-top: 0;
   perspective: none;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  will-change: scroll-position;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }

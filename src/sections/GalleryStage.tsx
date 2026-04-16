@@ -8,7 +8,6 @@ const galleryAds = [
     format: "16:9 landscape",
     description: "Click or swipe to continue through the sequence.",
     video: "/assets/stressed-out/videos/glasses-ad.mp4",
-    poster: "/assets/stressed-out/images/logo-3.png",
   },
   {
     id: "sneaker",
@@ -16,7 +15,6 @@ const galleryAds = [
     format: "16:9 landscape",
     description: "Optimized for smooth autoplay in a static deploy.",
     video: "/assets/stressed-out/videos/shoe-ad.mp4",
-    poster: "/assets/stressed-out/images/logo-3.png",
   },
   {
     id: "dog",
@@ -24,7 +22,6 @@ const galleryAds = [
     format: "9:16 portrait",
     description: "Portrait format preserved without crop.",
     video: "/assets/stressed-out/videos/dog-ad.mp4",
-    poster: "/assets/stressed-out/images/logo-3.png",
     orientation: "portrait" as const,
   },
 ];
@@ -57,6 +54,7 @@ export function GalleryStage({ isActive = false }: GalleryStageProps = {}) {
     if (videos.length === 0) {
       return;
     }
+    const scrollViewport = document.querySelector(".story-stage__viewport");
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -83,7 +81,7 @@ export function GalleryStage({ isActive = false }: GalleryStageProps = {}) {
           }
         }
       },
-      { threshold: [0, 0.4, 1], root: document.querySelector(".story-stage__viewport") },
+      { threshold: [0, 0.4, 1], root: scrollViewport },
     );
 
     videos.forEach((video) => {

@@ -99,6 +99,7 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
   useEffect(() => {
     const videos = videoRefs.current.filter(Boolean);
     if (videos.length === 0) return;
+    const scrollViewport = document.querySelector(".story-stage__viewport");
 
     const metadataHandlers = new Map<HTMLVideoElement, () => void>();
     const canPlayHandlers = new Map<HTMLVideoElement, () => void>();
@@ -124,10 +125,11 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
           }
         }
       },
-      { threshold: [0, 0.4, 1], root: document.querySelector(".story-stage__viewport") },
+      { threshold: [0, 0.4, 1], root: scrollViewport },
     );
 
     for (const video of videos) {
+      video.load();
       const handleLoadedMetadata = () => playVideo(video, isActive);
       const handleCanPlay = () => playVideo(video, isActive);
       const handleEnded = () => {
@@ -182,6 +184,9 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
     }
 
     for (const video of videos) {
+      if (Math.abs(video.currentTime) > 0.08) {
+        video.currentTime = 0;
+      }
       playVideo(video, true);
     }
 

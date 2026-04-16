@@ -183,7 +183,7 @@ export function useStoryScroll({
     setIsTransitioning(true);
     transitionTimeoutRef.current = window.setTimeout(() => {
       setIsTransitioning(false);
-    }, Math.max(180, navigationCooldownMs * 3));
+    }, Math.max(96, navigationCooldownMs + 24));
   }
 
   function navigateTo(index: number, options: NavigateOptions = {}) {
@@ -215,14 +215,12 @@ export function useStoryScroll({
 
     if (scrollFrameRef.current !== null) {
       window.cancelAnimationFrame(scrollFrameRef.current);
+      scrollFrameRef.current = null;
     }
 
-    scrollFrameRef.current = window.requestAnimationFrame(() => {
-      target.scrollIntoView({
-        block: "start",
-        behavior: "smooth",
-      });
-      scrollFrameRef.current = null;
+    target.scrollIntoView({
+      block: "start",
+      behavior: "smooth",
     });
   }
 
