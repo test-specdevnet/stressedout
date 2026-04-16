@@ -121,7 +121,7 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
           }
         }
       },
-      { threshold: [0, 0.5, 1] },
+      { threshold: [0, 0.5, 1], root: document.querySelector(".story-stage__viewport") },
     );
 
     for (const video of videos) {

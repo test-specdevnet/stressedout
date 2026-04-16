@@ -8,6 +8,9 @@ html,
 body {
   margin: 0;
   padding: 0;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
 }
 
 :root {
@@ -467,13 +470,18 @@ video {
   position: relative;
   height: 100vh;
   height: 100dvh;
-  overflow: hidden;
-  perspective: 2200px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-snap-type: y mandatory;
   isolation: isolate;
   scroll-behavior: smooth;
-  transform: translateZ(0);
-  will-change: transform;
-  backface-visibility: hidden;
+  perspective: none;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.story-stage__viewport::-webkit-scrollbar {
+  display: none;
 }
 
 .story-stage__controls,
@@ -677,23 +685,27 @@ video {
 }
 
 .story-panel {
-  position: absolute;
-  inset: 0;
+  position: relative;
+  inset: auto;
   display: grid;
   align-items: stretch;
+  min-height: 100vh;
+  min-height: 100dvh;
+  height: 100vh;
+  height: 100dvh;
   padding: 6.8rem 6.25rem 2.25rem 6.7rem;
-  opacity: var(--panel-opacity, 0);
-  visibility: hidden;
-  pointer-events: none;
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
   transform-origin: var(--story-wheel-pivot-x, 112%) var(--story-wheel-pivot-y, 50%);
-  transform:
-    rotate(var(--panel-angle, 0deg))
-    scale(var(--panel-scale, 0.92));
-  filter: blur(var(--panel-blur, 0px));
+  transform: none;
+  filter: none;
   backface-visibility: hidden;
   transform-style: preserve-3d;
-  will-change: transform, opacity, filter, z-index;
+  will-change: auto;
   transition: none;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
 }
 
 .story-panel.is-visible {
@@ -705,9 +717,9 @@ video {
 }
 
 .story-panel:not(.is-visible) {
-  opacity: 0;
-  visibility: hidden;
-  filter: blur(8px);
+  opacity: 1;
+  visibility: visible;
+  filter: none;
 }
 
 .story-panel__surface {

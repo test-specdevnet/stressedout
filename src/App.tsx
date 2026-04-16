@@ -2,11 +2,7 @@ import { ChevronDown, ChevronUp, Instagram, Mail } from "lucide-react";
 import { useEffect, useState } from "react";
 import { GlassButton } from "./components/GlassButton";
 import { useStoryScroll } from "./hooks/useStoryScroll";
-import {
-  getPanelWheelState,
-  getRelativeWheelSlot,
-  STORY_WHEEL_CONSTANTS,
-} from "./lib/storyWheel";
+import { STORY_WHEEL_CONSTANTS } from "./lib/storyWheel";
 import { AboutStage } from "./sections/AboutStage";
 import { ContactStage } from "./sections/ContactStage";
 import { DynamicVideosStage } from "./sections/DynamicVideosStage";
@@ -49,8 +45,6 @@ const progressNavItems = [
 
 const DEFAULT_TRANSITION_MS = 720;
 const REDUCED_TRANSITION_MS = 220;
-const WHEEL_THRESHOLD = 24;
-const WHEEL_RESET_MS = 72;
 const NAVIGATION_COOLDOWN_MS = 88;
 const TOUCH_THRESHOLD = 34;
 
@@ -71,19 +65,18 @@ export default function App() {
   const transitionDuration = prefersReducedMotion ? REDUCED_TRANSITION_MS : DEFAULT_TRANSITION_MS;
   const {
     activeIndex,
-    fromIndex,
-    toIndex,
     direction,
     isTransitioning,
-    stepProgress,
     navigateTo,
     handleTouchStart,
     handleTouchMove,
     handleTouchEnd,
+    setViewportRef,
+    registerSection,
   } = useStoryScroll({
     sectionIds,
-    wheelThreshold: WHEEL_THRESHOLD,
-    wheelResetMs: WHEEL_RESET_MS,
+    wheelThreshold: 0,
+    wheelResetMs: 0,
     navigationCooldownMs: NAVIGATION_COOLDOWN_MS,
     transitionDuration,
     touchThreshold: TOUCH_THRESHOLD,
@@ -96,11 +89,8 @@ export default function App() {
     }
   }
 
-  const totalSections = sections.length;
-  const displayIndex = isTransitioning && toIndex !== null ? toIndex : activeIndex;
-  const currentNavIndex = progressNavItems.findIndex((item) => item.id === sections[displayIndex]?.id);
-  const pinwheelRotation =
-    (direction === "forward" ? -1 : 1) * stepProgress * STORY_WHEEL_CONSTANTS.STEP_ANGLE_DEG;
+  const currentNavIndex = progressNavItems.findIndex((item) => item.id === sections[activeIndex]?.id);
+  const pinwheelRotation = activeIndex * -STORY_WHEEL_CONSTANTS.STEP_ANGLE_DEG;
 
   return (
     <div className="site-shell">
@@ -222,34 +212,26 @@ export default function App() {
           </div>
         </div>
 
-        <div className="story-stage__viewport">
+        <div className="story-stage__viewport" ref={setViewportRef}>
           {sections.map((section, index) => {
-            const relativeSlot = getRelativeWheelSlot(
-              index,
-              activeIndex,
-              totalSections,
-              isTransitioning,
-              fromIndex,
-              stepProgress,
-              direction,
-            );
-            const panelState = getPanelWheelState(relativeSlot);
-            const isActive = !isTransitioning && index === activeIndex;
+            const isActive = index === activeIndex;
             const Stage = section.render;
 
             return (
               <section
                 key={section.id}
                 id={section.id}
-                className={`story-panel ${panelState.isVisible ? "is-visible" : ""} ${panelState.isCenter ? "is-center" : ""}`.trim()}
-                aria-hidden={!panelState.isCenter}
+                ref={registerSection(index)}
+                className={`story-panel is-visible ${isActive ? "is-center is-active" : ""}`.trim()}
+                aria-hidden={false}
                 data-panel-index={index}
                 data-panel-label={section.label}
-                data-slot={panelState.slotName}
                 data-active={isActive ? "true" : "false"}
                 data-transitioning={isTransitioning ? "true" : "false"}
                 data-direction={direction}
-                style={panelState.style}
+                style={{
+                  zIndex: isActive ? 2 : 1,
+                }}
               >
                 <div className="story-panel__surface glass-panel">
                   <div className="story-panel__frame">
@@ -259,7 +241,7 @@ export default function App() {
                         {String(index + 1).padStart(2, "0")}
                       </span>
                     </div>
-                      <Stage isActive={isActive} reducedMotion={prefersReducedMotion} />
+                    <Stage isActive={isActive} reducedMotion={prefersReducedMotion} />
                   </div>
                 </div>
               </section>
