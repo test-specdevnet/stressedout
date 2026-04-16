@@ -1511,7 +1511,7 @@ section#hero .story-panel__meta {
   position: relative;
   padding-left: 1.5rem;
   color: var(--bg-muted);
-  font-size: 0.98rem;
+  font-size: 1.08rem;
   line-height: 1.68;
 }
 
@@ -1534,7 +1534,7 @@ section#hero .story-panel__meta {
   align-content: start;
   justify-items: stretch;
   gap: 0.5rem;
-  width: min(100%, 38rem);
+  width: min(100%, 42rem);
   margin-left: auto;
   transform: translateY(-1.15rem);
 }
@@ -1547,7 +1547,7 @@ section#hero .story-panel__meta {
 }
 
 .gallery-carousel-panel__header {
-  width: min(100%, 32rem);
+  width: min(100%, 36rem);
   justify-self: end;
   justify-content: flex-start;
   margin: 0;
@@ -1555,7 +1555,7 @@ section#hero .story-panel__meta {
 
 .gallery-carousel-panel__subheader {
   margin: 0;
-  width: min(100%, 32rem);
+  width: min(100%, 36rem);
   justify-self: end;
   color: var(--bg-ink);
   font-family: "Poppins", sans-serif;
@@ -1655,7 +1655,7 @@ section#hero .story-panel__meta {
 }
 
 .gallery-slide__shell {
-  width: min(100%, 32rem);
+  width: min(100%, 36rem);
   height: 100%;
   border-radius: calc(var(--radius-xl) - 0.15rem);
 }
@@ -1939,7 +1939,7 @@ section#hero .story-panel__meta {
 
 .pricing-stage-grid {
   align-items: stretch;
-  gap: 0.76rem;
+  gap: 1rem;
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
@@ -2090,6 +2090,7 @@ section#hero .story-panel__meta {
   align-content: start;
   gap: 0.64rem;
   min-height: 100%;
+  width: 100%;
   padding: 1rem 0.98rem 0.9rem;
   border-radius: 1.5rem;
   background:
