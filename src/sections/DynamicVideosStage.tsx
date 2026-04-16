@@ -274,11 +274,11 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
                     {!startedVideos[variantVideoIndices[row.label][variant.label]] ? (
                       <button
                         type="button"
-                        className="absolute inset-0 flex items-center justify-center bg-black/30 transition-colors group-hover:bg-black/20 rounded-xl cursor-pointer"
+                        className="absolute inset-0 z-10 flex items-center justify-center bg-black/30 transition-colors hover:bg-black/10 rounded-xl cursor-pointer"
                         onClick={() => handleVideoStart(variantVideoIndices[row.label][variant.label])}
                         aria-label={`Play ${variant.displayLabel}`}
                       >
-                        <Play className="h-16 w-16 text-white" />
+                        <Play className="h-16 w-16 text-white transition-transform hover:scale-110" />
                       </button>
                     ) : null}
                   </div>
