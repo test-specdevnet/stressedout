@@ -1,4 +1,4 @@
-import { ArrowRight, Play } from "lucide-react";
+import { ArrowRight, Pause, Play } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 type TransformationRow = {
@@ -72,10 +72,11 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
   const videoRefs = useRef<HTMLVideoElement[]>([]);
   const visibleVideosRef = useRef<Set<HTMLVideoElement>>(new Set());
   const [startedVideos, setStartedVideos] = useState<Record<number, boolean>>({});
+  const [pausedVideos, setPausedVideos] = useState<Record<number, boolean>>({});
 
   const playVideo = (video: HTMLVideoElement, force = false) => {
     const videoIndex = videoRefs.current.findIndex((item) => item === video);
-    if (videoIndex < 0 || !startedVideos[videoIndex]) {
+    if (videoIndex < 0 || !startedVideos[videoIndex] || pausedVideos[videoIndex]) {
       video.pause();
       if (Math.abs(video.currentTime) > 0.08) {
         video.currentTime = 0;
@@ -94,11 +95,10 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
     video.muted = true;
     video.defaultMuted = true;
     video.autoplay = true;
-    video.loop = true;
+    video.loop = false;
     video.playsInline = true;
     video.setAttribute("muted", "");
     video.setAttribute("autoplay", "");
-    video.setAttribute("loop", "");
     video.setAttribute("playsinline", "");
     const playPromise = video.play();
     if (playPromise && typeof playPromise.catch === "function") {
@@ -111,12 +111,35 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
     if (!video) return;
 
     setStartedVideos((current) => (current[videoIndex] ? current : { ...current, [videoIndex]: true }));
+    setPausedVideos((current) => (current[videoIndex] ? { ...current, [videoIndex]: false } : current));
     video.load();
     video.currentTime = 0;
     const playPromise = video.play();
     if (playPromise && typeof playPromise.catch === "function") {
       playPromise.catch(() => {});
     }
+  };
+
+  const handleVideoToggle = (videoIndex: number) => {
+    const video = videoRefs.current[videoIndex];
+    if (!video) return;
+
+    if (!startedVideos[videoIndex]) {
+      handleVideoStart(videoIndex);
+      return;
+    }
+
+    if (pausedVideos[videoIndex]) {
+      setPausedVideos((current) => ({ ...current, [videoIndex]: false }));
+      const playPromise = video.play();
+      if (playPromise && typeof playPromise.catch === "function") {
+        playPromise.catch(() => {});
+      }
+      return;
+    }
+
+    video.pause();
+    setPausedVideos((current) => ({ ...current, [videoIndex]: true }));
   };
 
   useEffect(() => {
@@ -155,8 +178,11 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
       const handleLoadedMetadata = () => playVideo(video, isActive);
       const handleCanPlay = () => playVideo(video, isActive);
       const handleEnded = () => {
-        video.currentTime = 0;
-        playVideo(video, isActive);
+        const videoIndex = videoRefs.current.findIndex((item) => item === video);
+        video.pause();
+        if (videoIndex >= 0) {
+          setPausedVideos((current) => ({ ...current, [videoIndex]: true }));
+        }
       };
       metadataHandlers.set(video, handleLoadedMetadata);
       canPlayHandlers.set(video, handleCanPlay);
@@ -189,7 +215,7 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
       visibleVideosRef.current.clear();
       document.removeEventListener("visibilitychange", onVisibilityChange);
     };
-  }, [isActive, startedVideos]);
+  }, [isActive, pausedVideos, startedVideos]);
 
   useEffect(() => {
     const videos = videoRefs.current.filter(Boolean);
@@ -219,7 +245,7 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
         playPromise.catch(() => undefined);
       }
     }
-  }, [isActive, startedVideos]);
+  }, [isActive, pausedVideos, startedVideos]);
 
   return (
     <div className="stage-layout stage-layout--workflow dynamic-stage-layout">
@@ -251,39 +277,46 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
                 </span>
               </div>
 
-              {row.variants.map((variant) => (
-                <figure key={variant.video} className="glass-panel dynamic-media-panel">
-                  <figcaption className="dynamic-media-label">{variant.displayLabel}</figcaption>
-                  <div className="dynamic-variant-video-shell group">
-                    <video
-                      className={`dynamic-variant-video ${row.label === "Coffee" ? "dynamic-variant-video--coffee" : ""}`.trim()}
-                      muted
-                      loop
-                      playsInline
-                      preload="none"
-                      controls={false}
-                      ref={(node) => {
-                        if (node) {
-                          videoRefs.current[variantVideoIndices[row.label][variant.label]] = node;
-                        }
-                      }}
-                    >
-                      <source src={variant.video.replace(".mp4", ".webm")} type="video/webm" />
-                      <source src={variant.video} type="video/mp4" />
-                    </video>
-                    {!startedVideos[variantVideoIndices[row.label][variant.label]] ? (
+              {row.variants.map((variant) => {
+                const videoIndex = variantVideoIndices[row.label][variant.label];
+                const hasStarted = !!startedVideos[videoIndex];
+                const isPaused = !!pausedVideos[videoIndex];
+
+                return (
+                  <figure key={variant.video} className="glass-panel dynamic-media-panel">
+                    <figcaption className="dynamic-media-label">{variant.displayLabel}</figcaption>
+                    <div className="dynamic-variant-video-shell group">
+                      <video
+                        className={`dynamic-variant-video ${row.label === "Coffee" ? "dynamic-variant-video--coffee" : ""}`.trim()}
+                        muted
+                        playsInline
+                        preload="none"
+                        controls={false}
+                        ref={(node) => {
+                          if (node) {
+                            videoRefs.current[videoIndex] = node;
+                          }
+                        }}
+                      >
+                        <source src={variant.video.replace(".mp4", ".webm")} type="video/webm" />
+                        <source src={variant.video} type="video/mp4" />
+                      </video>
                       <button
                         type="button"
-                        className="dynamic-video-play-button"
-                        onClick={() => handleVideoStart(variantVideoIndices[row.label][variant.label])}
-                        aria-label={`Play ${variant.displayLabel}`}
+                        className={`dynamic-video-play-button ${hasStarted && !isPaused ? "is-active" : ""}`.trim()}
+                        onClick={() => handleVideoToggle(videoIndex)}
+                        aria-label={`${hasStarted && !isPaused ? "Pause" : "Play"} ${variant.displayLabel}`}
                       >
-                        <Play className="dynamic-video-play-icon" />
+                        {hasStarted && !isPaused ? (
+                          <Pause className="dynamic-video-play-icon" />
+                        ) : (
+                          <Play className="dynamic-video-play-icon" />
+                        )}
                       </button>
-                    ) : null}
-                  </div>
-                </figure>
-              ))}
+                    </div>
+                  </figure>
+                );
+              })}
             </div>
           </section>
         ))}
