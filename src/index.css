@@ -1338,23 +1338,23 @@ section#hero .story-panel__meta {
 
 .dynamic-media-stack {
   display: grid;
-  gap: 0.12rem;
+  gap: 0.95rem;
 }
 
 .dynamic-media-row {
   display: grid;
-  gap: 0.12rem;
+  gap: 0.62rem;
   position: relative;
 }
 
 .dynamic-media-row--wine {
-  margin-top: 0;
+  margin-top: 1.25rem;
 }
 
 .dynamic-media-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.52rem;
+  gap: 0.72rem;
 }
 
 .dynamic-media-panel {
@@ -1362,11 +1362,10 @@ section#hero .story-panel__meta {
   margin: 0;
   overflow: hidden;
   border-radius: 1.08rem;
-  padding: 0.14rem 0.14rem 0.08rem;
+  padding: 0.38rem;
   display: grid;
-  align-content: start;
-  gap: 0.06rem;
-  min-height: 0;
+  gap: 0.32rem;
+  min-height: clamp(18.5rem, 22vw, 21.25rem);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)),
     radial-gradient(circle at 86% 12%, rgba(231, 57, 214, 0.12), transparent 0 20%);
@@ -1405,12 +1404,12 @@ section#hero .story-panel__meta {
 
 .dynamic-media-label {
   margin: 0;
-  padding: 0.02rem 0.12rem 0;
+  padding: 0.2rem 0.24rem 0;
   color: rgba(255, 255, 255, 0.76);
-  font-size: 0.5rem;
+  font-size: 0.64rem;
   font-weight: 500;
   letter-spacing: 0.08em;
-  line-height: 1;
+  line-height: 1.2;
   text-transform: uppercase;
 }
 
@@ -1423,6 +1422,7 @@ section#hero .story-panel__meta {
 .dynamic-static-image,
 .dynamic-variant-video {
   width: 100%;
+  height: auto;
   display: block;
   background: #04050a;
   object-fit: contain;
@@ -1431,12 +1431,12 @@ section#hero .story-panel__meta {
 }
 
 .dynamic-static-image {
-  aspect-ratio: 16 / 4.45;
+  aspect-ratio: 16 / 5.8;
   object-position: 44% center;
 }
 
 .dynamic-variant-video {
-  aspect-ratio: 16 / 4.45;
+  aspect-ratio: 16 / 5.8;
 }
 
 .dynamic-video-play-button {
