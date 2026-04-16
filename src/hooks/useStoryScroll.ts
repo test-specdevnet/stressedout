@@ -43,6 +43,7 @@ export function useStoryScroll({
   const touchStartYRef = useRef<number | null>(null);
   const touchLastYRef = useRef<number | null>(null);
   const transitionTimeoutRef = useRef<number | null>(null);
+  const scrollFrameRef = useRef<number | null>(null);
 
   useEffect(() => {
     activeIndexRef.current = activeIndex;
@@ -50,6 +51,9 @@ export function useStoryScroll({
 
   useEffect(() => {
     return () => {
+      if (scrollFrameRef.current !== null) {
+        window.cancelAnimationFrame(scrollFrameRef.current);
+      }
       if (transitionTimeoutRef.current !== null) {
         window.clearTimeout(transitionTimeoutRef.current);
       }
@@ -209,9 +213,16 @@ export function useStoryScroll({
       window.history.replaceState(null, "", `#${nextId}`);
     }
 
-    target.scrollIntoView({
-      block: "start",
-      behavior: "smooth",
+    if (scrollFrameRef.current !== null) {
+      window.cancelAnimationFrame(scrollFrameRef.current);
+    }
+
+    scrollFrameRef.current = window.requestAnimationFrame(() => {
+      target.scrollIntoView({
+        block: "start",
+        behavior: "smooth",
+      });
+      scrollFrameRef.current = null;
     });
   }
 

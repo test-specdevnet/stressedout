@@ -62,10 +62,13 @@ export function GalleryStage({ isActive = false }: GalleryStageProps = {}) {
       (entries) => {
         for (const entry of entries) {
           const video = entry.target as HTMLVideoElement;
-          if (entry.intersectionRatio >= 0.5) {
+          if (entry.intersectionRatio >= 0.4) {
             visibleVideosRef.current.add(video);
             const index = videoRefs.current.findIndex((item) => item === video);
             if (index === activeIndex && isActive) {
+              if (Math.abs(video.currentTime) > 0.08) {
+                video.currentTime = 0;
+              }
               const playPromise = video.play();
               if (playPromise && typeof playPromise.catch === "function") {
                 playPromise.catch(() => undefined);
@@ -80,7 +83,7 @@ export function GalleryStage({ isActive = false }: GalleryStageProps = {}) {
           }
         }
       },
-      { threshold: [0, 0.5, 1], root: document.querySelector(".story-stage__viewport") },
+      { threshold: [0, 0.4, 1], root: document.querySelector(".story-stage__viewport") },
     );
 
     videos.forEach((video) => {

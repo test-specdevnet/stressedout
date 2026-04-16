@@ -11,6 +11,7 @@ body {
   scroll-snap-type: y mandatory;
   scroll-behavior: smooth;
   overscroll-behavior: contain;
+  scroll-padding-top: 0;
 }
 
 :root {
@@ -475,6 +476,8 @@ video {
   scroll-snap-type: y mandatory;
   isolation: isolate;
   scroll-behavior: smooth;
+  overscroll-behavior: contain;
+  scroll-padding-top: 0;
   perspective: none;
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -698,11 +701,11 @@ video {
   visibility: visible;
   pointer-events: auto;
   transform-origin: var(--story-wheel-pivot-x, 112%) var(--story-wheel-pivot-y, 50%);
-  transform: none;
+  transform: translateZ(0);
   filter: none;
   backface-visibility: hidden;
   transform-style: preserve-3d;
-  will-change: auto;
+  will-change: transform;
   transition: none;
   scroll-snap-align: start;
   scroll-snap-stop: always;
