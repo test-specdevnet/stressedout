@@ -111,6 +111,7 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
     if (!video) return;
 
     setStartedVideos((current) => (current[videoIndex] ? current : { ...current, [videoIndex]: true }));
+    video.load();
     video.currentTime = 0;
     const playPromise = video.play();
     if (playPromise && typeof playPromise.catch === "function") {
@@ -151,7 +152,6 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
     );
 
     for (const video of videos) {
-      video.load();
       const handleLoadedMetadata = () => playVideo(video, isActive);
       const handleCanPlay = () => playVideo(video, isActive);
       const handleEnded = () => {
@@ -260,7 +260,7 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
                       muted
                       loop
                       playsInline
-                      preload="metadata"
+                      preload="none"
                       controls={false}
                       ref={(node) => {
                         if (node) {
