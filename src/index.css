@@ -1415,7 +1415,6 @@ section#hero .story-panel__meta {
 
 .dynamic-variant-video-shell {
   position: relative;
-  height: 100%;
   border-radius: 0.72rem;
   overflow: hidden;
 }
@@ -1423,7 +1422,6 @@ section#hero .story-panel__meta {
 .dynamic-static-image,
 .dynamic-variant-video {
   width: 100%;
-  height: 100%;
   display: block;
   background: #04050a;
   object-fit: contain;
@@ -1940,7 +1938,7 @@ section#hero .story-panel__meta {
 .pricing-stage-grid {
   align-items: stretch;
   gap: 1.75rem;
-  grid-template-columns: repeat(3, minmax(20rem, 1fr));
+  grid-template-columns: repeat(3, minmax(21.5rem, 1fr));
 }
 
 .pricing-stage {
