@@ -70,39 +70,35 @@ type DynamicVideosStageProps = {
 export function DynamicVideosStage(props?: DynamicVideosStageProps) {
   const isActive = props?.isActive ?? false;
   const videoRefs = useRef<HTMLVideoElement[]>([]);
-  const visibleVideosRef = useRef<Set<HTMLVideoElement>>(new Set());
   const [startedVideos, setStartedVideos] = useState<Record<number, boolean>>({});
-  const [pausedVideos, setPausedVideos] = useState<Record<number, boolean>>({});
+  const [playingVideos, setPlayingVideos] = useState<Record<number, boolean>>({});
 
-  const playVideo = (video: HTMLVideoElement, force = false) => {
-    const videoIndex = videoRefs.current.findIndex((item) => item === video);
-    if (videoIndex < 0 || !startedVideos[videoIndex] || pausedVideos[videoIndex]) {
-      video.pause();
-      if (Math.abs(video.currentTime) > 0.08) {
-        video.currentTime = 0;
-      }
-      return;
-    }
+  const pauseVideo = (videoIndex: number, reset = false) => {
+    const video = videoRefs.current[videoIndex];
+    if (!video) return;
 
-    if (!force && !visibleVideosRef.current.has(video)) {
-      video.pause();
-      if (Math.abs(video.currentTime) > 0.08) {
-        video.currentTime = 0;
-      }
-      return;
+    video.pause();
+    if (reset) {
+      video.currentTime = 0;
     }
+    setPlayingVideos((current) => ({ ...current, [videoIndex]: false }));
+  };
+
+  const playVideo = (videoIndex: number) => {
+    const video = videoRefs.current[videoIndex];
+    if (!video) return;
 
     video.muted = true;
     video.defaultMuted = true;
-    video.autoplay = true;
-    video.loop = false;
     video.playsInline = true;
     video.setAttribute("muted", "");
-    video.setAttribute("autoplay", "");
     video.setAttribute("playsinline", "");
     const playPromise = video.play();
+    setPlayingVideos((current) => ({ ...current, [videoIndex]: true }));
     if (playPromise && typeof playPromise.catch === "function") {
-      playPromise.catch(() => {});
+      playPromise.catch(() => {
+        setPlayingVideos((current) => ({ ...current, [videoIndex]: false }));
+      });
     }
   };
 
@@ -111,141 +107,66 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
     if (!video) return;
 
     setStartedVideos((current) => (current[videoIndex] ? current : { ...current, [videoIndex]: true }));
-    setPausedVideos((current) => (current[videoIndex] ? { ...current, [videoIndex]: false } : current));
     video.load();
     video.currentTime = 0;
-    const playPromise = video.play();
-    if (playPromise && typeof playPromise.catch === "function") {
-      playPromise.catch(() => {});
-    }
+    playVideo(videoIndex);
   };
 
   const handleVideoToggle = (videoIndex: number) => {
-    const video = videoRefs.current[videoIndex];
-    if (!video) return;
-
     if (!startedVideos[videoIndex]) {
       handleVideoStart(videoIndex);
       return;
     }
 
-    if (pausedVideos[videoIndex]) {
-      setPausedVideos((current) => ({ ...current, [videoIndex]: false }));
-      const playPromise = video.play();
-      if (playPromise && typeof playPromise.catch === "function") {
-        playPromise.catch(() => {});
-      }
+    if (playingVideos[videoIndex]) {
+      pauseVideo(videoIndex, false);
       return;
     }
 
-    video.pause();
-    setPausedVideos((current) => ({ ...current, [videoIndex]: true }));
+    playVideo(videoIndex);
   };
 
   useEffect(() => {
     const videos = videoRefs.current.filter(Boolean);
     if (videos.length === 0) return;
-    const scrollViewport = document.querySelector(".story-stage__viewport");
-
-    const metadataHandlers = new Map<HTMLVideoElement, () => void>();
-    const canPlayHandlers = new Map<HTMLVideoElement, () => void>();
     const endedHandlers = new Map<HTMLVideoElement, () => void>();
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          const video = entry.target as HTMLVideoElement;
-          if (entry.intersectionRatio >= 0.4) {
-            visibleVideosRef.current.add(video);
-            if (isActive) {
-              if (Math.abs(video.currentTime) > 0.08) {
-                video.currentTime = 0;
-              }
-              playVideo(video, true);
-            }
-          } else {
-            visibleVideosRef.current.delete(video);
-            video.pause();
-            if (Math.abs(video.currentTime) > 0.08) {
-              video.currentTime = 0;
-            }
-          }
-        }
-      },
-      { threshold: [0, 0.4, 1], root: scrollViewport },
-    );
 
-    for (const video of videos) {
-      const handleLoadedMetadata = () => playVideo(video, isActive);
-      const handleCanPlay = () => playVideo(video, isActive);
+    for (const [videoIndex, video] of videos.entries()) {
       const handleEnded = () => {
-        const videoIndex = videoRefs.current.findIndex((item) => item === video);
-        video.pause();
-        if (videoIndex >= 0) {
-          setPausedVideos((current) => ({ ...current, [videoIndex]: true }));
-        }
+        pauseVideo(videoIndex, true);
       };
-      metadataHandlers.set(video, handleLoadedMetadata);
-      canPlayHandlers.set(video, handleCanPlay);
       endedHandlers.set(video, handleEnded);
-      video.addEventListener("loadedmetadata", handleLoadedMetadata, { passive: true });
-      video.addEventListener("canplay", handleCanPlay, { passive: true });
       video.addEventListener("ended", handleEnded, { passive: true });
-      observer.observe(video);
     }
 
     const onVisibilityChange = () => {
-      if (!document.hidden) {
-        for (const video of videos) playVideo(video, isActive);
+      if (document.hidden) {
+        for (const [videoIndex] of videos.entries()) {
+          pauseVideo(videoIndex, false);
+        }
       }
     };
 
     document.addEventListener("visibilitychange", onVisibilityChange);
 
     return () => {
-      for (const [video, handler] of metadataHandlers) {
-        video.removeEventListener("loadedmetadata", handler);
-      }
-      for (const [video, handler] of canPlayHandlers) {
-        video.removeEventListener("canplay", handler);
-      }
       for (const [video, handler] of endedHandlers) {
         video.removeEventListener("ended", handler);
       }
-      observer.disconnect();
-      visibleVideosRef.current.clear();
       document.removeEventListener("visibilitychange", onVisibilityChange);
     };
-  }, [isActive, pausedVideos, startedVideos]);
+  }, []);
 
   useEffect(() => {
     const videos = videoRefs.current.filter(Boolean);
     if (videos.length === 0) return;
 
     if (!isActive) {
-      for (const video of videos) {
-        video.pause();
-        if (Math.abs(video.currentTime) > 0.08) {
-          video.currentTime = 0;
-        }
-      }
-      return;
-    }
-
-    for (const video of videos) {
-      if (Math.abs(video.currentTime) > 0.08) {
-        video.currentTime = 0;
-      }
-      playVideo(video, true);
-    }
-
-    const firstVideo = videos[0];
-    if (firstVideo) {
-      const playPromise = firstVideo.play();
-      if (playPromise && typeof playPromise.catch === "function") {
-        playPromise.catch(() => undefined);
+      for (const [videoIndex] of videos.entries()) {
+        pauseVideo(videoIndex, true);
       }
     }
-  }, [isActive, pausedVideos, startedVideos]);
+  }, [isActive]);
 
   return (
     <div className="stage-layout stage-layout--workflow dynamic-stage-layout">
@@ -280,7 +201,7 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
               {row.variants.map((variant) => {
                 const videoIndex = variantVideoIndices[row.label][variant.label];
                 const hasStarted = !!startedVideos[videoIndex];
-                const isPaused = !!pausedVideos[videoIndex];
+                const isPlaying = !!playingVideos[videoIndex];
 
                 return (
                   <figure key={variant.video} className="glass-panel dynamic-media-panel">
@@ -303,11 +224,11 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
                       </video>
                       <button
                         type="button"
-                        className={`dynamic-video-play-button ${hasStarted && !isPaused ? "is-active" : ""}`.trim()}
+                        className={`dynamic-video-play-button ${isPlaying ? "is-active" : ""}`.trim()}
                         onClick={() => handleVideoToggle(videoIndex)}
-                        aria-label={`${hasStarted && !isPaused ? "Pause" : "Play"} ${variant.displayLabel}`}
+                        aria-label={`${isPlaying ? "Pause" : "Play"} ${variant.displayLabel}`}
                       >
-                        {hasStarted && !isPaused ? (
+                        {hasStarted && isPlaying ? (
                           <Pause className="dynamic-video-play-icon" />
                         ) : (
                           <Play className="dynamic-video-play-icon" />
