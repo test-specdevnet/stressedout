@@ -121,25 +121,45 @@ export default function App() {
         </a>
 
         <div className="floating-widget-stack" aria-label="Quick actions">
-          <GlassButton
-            className="floating-widget"
-            href="mailto:hello@stressedoutadvertising.com"
-            icon={Mail}
-            aria-label="Email us"
+          <BorderBeam
+            className="beam-shell beam-shell--widget"
+            size="md"
+            colorVariant="colorful"
+            duration={2.5}
+            strength={1}
+            brightness={1.4}
+            borderRadius={999}
           >
-            Email us
-          </GlassButton>
-          <GlassButton
-            className="floating-widget"
-            href="https://www.instagram.com/stressedoutadvertising?igsh=MzJxdXcybGRobTdt"
-            target="_blank"
-            rel="noreferrer"
-            icon={Instagram}
-            variant="secondary"
-            aria-label="Follow us on Instagram"
+            <GlassButton
+              className="floating-widget"
+              href="mailto:hello@stressedoutadvertising.com"
+              icon={Mail}
+              aria-label="Email us"
+            >
+              Email us
+            </GlassButton>
+          </BorderBeam>
+          <BorderBeam
+            className="beam-shell beam-shell--widget"
+            size="md"
+            colorVariant="colorful"
+            duration={2.5}
+            strength={1}
+            brightness={1.4}
+            borderRadius={999}
           >
-            Follow us
-          </GlassButton>
+            <GlassButton
+              className="floating-widget"
+              href="https://www.instagram.com/stressedoutadvertising?igsh=MzJxdXcybGRobTdt"
+              target="_blank"
+              rel="noreferrer"
+              icon={Instagram}
+              variant="secondary"
+              aria-label="Follow us on Instagram"
+            >
+              Follow us
+            </GlassButton>
+          </BorderBeam>
         </div>
       </header>
 
@@ -151,50 +171,30 @@ export default function App() {
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        <BorderBeam
-          className="beam-shell beam-shell--progress"
-          size="md"
-          colorVariant="colorful"
-          duration={2.5}
-          strength={1}
-          brightness={1.4}
-          borderRadius={24}
-        >
-          <div className="story-stage__progress glass-nav" aria-label="Story progress">
-            <p className="story-stage__progress-label">
-              {String(currentNavIndex + 1).padStart(2, "0")} / {String(progressNavItems.length).padStart(2, "0")}
-            </p>
-            <div className="story-stage__progress-list">
-              {progressNavItems.map((item, index) => {
-                const sectionIndex = sections.findIndex((section) => section.id === item.id);
-                const isCurrent = index === currentNavIndex;
-                return (
-                  <BorderBeam
-                    key={item.id}
-                    className="beam-shell beam-shell--progress-item"
-                    size="md"
-                    colorVariant="colorful"
-                    duration={2.5}
-                    strength={1}
-                    brightness={1.4}
-                    borderRadius={999}
-                  >
-                    <button
-                      type="button"
-                      className={`story-stage__progress-item ${isCurrent ? "is-current" : ""}`.trim()}
-                      onClick={() => navigateTo(sectionIndex)}
-                      aria-label={`Go to ${item.label}`}
-                      aria-current={isCurrent ? "page" : undefined}
-                    >
-                      <span>{String(index + 1).padStart(2, "0")}</span>
-                      <span>{item.label}</span>
-                    </button>
-                  </BorderBeam>
-                );
-              })}
-            </div>
+        <div className="story-stage__progress glass-nav" aria-label="Story progress">
+          <p className="story-stage__progress-label">
+            {String(currentNavIndex + 1).padStart(2, "0")} / {String(progressNavItems.length).padStart(2, "0")}
+          </p>
+          <div className="story-stage__progress-list">
+            {progressNavItems.map((item, index) => {
+              const sectionIndex = sections.findIndex((section) => section.id === item.id);
+              const isCurrent = index === currentNavIndex;
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  className={`story-stage__progress-item ${isCurrent ? "is-current" : ""}`.trim()}
+                  onClick={() => navigateTo(sectionIndex)}
+                  aria-label={`Go to ${item.label}`}
+                  aria-current={isCurrent ? "page" : undefined}
+                >
+                  <span>{String(index + 1).padStart(2, "0")}</span>
+                  <span>{item.label}</span>
+                </button>
+              );
+            })}
           </div>
-        </BorderBeam>
+        </div>
 
         <div className="story-stage__controls" aria-label="Story navigation">
           <BorderBeam
