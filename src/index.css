@@ -1377,15 +1377,17 @@ section#hero .story-panel__meta {
 
 .dynamic-stage-layout {
   align-content: start;
-  gap: 0.9rem;
+  gap: 1rem;
   height: auto;
   min-height: 0;
   overflow: visible;
   box-sizing: border-box;
+  padding-bottom: 1rem;
 }
 
 .dynamic-stage-copy {
   max-width: none;
+  padding-bottom: 0.35rem;
 }
 
 .dynamic-stage-title {
@@ -1398,12 +1400,14 @@ section#hero .story-panel__meta {
 .dynamic-media-stack {
   display: grid;
   grid-template-rows: auto auto;
-  gap: clamp(1.4rem, 2vw, 2.2rem);
+  gap: clamp(1.4rem, 2vw, 2rem);
   width: 100%;
   height: auto;
   min-height: 0;
   overflow: visible;
   box-sizing: border-box;
+  padding-top: 1rem;
+  padding-bottom: 2rem;
 }
 
 .dynamic-media-row {
@@ -1423,7 +1427,7 @@ section#hero .story-panel__meta {
 
 .dynamic-media-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   align-items: start;
   gap: clamp(0.72rem, 1vw, 1rem);
   width: 100%;
@@ -1437,7 +1441,7 @@ section#hero .story-panel__meta {
   min-width: 0;
   max-width: 100%;
   margin: 0;
-  overflow: hidden;
+  overflow: visible;
   border-radius: 1.08rem;
   padding: 0.38rem;
   display: grid;
@@ -1445,6 +1449,7 @@ section#hero .story-panel__meta {
   gap: 0.28rem;
   min-height: 0;
   height: auto;
+  max-height: none;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)),
     radial-gradient(circle at 86% 12%, rgba(231, 57, 214, 0.12), transparent 0 20%);
@@ -1511,20 +1516,23 @@ section#hero .story-panel__meta {
   height: auto;
   display: block;
   background: #04050a;
-  object-fit: contain;
+  object-fit: cover;
   object-position: center center;
   border-radius: 0.72rem;
   box-sizing: border-box;
 }
 
 .dynamic-static-image {
-  aspect-ratio: 1168 / 784;
+  aspect-ratio: 16 / 9;
   object-position: 44% center;
 }
 
 .dynamic-variant-video {
-  aspect-ratio: 1168 / 784;
-  object-fit: contain;
+  aspect-ratio: 16 / 9;
+}
+
+.dynamic-variant-video-shell {
+  aspect-ratio: 16 / 9;
 }
 
 .dynamic-video-play-button {
