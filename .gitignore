@@ -8,6 +8,8 @@ tmp-video-frames-2/
 /*-local.png
 /*-check*.png
 /*-pass*.png
+/*-after-revert.png
+/playwright-*.png
 /*.patch
 vite.config.js
 vite.config.d.ts

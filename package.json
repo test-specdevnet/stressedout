@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "build:embed": "npm.cmd run build && node scripts/build-carrd-embed.mjs"
+    "build:embed": "npm run build && node scripts/build-carrd-embed.mjs"
   },
   "dependencies": {
     "lucide-react": "^0.525.0",
