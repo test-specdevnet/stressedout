@@ -1,4 +1,5 @@
 import { ChevronDown, ChevronUp, Instagram, Mail } from "lucide-react";
+import { BorderBeam } from "border-beam";
 import { useEffect, useState } from "react";
 import { GlassButton } from "./components/GlassButton";
 import { useStoryScroll } from "./hooks/useStoryScroll";
@@ -150,50 +151,90 @@ export default function App() {
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        <div className="story-stage__progress glass-nav" aria-label="Story progress">
-          <p className="story-stage__progress-label">
-            {String(currentNavIndex + 1).padStart(2, "0")} / {String(progressNavItems.length).padStart(2, "0")}
-          </p>
-          <div className="story-stage__progress-list">
-            {progressNavItems.map((item, index) => {
-              const sectionIndex = sections.findIndex((section) => section.id === item.id);
-              const isCurrent = index === currentNavIndex;
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  className={`story-stage__progress-item ${isCurrent ? "is-current" : ""}`.trim()}
-                  onClick={() => navigateTo(sectionIndex)}
-                  aria-label={`Go to ${item.label}`}
-                  aria-current={isCurrent ? "page" : undefined}
-                >
-                  <span>{String(index + 1).padStart(2, "0")}</span>
-                  <span>{item.label}</span>
-                </button>
-              );
-            })}
+        <BorderBeam
+          className="beam-shell beam-shell--progress"
+          size="md"
+          colorVariant="colorful"
+          duration={2.5}
+          strength={1}
+          brightness={1.4}
+          borderRadius={24}
+        >
+          <div className="story-stage__progress glass-nav" aria-label="Story progress">
+            <p className="story-stage__progress-label">
+              {String(currentNavIndex + 1).padStart(2, "0")} / {String(progressNavItems.length).padStart(2, "0")}
+            </p>
+            <div className="story-stage__progress-list">
+              {progressNavItems.map((item, index) => {
+                const sectionIndex = sections.findIndex((section) => section.id === item.id);
+                const isCurrent = index === currentNavIndex;
+                return (
+                  <BorderBeam
+                    key={item.id}
+                    className="beam-shell beam-shell--progress-item"
+                    size="md"
+                    colorVariant="colorful"
+                    duration={2.5}
+                    strength={1}
+                    brightness={1.4}
+                    borderRadius={999}
+                  >
+                    <button
+                      type="button"
+                      className={`story-stage__progress-item ${isCurrent ? "is-current" : ""}`.trim()}
+                      onClick={() => navigateTo(sectionIndex)}
+                      aria-label={`Go to ${item.label}`}
+                      aria-current={isCurrent ? "page" : undefined}
+                    >
+                      <span>{String(index + 1).padStart(2, "0")}</span>
+                      <span>{item.label}</span>
+                    </button>
+                  </BorderBeam>
+                );
+              })}
+            </div>
           </div>
-        </div>
+        </BorderBeam>
 
         <div className="story-stage__controls" aria-label="Story navigation">
-          <button
-            type="button"
-            className="story-arrow glass-nav"
-            onClick={() => navigateTo(activeIndex - 1, { wrap: true, directionOverride: "backward" })}
-            disabled={isTransitioning}
-            aria-label="Go to previous section"
+          <BorderBeam
+            className="beam-shell beam-shell--nav-control"
+            size="md"
+            colorVariant="colorful"
+            duration={2.5}
+            strength={1}
+            brightness={1.4}
+            borderRadius={24}
           >
-            <ChevronUp size={22} strokeWidth={2.2} />
-          </button>
-          <button
-            type="button"
-            className="story-arrow glass-nav"
-            onClick={() => navigateTo(activeIndex + 1, { wrap: true, directionOverride: "forward" })}
-            disabled={isTransitioning}
-            aria-label="Go to next section"
+            <button
+              type="button"
+              className="story-arrow glass-nav"
+              onClick={() => navigateTo(activeIndex - 1, { wrap: true, directionOverride: "backward" })}
+              disabled={isTransitioning}
+              aria-label="Go to previous section"
+            >
+              <ChevronUp size={22} strokeWidth={2.2} />
+            </button>
+          </BorderBeam>
+          <BorderBeam
+            className="beam-shell beam-shell--nav-control"
+            size="md"
+            colorVariant="colorful"
+            duration={2.5}
+            strength={1}
+            brightness={1.4}
+            borderRadius={24}
           >
-            <ChevronDown size={22} strokeWidth={2.2} />
-          </button>
+            <button
+              type="button"
+              className="story-arrow glass-nav"
+              onClick={() => navigateTo(activeIndex + 1, { wrap: true, directionOverride: "forward" })}
+              disabled={isTransitioning}
+              aria-label="Go to next section"
+            >
+              <ChevronDown size={22} strokeWidth={2.2} />
+            </button>
+          </BorderBeam>
         </div>
 
         <div className="story-stage__pinwheel" aria-hidden="true">
@@ -233,17 +274,27 @@ export default function App() {
                   zIndex: isActive ? 2 : 1,
                 }}
               >
-                <div className="story-panel__surface glass-panel">
-                  <div className="story-panel__frame">
-                    <div className="story-panel__meta">
-                      <p className="story-panel__eyebrow">{section.label}</p>
-                      <span className="story-panel__count">
-                        {String(index + 1).padStart(2, "0")}
-                      </span>
+                <BorderBeam
+                  className="beam-shell beam-shell--story-panel"
+                  size="md"
+                  colorVariant="colorful"
+                  duration={2.5}
+                  strength={1}
+                  brightness={1.4}
+                  borderRadius={24}
+                >
+                  <div className="story-panel__surface glass-panel">
+                    <div className="story-panel__frame">
+                      <div className="story-panel__meta">
+                        <p className="story-panel__eyebrow">{section.label}</p>
+                        <span className="story-panel__count">
+                          {String(index + 1).padStart(2, "0")}
+                        </span>
+                      </div>
+                      <Stage isActive={isActive} reducedMotion={prefersReducedMotion} />
                     </div>
-                    <Stage isActive={isActive} reducedMotion={prefersReducedMotion} />
                   </div>
-                </div>
+                </BorderBeam>
               </section>
             );
           })}

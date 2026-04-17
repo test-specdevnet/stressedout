@@ -445,6 +445,61 @@ video {
     rgba(50, 22, 95, 0.18);
 }
 
+.beam-shell {
+  position: relative;
+  display: block;
+  isolation: isolate;
+}
+
+.beam-shell > [data-beam-bloom] {
+  opacity: 0.55;
+  filter: blur(14px) saturate(1.1);
+}
+
+.beam-shell--story-panel {
+  height: 100%;
+}
+
+.beam-shell--story-panel > .story-panel__surface {
+  height: 100%;
+}
+
+.beam-shell--progress,
+.beam-shell--nav-control,
+.beam-shell--dot-control,
+.beam-shell--progress-item {
+  flex-shrink: 0;
+}
+
+.beam-shell--progress-item {
+  border-radius: var(--radius-pill);
+}
+
+.beam-shell--progress-item > .story-stage__progress-item {
+  width: 100%;
+  border-radius: inherit;
+}
+
+.beam-shell--nav-control {
+  pointer-events: auto;
+}
+
+.beam-shell--nav-control > .story-arrow,
+.beam-shell--nav-control > .gallery-carousel__arrow,
+.beam-shell--nav-control > .pricing-stage__arrow {
+  width: 100%;
+  height: 100%;
+}
+
+.beam-shell--dot-control {
+  display: inline-flex;
+  border-radius: var(--radius-pill);
+}
+
+.beam-shell--dot-control > .pricing-stage__dot {
+  display: block;
+}
+
 .story-stage {
   position: relative;
   height: 100vh;

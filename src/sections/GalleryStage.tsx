@@ -1,4 +1,5 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { BorderBeam } from "border-beam";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 const galleryAds = [
@@ -212,14 +213,24 @@ export function GalleryStage({ isActive = false }: GalleryStageProps = {}) {
           aria-roledescription="carousel"
           aria-label={carouselLabel}
         >
-          <button
-            type="button"
-            className="gallery-carousel__arrow gallery-carousel__arrow--prev glass-nav"
-            onClick={goToPreviousSlide}
-            aria-label="Show previous ad"
+          <BorderBeam
+            className="beam-shell beam-shell--nav-control"
+            size="md"
+            colorVariant="colorful"
+            duration={2.5}
+            strength={1}
+            brightness={1.4}
+            borderRadius={24}
           >
-            <ChevronLeft size={20} strokeWidth={2.4} />
-          </button>
+            <button
+              type="button"
+              className="gallery-carousel__arrow gallery-carousel__arrow--prev glass-nav"
+              onClick={goToPreviousSlide}
+              aria-label="Show previous ad"
+            >
+              <ChevronLeft size={20} strokeWidth={2.4} />
+            </button>
+          </BorderBeam>
 
           <div className={`gallery-carousel__viewport ${activeAd.orientation === "portrait" ? "is-portrait-active" : ""}`.trim()}>
             <div className="gallery-carousel__ambient-glow" aria-hidden="true" />
@@ -264,14 +275,24 @@ export function GalleryStage({ isActive = false }: GalleryStageProps = {}) {
             </div>
           </div>
 
-          <button
-            type="button"
-            className="gallery-carousel__arrow gallery-carousel__arrow--next glass-nav"
-            onClick={goToNextSlide}
-            aria-label="Show next ad"
+          <BorderBeam
+            className="beam-shell beam-shell--nav-control"
+            size="md"
+            colorVariant="colorful"
+            duration={2.5}
+            strength={1}
+            brightness={1.4}
+            borderRadius={24}
           >
-            <ChevronRight size={20} strokeWidth={2.4} />
-          </button>
+            <button
+              type="button"
+              className="gallery-carousel__arrow gallery-carousel__arrow--next glass-nav"
+              onClick={goToNextSlide}
+              aria-label="Show next ad"
+            >
+              <ChevronRight size={20} strokeWidth={2.4} />
+            </button>
+          </BorderBeam>
         </div>
       </div>
     </div>
