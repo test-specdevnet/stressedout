@@ -237,6 +237,80 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
           </section>
         ))}
       </div>
+
+      <style>{`
+        /* LAYOUT FIX v3 — Fixed header overlap + bottom wine cropping (applied to current AFTER version) */
+        /* NEW FIXES — header overlap + bottom cropping */
+        .stage-layout--workflow,
+        .dynamic-stage-layout,
+        .dynamic-stage-copy {
+          height: auto;
+          max-height: none;
+          overflow: visible;
+          padding-bottom: 1rem;
+        }
+
+        .dynamic-media-stack {
+          display: flex;
+          flex-direction: column;
+          gap: 3.5rem;
+          width: 100%;
+          max-width: 100%;
+          height: auto;
+          overflow: visible;
+          padding-top: 2rem;
+          padding-bottom: 3rem;
+          margin-top: 0;
+        }
+
+        .dynamic-media-row {
+          width: 100%;
+          height: auto;
+          box-sizing: border-box;
+        }
+
+        .glass-panel,
+        .dynamic-media-panel {
+          height: auto;
+          max-height: none;
+          overflow: visible;
+          box-sizing: border-box;
+          display: flex;
+          flex-direction: column;
+        }
+
+        .dynamic-media-grid {
+          display: grid;
+          grid-template-columns: 1fr 48px 1fr 1fr;
+          gap: 1.5rem;
+          align-items: start;
+          width: 100%;
+          max-width: 100%;
+        }
+
+        .dynamic-static-image,
+        .dynamic-variant-video {
+          width: 100%;
+          height: auto;
+          aspect-ratio: 16 / 9;
+          object-fit: cover;
+          border-radius: inherit;
+          display: block;
+        }
+
+        .dynamic-variant-video-shell {
+          position: relative;
+          width: 100%;
+          aspect-ratio: 16 / 9;
+          overflow: hidden;
+          border-radius: inherit;
+        }
+
+        .dynamic-media-label {
+          margin-bottom: 0.5rem !important;
+          padding-bottom: 0;
+        }
+      `}</style>
     </div>
   );
 }
