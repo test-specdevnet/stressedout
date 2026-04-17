@@ -70,7 +70,6 @@ type DynamicVideosStageProps = {
 export function DynamicVideosStage(props?: DynamicVideosStageProps) {
   const isActive = props?.isActive ?? false;
   const videoRefs = useRef<HTMLVideoElement[]>([]);
-  const [startedVideos, setStartedVideos] = useState<Record<number, boolean>>({});
   const [playingVideos, setPlayingVideos] = useState<Record<number, boolean>>({});
 
   const pauseVideo = (videoIndex: number, reset = false) => {
@@ -102,22 +101,7 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
     }
   };
 
-  const handleVideoStart = (videoIndex: number) => {
-    const video = videoRefs.current[videoIndex];
-    if (!video) return;
-
-    setStartedVideos((current) => (current[videoIndex] ? current : { ...current, [videoIndex]: true }));
-    video.load();
-    video.currentTime = 0;
-    playVideo(videoIndex);
-  };
-
   const handleVideoToggle = (videoIndex: number) => {
-    if (!startedVideos[videoIndex]) {
-      handleVideoStart(videoIndex);
-      return;
-    }
-
     if (playingVideos[videoIndex]) {
       pauseVideo(videoIndex, false);
       return;
@@ -129,14 +113,20 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
   useEffect(() => {
     const videos = videoRefs.current.filter(Boolean);
     if (videos.length === 0) return;
-    const endedHandlers = new Map<HTMLVideoElement, () => void>();
+    const playHandlers = new Map<HTMLVideoElement, () => void>();
+    const pauseHandlers = new Map<HTMLVideoElement, () => void>();
 
     for (const [videoIndex, video] of videos.entries()) {
-      const handleEnded = () => {
-        pauseVideo(videoIndex, true);
+      const handlePlay = () => {
+        setPlayingVideos((current) => ({ ...current, [videoIndex]: true }));
       };
-      endedHandlers.set(video, handleEnded);
-      video.addEventListener("ended", handleEnded, { passive: true });
+      const handlePause = () => {
+        setPlayingVideos((current) => ({ ...current, [videoIndex]: false }));
+      };
+      playHandlers.set(video, handlePlay);
+      pauseHandlers.set(video, handlePause);
+      video.addEventListener("play", handlePlay, { passive: true });
+      video.addEventListener("pause", handlePause, { passive: true });
     }
 
     const onVisibilityChange = () => {
@@ -150,8 +140,11 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
     document.addEventListener("visibilitychange", onVisibilityChange);
 
     return () => {
-      for (const [video, handler] of endedHandlers) {
-        video.removeEventListener("ended", handler);
+      for (const [video, handler] of playHandlers) {
+        video.removeEventListener("play", handler);
+      }
+      for (const [video, handler] of pauseHandlers) {
+        video.removeEventListener("pause", handler);
       }
       document.removeEventListener("visibilitychange", onVisibilityChange);
     };
@@ -200,7 +193,6 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
 
               {row.variants.map((variant) => {
                 const videoIndex = variantVideoIndices[row.label][variant.label];
-                const hasStarted = !!startedVideos[videoIndex];
                 const isPlaying = !!playingVideos[videoIndex];
 
                 return (
@@ -210,8 +202,9 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
                       <video
                         className={`dynamic-variant-video ${row.label === "Coffee" ? "dynamic-variant-video--coffee" : ""}`.trim()}
                         muted
+                        loop
                         playsInline
-                        preload="none"
+                        preload="metadata"
                         controls={false}
                         ref={(node) => {
                           if (node) {
@@ -227,12 +220,14 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
                         className={`dynamic-video-play-button ${isPlaying ? "is-active" : ""}`.trim()}
                         onClick={() => handleVideoToggle(videoIndex)}
                         aria-label={`${isPlaying ? "Pause" : "Play"} ${variant.displayLabel}`}
+                        aria-pressed={isPlaying}
                       >
-                        {hasStarted && isPlaying ? (
+                        {isPlaying ? (
                           <Pause className="dynamic-video-play-icon" />
                         ) : (
                           <Play className="dynamic-video-play-icon" />
                         )}
+                        <span className="dynamic-video-play-text">{isPlaying ? "Pause" : "Play"}</span>
                       </button>
                     </div>
                   </figure>
