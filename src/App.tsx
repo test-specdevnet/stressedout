@@ -103,31 +103,43 @@ export default function App() {
       </div>
 
       <header className="site-header">
-        <a
-          className="brand-mark glass-nav"
-          href="#hero"
-          aria-label="Stressed Out home"
-          onClick={(event) => {
-            event.preventDefault();
-            handleAnchorNavigation("hero");
-          }}
+        <BorderBeam
+          className="beam-shell beam-shell--widget"
+          size="md"
+          colorVariant="mono"
+          staticColors
+          duration={2.5}
+          strength={1}
+          brightness={1.25}
+          borderRadius={24}
         >
-          <img
-            className="brand-mark__logo"
-            src="/assets/stressed-out/images/logo-3.png"
-            alt="Stressed Out logo"
-          />
-          <span className="brand-mark__name">Stressed Out Advertising</span>
-        </a>
+          <a
+            className="brand-mark glass-nav"
+            href="#hero"
+            aria-label="Stressed Out home"
+            onClick={(event) => {
+              event.preventDefault();
+              handleAnchorNavigation("hero");
+            }}
+          >
+            <img
+              className="brand-mark__logo"
+              src="/assets/stressed-out/images/logo-3.png"
+              alt="Stressed Out logo"
+            />
+            <span className="brand-mark__name">Stressed Out Advertising</span>
+          </a>
+        </BorderBeam>
 
         <div className="floating-widget-stack" aria-label="Quick actions">
           <BorderBeam
             className="beam-shell beam-shell--widget"
             size="md"
-            colorVariant="colorful"
+            colorVariant="mono"
+            staticColors
             duration={2.5}
             strength={1}
-            brightness={1.4}
+            brightness={1.25}
             borderRadius={999}
           >
             <GlassButton
@@ -142,10 +154,11 @@ export default function App() {
           <BorderBeam
             className="beam-shell beam-shell--widget"
             size="md"
-            colorVariant="colorful"
+            colorVariant="mono"
+            staticColors
             duration={2.5}
             strength={1}
-            brightness={1.4}
+            brightness={1.25}
             borderRadius={999}
           >
             <GlassButton
@@ -200,10 +213,11 @@ export default function App() {
           <BorderBeam
             className="beam-shell beam-shell--nav-control"
             size="md"
-            colorVariant="colorful"
+            colorVariant="mono"
+            staticColors
             duration={2.5}
             strength={1}
-            brightness={1.4}
+            brightness={1.25}
             borderRadius={24}
           >
             <button
@@ -219,10 +233,11 @@ export default function App() {
           <BorderBeam
             className="beam-shell beam-shell--nav-control"
             size="md"
-            colorVariant="colorful"
+            colorVariant="mono"
+            staticColors
             duration={2.5}
             strength={1}
-            brightness={1.4}
+            brightness={1.25}
             borderRadius={24}
           >
             <button
@@ -274,27 +289,17 @@ export default function App() {
                   zIndex: isActive ? 2 : 1,
                 }}
               >
-                <BorderBeam
-                  className="beam-shell beam-shell--story-panel"
-                  size="md"
-                  colorVariant="colorful"
-                  duration={2.5}
-                  strength={1}
-                  brightness={1.4}
-                  borderRadius={24}
-                >
-                  <div className="story-panel__surface glass-panel">
-                    <div className="story-panel__frame">
-                      <div className="story-panel__meta">
-                        <p className="story-panel__eyebrow">{section.label}</p>
-                        <span className="story-panel__count">
-                          {String(index + 1).padStart(2, "0")}
-                        </span>
-                      </div>
-                      <Stage isActive={isActive} reducedMotion={prefersReducedMotion} />
+                <div className="story-panel__surface glass-panel">
+                  <div className="story-panel__frame">
+                    <div className="story-panel__meta">
+                      <p className="story-panel__eyebrow">{section.label}</p>
+                      <span className="story-panel__count">
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
                     </div>
+                    <Stage isActive={isActive} reducedMotion={prefersReducedMotion} />
                   </div>
-                </BorderBeam>
+                </div>
               </section>
             );
           })}

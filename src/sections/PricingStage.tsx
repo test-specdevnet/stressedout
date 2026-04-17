@@ -1,5 +1,4 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { BorderBeam } from "border-beam";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { GlassButton } from "../components/GlassButton";
@@ -214,24 +213,14 @@ export function PricingStage() {
         aria-roledescription="carousel"
         aria-label={`Pricing carousel showing page ${safeActivePage + 1} of ${pages.length}`}
       >
-        <BorderBeam
-          className="beam-shell beam-shell--nav-control"
-          size="md"
-          colorVariant="colorful"
-          duration={2.5}
-          strength={1}
-          brightness={1.4}
-          borderRadius={24}
+        <button
+          type="button"
+          className="pricing-stage__arrow pricing-stage__arrow--prev gallery-carousel__arrow gallery-carousel__arrow--prev glass-nav"
+          onClick={goToPreviousPage}
+          aria-label="Show previous pricing cards"
         >
-          <button
-            type="button"
-            className="pricing-stage__arrow pricing-stage__arrow--prev gallery-carousel__arrow gallery-carousel__arrow--prev glass-nav"
-            onClick={goToPreviousPage}
-            aria-label="Show previous pricing cards"
-          >
-            <ChevronLeft size={22} strokeWidth={2.5} />
-          </button>
-        </BorderBeam>
+          <ChevronLeft size={22} strokeWidth={2.5} />
+        </button>
 
         <div ref={viewportRef} className="pricing-stage__viewport">
           <div className="pricing-stage__track">
@@ -277,45 +266,25 @@ export function PricingStage() {
           </div>
         </div>
 
-        <BorderBeam
-          className="beam-shell beam-shell--nav-control"
-          size="md"
-          colorVariant="colorful"
-          duration={2.5}
-          strength={1}
-          brightness={1.4}
-          borderRadius={24}
+        <button
+          type="button"
+          className="pricing-stage__arrow pricing-stage__arrow--next gallery-carousel__arrow gallery-carousel__arrow--next glass-nav"
+          onClick={goToNextPage}
+          aria-label="Show next pricing cards"
         >
-          <button
-            type="button"
-            className="pricing-stage__arrow pricing-stage__arrow--next gallery-carousel__arrow gallery-carousel__arrow--next glass-nav"
-            onClick={goToNextPage}
-            aria-label="Show next pricing cards"
-          >
-            <ChevronRight size={22} strokeWidth={2.5} />
-          </button>
-        </BorderBeam>
+          <ChevronRight size={22} strokeWidth={2.5} />
+        </button>
 
         <div className="pricing-stage__dots" aria-hidden="true">
           {pages.map((_, pageIndex) => (
-            <BorderBeam
+            <button
               key={`pricing-dot-${pageIndex}`}
-              className="beam-shell beam-shell--dot-control"
-              size="md"
-              colorVariant="colorful"
-              duration={2.5}
-              strength={1}
-              brightness={1.4}
-              borderRadius={999}
+              type="button"
+              className={`pricing-stage__dot ${pageIndex === safeActivePage ? "is-active" : ""}`.trim()}
+              onClick={() => goToPage(pageIndex)}
             >
-              <button
-                type="button"
-                className={`pricing-stage__dot ${pageIndex === safeActivePage ? "is-active" : ""}`.trim()}
-                onClick={() => goToPage(pageIndex)}
-              >
-                <span className="sr-only">Show pricing page {pageIndex + 1}</span>
-              </button>
-            </BorderBeam>
+              <span className="sr-only">Show pricing page {pageIndex + 1}</span>
+            </button>
           ))}
         </div>
       </div>
