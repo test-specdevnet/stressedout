@@ -227,6 +227,8 @@ export function PricingStage() {
                       <p className="pricing-stage-card__price">{card.price}</p>
                       <p className="pricing-stage-card__description">{card.description}</p>
 
+                      <p className="pricing-stage-card__note">{card.note}</p>
+
                       <GlassButton
                         className="pricing-stage-card__cta"
                         href={card.href}
@@ -236,8 +238,6 @@ export function PricingStage() {
                       >
                         {card.ctaText}
                       </GlassButton>
-
-                      <p className="pricing-stage-card__note">{card.note}</p>
                     </div>
 
                     <ul className="pricing-stage-card__bullets" aria-label={`${card.title} included features`}>
