@@ -1459,38 +1459,36 @@ section#hero .story-panel__meta {
   border-radius: 0.72rem;
   overflow: hidden;
   width: 100%;
-  min-height: 0;
   max-width: 100%;
+  border: 4px solid red !important;
+  outline: 4px solid lime !important;
+  aspect-ratio: 16 / 12.5 !important;
+  min-height: 0;
+  box-sizing: border-box;
   background:
     radial-gradient(circle at 50% 30%, rgba(255, 255, 255, 0.08), transparent 46%),
     linear-gradient(180deg, rgba(7, 10, 20, 0.94), rgba(4, 6, 14, 0.98));
-  box-sizing: border-box;
 }
 
 .dynamic-static-image,
 .dynamic-variant-video {
-  width: 100%;
-  max-width: 100%;
-  height: 100%;
+  width: 100% !important;
+  height: 100% !important;
   display: block;
   background: #04050a;
-  object-fit: contain;
-  object-position: center center;
+  object-fit: contain !important;
+  object-position: center center !important;
   border-radius: 0.72rem;
   box-sizing: border-box;
 }
 
 .dynamic-static-image {
-  aspect-ratio: 16 / 8.6;
+  aspect-ratio: 16 / 12.5 !important;
   object-position: 44% center;
 }
 
 .dynamic-variant-video {
-  aspect-ratio: 16 / 8.6;
-}
-
-.dynamic-variant-video-shell {
-  aspect-ratio: 16 / 8.6;
+  aspect-ratio: auto;
 }
 
 .dynamic-video-play-button {
