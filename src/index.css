@@ -484,17 +484,6 @@ video {
   justify-self: start;
 }
 
-.beam-shell--progress {
-  display: block;
-  width: fit-content;
-  max-width: min(8.75rem, calc(100vw - 7rem));
-  position: fixed;
-  right: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 24;
-}
-
 .beam-shell--nav-control {
   pointer-events: auto;
 }
