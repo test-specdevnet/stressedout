@@ -183,30 +183,40 @@ export default function App() {
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        <div className="story-stage__progress glass-nav" aria-label="Story progress">
-          <p className="story-stage__progress-label">
-            {String(currentNavIndex + 1).padStart(2, "0")} / {String(progressNavItems.length).padStart(2, "0")}
-          </p>
-          <div className="story-stage__progress-list">
-            {progressNavItems.map((item, index) => {
-              const sectionIndex = sections.findIndex((section) => section.id === item.id);
-              const isCurrent = index === currentNavIndex;
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  className={`story-stage__progress-item ${isCurrent ? "is-current" : ""}`.trim()}
-                  onClick={() => navigateTo(sectionIndex)}
-                  aria-label={`Go to ${item.label}`}
-                  aria-current={isCurrent ? "page" : undefined}
-                >
-                  <span>{String(index + 1).padStart(2, "0")}</span>
-                  <span>{item.label}</span>
-                </button>
-              );
-            })}
+        <BorderBeam
+          className="beam-shell beam-shell--progress"
+          size="md"
+          colorVariant="ocean"
+          duration={BEAM_DURATION}
+          strength={0.82}
+          borderRadius={BEAM_BORDER_RADIUS}
+          active={!prefersReducedMotion}
+        >
+          <div className="story-stage__progress glass-nav" aria-label="Story progress">
+            <p className="story-stage__progress-label">
+              {String(currentNavIndex + 1).padStart(2, "0")} / {String(progressNavItems.length).padStart(2, "0")}
+            </p>
+            <div className="story-stage__progress-list">
+              {progressNavItems.map((item, index) => {
+                const sectionIndex = sections.findIndex((section) => section.id === item.id);
+                const isCurrent = index === currentNavIndex;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    className={`story-stage__progress-item ${isCurrent ? "is-current" : ""}`.trim()}
+                    onClick={() => navigateTo(sectionIndex)}
+                    aria-label={`Go to ${item.label}`}
+                    aria-current={isCurrent ? "page" : undefined}
+                  >
+                    <span>{String(index + 1).padStart(2, "0")}</span>
+                    <span>{item.label}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        </div>
+        </BorderBeam>
 
         <div className="story-stage__controls" aria-label="Story navigation">
           <BorderBeam
