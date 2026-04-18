@@ -223,21 +223,15 @@ export function PricingStage() {
                   >
                     <div className="pricing-stage-card__summary">
                       <span className="pricing-stage-card__badge">{card.badge}</span>
-                      <h3 className="pricing-stage-card__title">{card.title}</h3>
+                      <h3
+                        className={`pricing-stage-card__title ${card.title === "Stress Test Report" || card.title === "Stress Free Monthly" ? "pricing-stage-card__title--single-line" : ""}`.trim()}
+                      >
+                        {card.title}
+                      </h3>
                       <p className="pricing-stage-card__price">{card.price}</p>
                       <p className="pricing-stage-card__description">{card.description}</p>
 
                       <p className="pricing-stage-card__note">{card.note}</p>
-
-                      <GlassButton
-                        className="pricing-stage-card__cta"
-                        href={card.href}
-                        target="_blank"
-                        rel="noreferrer"
-                        variant="secondary"
-                      >
-                        {card.ctaText}
-                      </GlassButton>
                     </div>
 
                     <ul className="pricing-stage-card__bullets" aria-label={`${card.title} included features`}>
@@ -245,6 +239,16 @@ export function PricingStage() {
                         <li key={bullet}>{bullet}</li>
                       ))}
                     </ul>
+
+                    <GlassButton
+                      className="pricing-stage-card__cta"
+                      href={card.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      variant="secondary"
+                    >
+                      {card.ctaText}
+                    </GlassButton>
                   </article>
                 </div>
               );

@@ -2325,9 +2325,14 @@ section#hero .story-panel__meta {
   font-size: clamp(1.46rem, 1.75vw, 1.72rem);
   line-height: 1.03;
   letter-spacing: -0.04em;
+  text-wrap: balance;
+  max-width: none;
+}
+
+.pricing-stage-card__title--single-line {
   white-space: nowrap;
   text-wrap: nowrap;
-  max-width: none;
+  font-size: clamp(1.22rem, 1.45vw, 1.42rem);
 }
 
 .pricing-stage-card__price {
@@ -2344,7 +2349,7 @@ section#hero .story-panel__meta {
   margin-top: 0;
   font-size: clamp(0.88rem, 0.94vw, 0.96rem);
   line-height: 1.25;
-  max-width: 52ch;
+  max-width: 62ch;
 }
 
 .pricing-stage-card__bullets {
@@ -2362,7 +2367,7 @@ section#hero .story-panel__meta {
   color: rgba(255, 255, 255, 0.92);
   font-size: clamp(0.86rem, 0.92vw, 0.94rem);
   line-height: 1.2;
-  max-width: 44ch;
+  max-width: 58ch;
 }
 
 .pricing-stage-card__bullets li::before {
@@ -2380,7 +2385,7 @@ section#hero .story-panel__meta {
 .pricing-stage-card__cta.glass-button {
   justify-self: stretch;
   width: 100%;
-  margin-top: 0.26rem;
+  margin-top: 0.34rem;
   min-height: 2.9rem;
   padding: 0.68rem 1rem;
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -2418,7 +2423,7 @@ section#hero .story-panel__meta {
   margin-bottom: 0;
   font-size: clamp(0.74rem, 0.78vw, 0.82rem);
   line-height: 1.16;
-  max-width: 56ch;
+  max-width: 68ch;
 }
 
 @keyframes drift {
@@ -2827,6 +2832,12 @@ section#hero .story-panel__meta {
     font-size: clamp(1.55rem, 8vw, 1.8rem);
     white-space: normal;
     text-wrap: balance;
+  }
+
+  .pricing-stage-card__title--single-line {
+    white-space: normal;
+    text-wrap: balance;
+    font-size: clamp(1.55rem, 8vw, 1.8rem);
   }
 
   .pricing-stage-card__price {
