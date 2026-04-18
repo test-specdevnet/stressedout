@@ -1452,6 +1452,7 @@ section#hero .story-panel__meta {
   text-transform: uppercase;
 }
 
+/* ==================== DYNAMIC VIDEO WIDGETS – FINAL CLEAN FIX ==================== */
 .dynamic-variant-video-shell {
   position: relative;
   display: grid;
@@ -1460,9 +1461,7 @@ section#hero .story-panel__meta {
   overflow: hidden;
   width: 100%;
   max-width: 100%;
-  border: 4px solid red !important;
-  outline: 4px solid lime !important;
-  aspect-ratio: 16 / 12.5 !important;
+  aspect-ratio: 16 / 13.8 !important;   /* taller ratio specifically for full wine pour + glass */
   min-height: 0;
   box-sizing: border-box;
   background:
@@ -1482,13 +1481,10 @@ section#hero .story-panel__meta {
   box-sizing: border-box;
 }
 
-.dynamic-static-image {
-  aspect-ratio: 16 / 12.5 !important;
-  object-position: 44% center;
-}
-
+/* Force-remove any aspect-ratio that might be set directly on the images/videos */
+.dynamic-static-image,
 .dynamic-variant-video {
-  aspect-ratio: auto;
+  aspect-ratio: unset !important;
 }
 
 .dynamic-video-play-button {
@@ -1522,8 +1518,6 @@ section#hero .story-panel__meta {
   opacity: 0.72;
 }
 
-.dynamic-variant-video-shell:hover .dynamic-video-play-button,
-.dynamic-variant-video-shell:focus-within .dynamic-video-play-button,
 .dynamic-video-play-button.is-active:hover,
 .dynamic-video-play-button.is-active:focus-visible {
   opacity: 1;
@@ -1553,12 +1547,6 @@ section#hero .story-panel__meta {
   font-weight: 600;
   line-height: 1;
   letter-spacing: 0.01em;
-}
-
-.dynamic-variant-video--coffee {
-  background:
-    radial-gradient(circle at center, rgba(255, 255, 255, 0.1), transparent 64%),
-    #04050a;
 }
 
 .workflow-step {
