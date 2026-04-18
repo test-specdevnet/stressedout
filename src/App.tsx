@@ -49,6 +49,7 @@ const REDUCED_TRANSITION_MS = 220;
 const NAVIGATION_COOLDOWN_MS = 88;
 const TOUCH_THRESHOLD = 34;
 const BEAM_BORDER_RADIUS = 24;
+const BEAM_DURATION = 2.35;
 
 export default function App() {
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
@@ -108,7 +109,7 @@ export default function App() {
           className="beam-shell beam-shell--widget"
           size="md"
           colorVariant="ocean"
-          duration={1.96}
+          duration={BEAM_DURATION}
           strength={0.82}
           borderRadius={BEAM_BORDER_RADIUS}
           active={!prefersReducedMotion}
@@ -136,7 +137,7 @@ export default function App() {
             className="beam-shell beam-shell--widget"
             size="md"
             colorVariant="ocean"
-            duration={1.96}
+            duration={BEAM_DURATION}
             strength={0.82}
             borderRadius={999}
             active={!prefersReducedMotion}
@@ -154,7 +155,7 @@ export default function App() {
             className="beam-shell beam-shell--widget"
             size="md"
             colorVariant="ocean"
-            duration={1.96}
+            duration={BEAM_DURATION}
             strength={0.82}
             borderRadius={999}
             active={!prefersReducedMotion}
@@ -212,7 +213,7 @@ export default function App() {
             className="beam-shell beam-shell--nav-control"
             size="md"
             colorVariant="ocean"
-            duration={1.96}
+            duration={BEAM_DURATION}
             strength={0.82}
             borderRadius={BEAM_BORDER_RADIUS}
             active={!prefersReducedMotion}
@@ -231,7 +232,7 @@ export default function App() {
             className="beam-shell beam-shell--nav-control"
             size="md"
             colorVariant="ocean"
-            duration={1.96}
+            duration={BEAM_DURATION}
             strength={0.82}
             borderRadius={BEAM_BORDER_RADIUS}
             active={!prefersReducedMotion}
