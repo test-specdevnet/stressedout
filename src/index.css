@@ -1466,6 +1466,7 @@ section#hero .story-panel__meta {
   height: 100%;
   min-height: 0;
   box-sizing: border-box;
+  padding: 1rem 1.2rem 1.05rem;
   background:
     radial-gradient(circle at 50% 30%, rgba(255, 255, 255, 0.08), transparent 46%),
     linear-gradient(180deg, rgba(7, 10, 20, 0.94), rgba(4, 6, 14, 0.98));
@@ -1493,8 +1494,7 @@ section#hero .story-panel__meta {
   object-position: center center !important;
   border-radius: 0.72rem;
   box-sizing: border-box;
-  transform: scale(0.74) !important;
-  transform-origin: center center !important;
+  transform: none !important;
 }
 
 /* Force-remove any aspect-ratio that might be set directly on the images/videos */
