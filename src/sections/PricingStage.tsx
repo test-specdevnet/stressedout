@@ -63,6 +63,22 @@ const pricingCards: PricingCard[] = [
     href: "https://buy.stripe.com/eVq14h0k8exhaEKfZDfjG01",
     note: "Select this add-on only if you already have video ads.",
   },
+  {
+    badge: "Best Value",
+    title: "Stress Free Monthly",
+    price: "$599/month",
+    description: "Subscription tier.",
+    bullets: [
+      "You send us ad concepts, static images, or UGC (up to 3 creatives)",
+      "We stress test your content and create dynamic video ads",
+      "You receive 5 branded variants per creative for a total of 15 ad variants per month",
+      "1 minor revision or variant",
+    ],
+    ctaText: "Start Monthly",
+    href: "https://buy.stripe.com/9B68wJ7MAfBlbIO7t7fjG04",
+    note: "Consistent testing results across ad variants.",
+    featured: true,
+  },
 ];
 
 const SWIPE_THRESHOLD_PX = 48;
@@ -205,28 +221,30 @@ export function PricingStage() {
                   <article
                     className={`pricing-stage-card glass-panel ${card.featured ? "is-featured" : ""}`.trim()}
                   >
-                    <span className="pricing-stage-card__badge">{card.badge}</span>
-                    <h3 className="pricing-stage-card__title">{card.title}</h3>
-                    <p className="pricing-stage-card__price">{card.price}</p>
-                    <p className="pricing-stage-card__description">{card.description}</p>
+                    <div className="pricing-stage-card__summary">
+                      <span className="pricing-stage-card__badge">{card.badge}</span>
+                      <h3 className="pricing-stage-card__title">{card.title}</h3>
+                      <p className="pricing-stage-card__price">{card.price}</p>
+                      <p className="pricing-stage-card__description">{card.description}</p>
+
+                      <GlassButton
+                        className="pricing-stage-card__cta"
+                        href={card.href}
+                        target="_blank"
+                        rel="noreferrer"
+                        variant="secondary"
+                      >
+                        {card.ctaText}
+                      </GlassButton>
+
+                      <p className="pricing-stage-card__note">{card.note}</p>
+                    </div>
 
                     <ul className="pricing-stage-card__bullets" aria-label={`${card.title} included features`}>
                       {card.bullets.map((bullet) => (
                         <li key={bullet}>{bullet}</li>
                       ))}
                     </ul>
-
-                    <GlassButton
-                      className="pricing-stage-card__cta"
-                      href={card.href}
-                      target="_blank"
-                      rel="noreferrer"
-                      variant="secondary"
-                    >
-                      {card.ctaText}
-                    </GlassButton>
-
-                    <p className="pricing-stage-card__note">{card.note}</p>
                   </article>
                 </div>
               );
