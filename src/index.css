@@ -1483,10 +1483,10 @@ section#hero .story-panel__meta {
 }
 
 .dynamic-variant-video {
-  width: 82% !important;
-  height: 82% !important;
-  max-width: 82% !important;
-  max-height: 82% !important;
+  width: auto !important;
+  height: auto !important;
+  max-width: 92% !important;
+  max-height: 92% !important;
   display: block;
   background: #04050a;
   object-fit: contain !important;
