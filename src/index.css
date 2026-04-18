@@ -1325,12 +1325,12 @@ section#hero .story-panel__meta {
   align-items: start;
   align-content: start;
   gap: 0.85rem;
-  height: auto;
+  height: 100%;
   min-height: 0;
-  overflow: visible;
+  overflow: hidden;
   box-sizing: border-box;
   padding-top: 0.2rem;
-  padding-bottom: 0.85rem;
+  padding-bottom: 0.5rem;
 }
 
 .dynamic-stage-copy {
@@ -1338,7 +1338,7 @@ section#hero .story-panel__meta {
   position: relative;
   z-index: 3;
   padding-top: 0.15rem;
-  padding-bottom: 0.35rem;
+  padding-bottom: 0.2rem;
 }
 
 .dynamic-stage-title {
@@ -1350,16 +1350,16 @@ section#hero .story-panel__meta {
 
 .dynamic-media-stack {
   display: grid;
-  grid-template-rows: repeat(2, max-content);
+  grid-template-rows: repeat(2, minmax(0, 1fr));
   align-content: start;
-  gap: clamp(1.05rem, 1.5vw, 1.5rem);
+  gap: clamp(0.7rem, 1vw, 1rem);
   width: 100%;
-  height: auto;
+  height: 100%;
   min-height: 0;
-  overflow: visible;
+  overflow: hidden;
   box-sizing: border-box;
-  padding-top: 0.45rem;
-  padding-bottom: 1.4rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
 }
 
 .dynamic-media-row {
@@ -1368,9 +1368,9 @@ section#hero .story-panel__meta {
   gap: 0.62rem;
   position: relative;
   width: 100%;
-  height: auto;
+  height: 100%;
   min-height: 0;
-  overflow: visible;
+  overflow: hidden;
   box-sizing: border-box;
 }
 
@@ -1381,12 +1381,13 @@ section#hero .story-panel__meta {
 .dynamic-media-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  height: 100%;
   align-items: start;
-  gap: clamp(0.72rem, 1vw, 0.95rem);
+  gap: clamp(0.55rem, 0.8vw, 0.8rem);
   width: 100%;
   min-height: 0;
   max-width: 100%;
-  overflow: visible;
+  overflow: hidden;
   box-sizing: border-box;
 }
 
@@ -1396,12 +1397,13 @@ section#hero .story-panel__meta {
   margin: 0;
   overflow: hidden;
   border-radius: 1.08rem;
-  padding: 0.32rem;
+  padding: 0.28rem;
   display: grid;
-  align-content: start;
-  gap: 0.18rem;
+  grid-template-rows: auto minmax(0, 1fr);
+  align-content: stretch;
+  gap: 0.14rem;
   min-height: 0;
-  height: auto;
+  height: 100%;
   max-height: none;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)),
@@ -1442,13 +1444,13 @@ section#hero .story-panel__meta {
 
 .dynamic-media-label {
   margin: 0;
-  padding: 0.18rem 0.22rem 0;
-  margin-bottom: 0.2rem;
+  padding: 0.16rem 0.2rem 0;
+  margin-bottom: 0.08rem;
   color: rgba(255, 255, 255, 0.76);
-  font-size: 0.6rem;
+  font-size: 0.56rem;
   font-weight: 500;
   letter-spacing: 0.08em;
-  line-height: 1.2;
+  line-height: 1.15;
   text-transform: uppercase;
 }
 
@@ -1461,7 +1463,7 @@ section#hero .story-panel__meta {
   overflow: hidden;
   width: 100%;
   max-width: 100%;
-  aspect-ratio: 16 / 13.8 !important;   /* taller ratio specifically for full wine pour + glass */
+  height: 100%;
   min-height: 0;
   box-sizing: border-box;
   background:
