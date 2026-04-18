@@ -1,5 +1,6 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import type { KeyboardEvent, TouchEvent } from "react";
 
 import { GlassButton } from "../components/GlassButton";
 
@@ -62,142 +63,101 @@ const pricingCards: PricingCard[] = [
     href: "https://buy.stripe.com/eVq14h0k8exhaEKfZDfjG01",
     note: "Select this add-on only if you already have video ads.",
   },
-  {
-    badge: "Best Value",
-    title: "Stress Free Monthly",
-    price: "$599/month",
-    description: "Subscription tier.",
-    bullets: [
-      "You send us ad concepts, static images, or UGC (up to 3 creatives)",
-      "We stress test your content and create dynamic video ads",
-      "You receive 5 branded variants per creative for a total of 15 ad variants per month",
-      "1 minor revision or variant",
-    ],
-    ctaText: "Start Monthly",
-    href: "https://buy.stripe.com/9B68wJ7MAfBlbIO7t7fjG04",
-    note: "Consistent testing results across ad variants.",
-    featured: true,
-  },
 ];
 
+const SWIPE_THRESHOLD_PX = 48;
+
 export function PricingStage() {
-  const [cardsPerPage, setCardsPerPage] = useState(3);
-  const [activePage, setActivePage] = useState(0);
-  const viewportRef = useRef<HTMLDivElement | null>(null);
+  const [activeIndex, setActiveIndex] = useState(1);
+  const [isTransitionEnabled, setIsTransitionEnabled] = useState(true);
+  const touchStartXRef = useRef<number | null>(null);
+  const touchDeltaXRef = useRef(0);
+
+  const slides = useMemo(
+    () => [pricingCards[pricingCards.length - 1], ...pricingCards, pricingCards[0]],
+    [],
+  );
+
+  const actualIndex = ((activeIndex - 1 + pricingCards.length) % pricingCards.length) + 1;
 
   useEffect(() => {
-    if (typeof window === "undefined") {
+    if (isTransitionEnabled) {
       return undefined;
     }
 
-    const mediaQuery = window.matchMedia("(max-width: 760px)");
+    const timeoutId = window.setTimeout(() => {
+      setIsTransitionEnabled(true);
+    }, 40);
 
-    function syncCardsPerPage(event?: MediaQueryList | MediaQueryListEvent) {
-      setCardsPerPage(event?.matches ?? mediaQuery.matches ? 1 : 3);
-    }
+    return () => window.clearTimeout(timeoutId);
+  }, [isTransitionEnabled]);
 
-    syncCardsPerPage(mediaQuery);
+  function goToIndex(index: number) {
+    setIsTransitionEnabled(true);
+    setActiveIndex(index);
+  }
 
-    const handleChange = (event: MediaQueryListEvent) => {
-      syncCardsPerPage(event);
-      setActivePage(0);
-    };
+  function goToPreviousSlide() {
+    goToIndex(activeIndex - 1);
+  }
 
-    mediaQuery.addEventListener("change", handleChange);
+  function goToNextSlide() {
+    goToIndex(activeIndex + 1);
+  }
 
-    return () => {
-      mediaQuery.removeEventListener("change", handleChange);
-    };
-  }, []);
+  function goToDot(index: number) {
+    goToIndex(index + 1);
+  }
 
-  const pages = useMemo(() => {
-    if (cardsPerPage >= pricingCards.length) {
-      return [pricingCards];
-    }
-
-    if (cardsPerPage === 1) {
-      return pricingCards.map((card) => [card]);
-    }
-
-    const lastStartIndex = pricingCards.length - cardsPerPage;
-
-    return Array.from({ length: lastStartIndex + 1 }, (_, pageIndex) =>
-      pricingCards.slice(pageIndex, pageIndex + cardsPerPage),
-    );
-  }, [cardsPerPage]);
-
-  const safeActivePage = activePage % pages.length;
-
-  useEffect(() => {
-    const viewport = viewportRef.current;
-
-    if (!viewport) {
+  function handleTransitionEnd() {
+    if (activeIndex === 0) {
+      setIsTransitionEnabled(false);
+      setActiveIndex(pricingCards.length);
       return;
     }
 
-    viewport.scrollTo({
-      left: 0,
-      behavior: "auto",
-    });
-  }, [cardsPerPage]);
-
-  useEffect(() => {
-    const viewport = viewportRef.current;
-
-    if (!viewport) {
-      return undefined;
-    }
-
-    let animationFrame = 0;
-
-    const handleScroll = () => {
-      cancelAnimationFrame(animationFrame);
-      animationFrame = window.requestAnimationFrame(() => {
-        const nextPage = Math.round(viewport.scrollLeft / Math.max(viewport.clientWidth, 1));
-        setActivePage((currentPage) => (currentPage === nextPage ? currentPage : nextPage));
-      });
-    };
-
-    viewport.addEventListener("scroll", handleScroll, { passive: true });
-
-    return () => {
-      cancelAnimationFrame(animationFrame);
-      viewport.removeEventListener("scroll", handleScroll);
-    };
-  }, [pages.length]);
-
-  function goToPage(index: number) {
-    const nextPage = (index + pages.length) % pages.length;
-    const viewport = viewportRef.current;
-
-    setActivePage(nextPage);
-
-    if (viewport) {
-      viewport.scrollTo({
-        left: nextPage * viewport.clientWidth,
-        behavior: "smooth",
-      });
+    if (activeIndex === slides.length - 1) {
+      setIsTransitionEnabled(false);
+      setActiveIndex(1);
     }
   }
 
-  function goToPreviousPage() {
-    goToPage(safeActivePage - 1);
-  }
-
-  function goToNextPage() {
-    goToPage(safeActivePage + 1);
-  }
-
-  function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
+  function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
     if (event.key === "ArrowRight") {
       event.preventDefault();
-      goToNextPage();
+      goToNextSlide();
     }
 
     if (event.key === "ArrowLeft") {
       event.preventDefault();
-      goToPreviousPage();
+      goToPreviousSlide();
     }
+  }
+
+  function handleTouchStart(event: TouchEvent<HTMLDivElement>) {
+    touchStartXRef.current = event.touches[0]?.clientX ?? null;
+    touchDeltaXRef.current = 0;
+  }
+
+  function handleTouchMove(event: TouchEvent<HTMLDivElement>) {
+    if (touchStartXRef.current === null) {
+      return;
+    }
+
+    touchDeltaXRef.current = (event.touches[0]?.clientX ?? 0) - touchStartXRef.current;
+  }
+
+  function handleTouchEnd() {
+    if (Math.abs(touchDeltaXRef.current) >= SWIPE_THRESHOLD_PX) {
+      if (touchDeltaXRef.current < 0) {
+        goToNextSlide();
+      } else {
+        goToPreviousSlide();
+      }
+    }
+
+    touchStartXRef.current = null;
+    touchDeltaXRef.current = 0;
   }
 
   return (
@@ -211,80 +171,88 @@ export function PricingStage() {
         tabIndex={0}
         onKeyDown={handleKeyDown}
         aria-roledescription="carousel"
-        aria-label={`Pricing carousel showing page ${safeActivePage + 1} of ${pages.length}`}
+        aria-label={`Pricing carousel showing card ${actualIndex} of ${pricingCards.length}`}
       >
         <button
           type="button"
           className="pricing-stage__arrow pricing-stage__arrow--prev gallery-carousel__arrow gallery-carousel__arrow--prev glass-nav"
-          onClick={goToPreviousPage}
-          aria-label="Show previous pricing cards"
+          onClick={goToPreviousSlide}
+          aria-label="Show previous pricing card"
         >
           <ChevronLeft size={22} strokeWidth={2.5} />
         </button>
 
-        <div ref={viewportRef} className="pricing-stage__viewport">
-          <div className="pricing-stage__track">
-            {pages.map((pageCards, pageIndex) => (
-              <div
-                key={`pricing-page-${pageIndex}`}
-                className={`pricing-stage__page ${pageIndex === safeActivePage ? "is-active" : ""}`.trim()}
-                aria-hidden={pageIndex !== safeActivePage}
-              >
-                <div className="pricing-stage-grid">
-                  {pageCards.map((card) => (
-                    <article
-                      key={`${pageIndex}-${card.title}`}
-                      className={`pricing-stage-card glass-panel ${card.featured ? "is-featured" : ""}`.trim()}
+        <div
+          className="pricing-stage__viewport"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          <div
+            className={`pricing-stage__track ${isTransitionEnabled ? "is-animated" : "is-snapping"}`.trim()}
+            style={{ transform: `translateX(-${activeIndex * 100}%)` }}
+            onTransitionEnd={handleTransitionEnd}
+          >
+            {slides.map((card, slideIndex) => {
+              const isActive = slideIndex === activeIndex;
+
+              return (
+                <div
+                  key={`${slideIndex}-${card.title}`}
+                  className="pricing-stage__slide"
+                  aria-hidden={!isActive}
+                >
+                  <article
+                    className={`pricing-stage-card glass-panel ${card.featured ? "is-featured" : ""}`.trim()}
+                  >
+                    <span className="pricing-stage-card__badge">{card.badge}</span>
+                    <h3 className="pricing-stage-card__title">{card.title}</h3>
+                    <p className="pricing-stage-card__price">{card.price}</p>
+                    <p className="pricing-stage-card__description">{card.description}</p>
+
+                    <ul className="pricing-stage-card__bullets" aria-label={`${card.title} included features`}>
+                      {card.bullets.map((bullet) => (
+                        <li key={bullet}>{bullet}</li>
+                      ))}
+                    </ul>
+
+                    <GlassButton
+                      className="pricing-stage-card__cta"
+                      href={card.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      variant="secondary"
                     >
-                      <span className="pricing-stage-card__badge">{card.badge}</span>
-                      <h3 className="pricing-stage-card__title">{card.title}</h3>
-                      <p className="pricing-stage-card__price">{card.price}</p>
-                      <p className="pricing-stage-card__description">{card.description}</p>
+                      {card.ctaText}
+                    </GlassButton>
 
-                      <ul className="pricing-stage-card__bullets" aria-label={`${card.title} included features`}>
-                        {card.bullets.map((bullet) => (
-                          <li key={bullet}>{bullet}</li>
-                        ))}
-                      </ul>
-
-                      <GlassButton
-                        className="pricing-stage-card__cta"
-                        href={card.href}
-                        target="_blank"
-                        rel="noreferrer"
-                        variant="secondary"
-                      >
-                        {card.ctaText}
-                      </GlassButton>
-
-                      <p className="pricing-stage-card__note">{card.note}</p>
-                    </article>
-                  ))}
+                    <p className="pricing-stage-card__note">{card.note}</p>
+                  </article>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
         <button
           type="button"
           className="pricing-stage__arrow pricing-stage__arrow--next gallery-carousel__arrow gallery-carousel__arrow--next glass-nav"
-          onClick={goToNextPage}
-          aria-label="Show next pricing cards"
+          onClick={goToNextSlide}
+          aria-label="Show next pricing card"
         >
           <ChevronRight size={22} strokeWidth={2.5} />
         </button>
 
-        <div className="pricing-stage__dots" aria-hidden="true">
-          {pages.map((_, pageIndex) => (
+        <div className="pricing-stage__dots">
+          {pricingCards.map((card, pageIndex) => (
             <button
-              key={`pricing-dot-${pageIndex}`}
+              key={`pricing-dot-${card.title}`}
               type="button"
-              className={`pricing-stage__dot ${pageIndex === safeActivePage ? "is-active" : ""}`.trim()}
-              onClick={() => goToPage(pageIndex)}
-            >
-              <span className="sr-only">Show pricing page {pageIndex + 1}</span>
-            </button>
+              className={`pricing-stage__dot ${pageIndex + 1 === actualIndex ? "is-active" : ""}`.trim()}
+              onClick={() => goToDot(pageIndex)}
+              aria-label={`Show ${card.title}`}
+              aria-pressed={pageIndex + 1 === actualIndex}
+            />
           ))}
         </div>
       </div>
