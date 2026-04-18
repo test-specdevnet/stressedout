@@ -1493,6 +1493,8 @@ section#hero .story-panel__meta {
   object-position: center center !important;
   border-radius: 0.72rem;
   box-sizing: border-box;
+  transform: scale(0.82);
+  transform-origin: center center;
 }
 
 /* Force-remove any aspect-ratio that might be set directly on the images/videos */
