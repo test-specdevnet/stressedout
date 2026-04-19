@@ -34,9 +34,13 @@ const supportPoints = [
 
 type GalleryStageProps = {
   isActive?: boolean;
+  isMobileTouchViewport?: boolean;
 };
 
-export function GalleryStage({ isActive = false }: GalleryStageProps = {}) {
+export function GalleryStage({
+  isActive = false,
+  isMobileTouchViewport = false,
+}: GalleryStageProps = {}) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [touchDeltaX, setTouchDeltaX] = useState(0);
@@ -63,7 +67,7 @@ export function GalleryStage({ isActive = false }: GalleryStageProps = {}) {
           if (entry.intersectionRatio >= 0.4) {
             visibleVideosRef.current.add(video);
             const index = videoRefs.current.findIndex((item) => item === video);
-            if (index === activeIndex && isActive) {
+            if (index === activeIndex && isActive && !isMobileTouchViewport) {
               if (Math.abs(video.currentTime) > 0.08) {
                 video.currentTime = 0;
               }
@@ -93,7 +97,7 @@ export function GalleryStage({ isActive = false }: GalleryStageProps = {}) {
       observer.disconnect();
       visibleVideosRef.current.clear();
     };
-  }, [activeIndex, isActive]);
+  }, [activeIndex, isActive, isMobileTouchViewport]);
 
   useEffect(() => {
     videoRefs.current.forEach((video, index) => {
@@ -101,7 +105,7 @@ export function GalleryStage({ isActive = false }: GalleryStageProps = {}) {
         return;
       }
 
-      if (index === activeIndex && isActive && visibleVideosRef.current.has(video)) {
+      if (index === activeIndex && isActive && visibleVideosRef.current.has(video) && !isMobileTouchViewport) {
         if (Math.abs(video.currentTime) > 0.08) {
           video.currentTime = 0;
         }
@@ -114,7 +118,7 @@ export function GalleryStage({ isActive = false }: GalleryStageProps = {}) {
         video.currentTime = 0;
       }
     });
-  }, [activeIndex, isActive]);
+  }, [activeIndex, isActive, isMobileTouchViewport]);
 
   useEffect(() => {
     if (!isActive) {
@@ -122,7 +126,12 @@ export function GalleryStage({ isActive = false }: GalleryStageProps = {}) {
     }
 
     videoRefs.current.forEach((video, index) => {
-      if (!video || index !== activeIndex || !visibleVideosRef.current.has(video)) {
+      if (
+        !video ||
+        index !== activeIndex ||
+        !visibleVideosRef.current.has(video) ||
+        isMobileTouchViewport
+      ) {
         return;
       }
 
@@ -131,7 +140,7 @@ export function GalleryStage({ isActive = false }: GalleryStageProps = {}) {
         playPromise.catch(() => undefined);
       }
     });
-  }, [activeIndex, isActive]);
+  }, [activeIndex, isActive, isMobileTouchViewport]);
 
   function goToSlide(index: number) {
     setActiveIndex((index + galleryAds.length) % galleryAds.length);
@@ -249,6 +258,7 @@ export function GalleryStage({ isActive = false }: GalleryStageProps = {}) {
                             playsInline
                             preload="metadata"
                             loop
+                            autoPlay={!isMobileTouchViewport && isCurrent && isActive}
                             controls={false}
                             disablePictureInPicture
                             aria-label={ad.title}

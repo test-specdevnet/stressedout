@@ -1,6 +1,7 @@
 type HeroStageProps = {
   isActive?: boolean;
   reducedMotion?: boolean;
+  isMobileTouchViewport?: boolean;
 };
 
 export function HeroStage(props?: HeroStageProps) {
@@ -21,6 +22,8 @@ export function HeroStage(props?: HeroStageProps) {
           className="hero-logo-image"
           src="/assets/stressed-out/images/logo-3.png"
           alt="Stressed Out logo"
+          loading={props?.isMobileTouchViewport ? "lazy" : undefined}
+          decoding={props?.isMobileTouchViewport ? "async" : undefined}
         />
       </div>
     </div>
