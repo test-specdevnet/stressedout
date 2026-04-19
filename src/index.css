@@ -3271,8 +3271,8 @@ section#hero .story-panel__meta {
 
   .story-panel:not(.is-center) .story-panel__surface,
   .story-panel:not(.is-center) .story-panel__frame {
-    opacity: 0;
-    visibility: hidden;
+    opacity: 1;
+    visibility: visible;
   }
 
   .story-panel__surface {
