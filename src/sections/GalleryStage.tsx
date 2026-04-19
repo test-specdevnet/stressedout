@@ -67,11 +67,30 @@ export function GalleryStage({
     video.muted = true;
     video.defaultMuted = true;
     video.playsInline = true;
+    video.preload = isMobileTouchViewport ? "auto" : "metadata";
 
-    const playPromise = video.play();
-    if (playPromise && typeof playPromise.catch === "function") {
-      playPromise.catch(() => undefined);
+    const attemptPlay = () => {
+      const playPromise = video.play();
+      if (playPromise && typeof playPromise.catch === "function") {
+        playPromise.catch(() => undefined);
+      }
+    };
+
+    if (video.readyState >= 2) {
+      attemptPlay();
+      return;
     }
+
+    const handleCanPlay = () => {
+      attemptPlay();
+    };
+
+    video.addEventListener("canplay", handleCanPlay, { once: true });
+    video.load();
+
+    return () => {
+      video.removeEventListener("canplay", handleCanPlay);
+    };
   }, [activeAd.id, isActive, isMobileTouchViewport]);
 
   useEffect(() => {
@@ -198,9 +217,9 @@ export function GalleryStage({
                         className="gallery-slide__video"
                         muted
                         playsInline
-                        preload={isActive ? "auto" : "metadata"}
+                        preload="metadata"
                         loop
-                        autoPlay={isActive}
+                        autoPlay={false}
                         controls={false}
                         disablePictureInPicture
                         aria-label={activeAd.title}
