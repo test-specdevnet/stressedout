@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronUp, Instagram, Mail } from "lucide-react";
+import { ChevronDown, ChevronUp, Instagram, Mail, Menu, X } from "lucide-react";
 import { BorderBeam } from "border-beam";
 import { useEffect, useState } from "react";
 import { GlassButton } from "./components/GlassButton";
@@ -28,8 +28,8 @@ const sections: StorySection[] = [
   { id: "about", label: "About Us", shortLabel: "About Us", render: AboutStage },
   {
     id: "dynamic-videos",
-    label: "Static → Dynamic",
-    shortLabel: "Static → Dynamic",
+    label: "Static to Dynamic",
+    shortLabel: "Static to Dynamic",
     render: DynamicVideosStage,
   },
   { id: "gallery", label: "Ad Gallery", shortLabel: "Ad Gallery", render: GalleryStage },
@@ -41,7 +41,7 @@ const sectionIds = sections.map((section) => section.id);
 const progressNavItems = [
   { id: "hero", label: "Welcome" },
   { id: "about", label: "About Us" },
-  { id: "dynamic-videos", label: "Static → Dynamic" },
+  { id: "dynamic-videos", label: "Static to Dynamic" },
   { id: "gallery", label: "Ad Gallery" },
   { id: "testimonials", label: "Praise" },
   { id: "pricing", label: "Pricing" },
@@ -58,6 +58,7 @@ const BEAM_DURATION = 2.35;
 export default function App() {
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const [isMobileTouchViewport, setIsMobileTouchViewport] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -74,7 +75,12 @@ export default function App() {
     const mobileWidth = window.matchMedia("(max-width: 768px)");
 
     const update = () => {
-      setIsMobileTouchViewport(mobileWidth.matches);
+      const isMobile = mobileWidth.matches;
+      setIsMobileTouchViewport(isMobile);
+
+      if (!isMobile) {
+        setIsMobileMenuOpen(false);
+      }
     };
 
     update();
@@ -108,6 +114,7 @@ export default function App() {
   function handleAnchorNavigation(id: string) {
     const index = sections.findIndex((section) => section.id === id);
     if (index >= 0) {
+      setIsMobileMenuOpen(false);
       navigateTo(index);
     }
   }
@@ -125,32 +132,50 @@ export default function App() {
       </div>
 
       <header className="site-header">
-        <BorderBeam
-          className="beam-shell beam-shell--widget"
-          size="md"
-          colorVariant="ocean"
-          duration={BEAM_DURATION}
-          strength={0.82}
-          borderRadius={BEAM_BORDER_RADIUS}
-          active={!prefersReducedMotion}
-        >
-          <a
-            className="brand-mark glass-nav"
-            href="#hero"
-            aria-label="Stressed Out home"
-            onClick={(event) => {
-              event.preventDefault();
-              handleAnchorNavigation("hero");
-            }}
+        <div className="site-header__brand-row">
+          <BorderBeam
+            className="beam-shell beam-shell--widget"
+            size="md"
+            colorVariant="ocean"
+            duration={BEAM_DURATION}
+            strength={0.82}
+            borderRadius={BEAM_BORDER_RADIUS}
+            active={!prefersReducedMotion}
           >
-            <img
-              className="brand-mark__logo"
-              src="/assets/stressed-out/images/logo-3.png"
-              alt="Stressed Out logo"
-            />
-            <span className="brand-mark__name">Stressed Out Advertising</span>
-          </a>
-        </BorderBeam>
+            <a
+              className="brand-mark glass-nav"
+              href="#hero"
+              aria-label="Stressed Out home"
+              onClick={(event) => {
+                event.preventDefault();
+                handleAnchorNavigation("hero");
+              }}
+            >
+              <img
+                className="brand-mark__logo"
+                src="/assets/stressed-out/images/logo-3.png"
+                srcSet="/assets/stressed-out/images/logo-3.png 1x"
+                sizes="(max-width: 48rem) 2.75rem, 3.3rem"
+                alt="Stressed Out logo"
+              />
+              <span className="brand-mark__name">Stressed Out Advertising</span>
+            </a>
+          </BorderBeam>
+
+          {isMobileTouchViewport ? (
+            <button
+              type="button"
+              className="mobile-menu-toggle glass-nav"
+              aria-label={isMobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+              aria-expanded={isMobileMenuOpen}
+              aria-controls="mobile-story-menu"
+              onClick={() => setIsMobileMenuOpen((current) => !current)}
+            >
+              <span className="mobile-menu-toggle__label">{sections[activeIndex]?.shortLabel ?? "Menu"}</span>
+              {isMobileMenuOpen ? <X size={20} strokeWidth={2.2} /> : <Menu size={20} strokeWidth={2.2} />}
+            </button>
+          ) : null}
+        </div>
 
         <div className="floating-widget-stack" aria-label="Quick actions">
           <BorderBeam
@@ -193,6 +218,76 @@ export default function App() {
             </GlassButton>
           </BorderBeam>
         </div>
+
+        {isMobileTouchViewport ? (
+          <>
+            <div
+              className={`mobile-menu-backdrop ${isMobileMenuOpen ? "is-open" : ""}`.trim()}
+              aria-hidden={!isMobileMenuOpen}
+              onClick={() => setIsMobileMenuOpen(false)}
+            />
+
+            <aside
+              id="mobile-story-menu"
+              className={`mobile-story-menu glass-panel ${isMobileMenuOpen ? "is-open" : ""}`.trim()}
+              aria-label="Mobile navigation"
+              aria-hidden={!isMobileMenuOpen}
+            >
+              <div className="mobile-story-menu__header">
+                <p className="mobile-story-menu__eyebrow">Navigate the story</p>
+                <button
+                  type="button"
+                  className="mobile-story-menu__close glass-nav"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  aria-label="Close navigation menu"
+                >
+                  <X size={18} strokeWidth={2.2} />
+                </button>
+              </div>
+
+              <div className="mobile-story-menu__list">
+                {progressNavItems.map((item, index) => {
+                  const isCurrent = index === currentNavIndex;
+
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      className={`mobile-story-menu__item ${isCurrent ? "is-current" : ""}`.trim()}
+                      onClick={() => handleAnchorNavigation(item.id)}
+                      aria-current={isCurrent ? "page" : undefined}
+                    >
+                      <span>{String(index + 1).padStart(2, "0")}</span>
+                      <span>{item.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="mobile-story-menu__actions">
+                <GlassButton
+                  className="floating-widget"
+                  href="mailto:hello@stressedoutadvertising.com"
+                  icon={Mail}
+                  aria-label="Email us"
+                >
+                  Email us
+                </GlassButton>
+                <GlassButton
+                  className="floating-widget"
+                  href="https://www.instagram.com/stressedoutadvertising?igsh=MzJxdXcybGRobTdt"
+                  target="_blank"
+                  rel="noreferrer"
+                  icon={Instagram}
+                  variant="secondary"
+                  aria-label="Follow us on Instagram"
+                >
+                  Follow us
+                </GlassButton>
+              </div>
+            </aside>
+          </>
+        ) : null}
       </header>
 
       <main
@@ -325,7 +420,6 @@ export default function App() {
             );
           })}
         </div>
-
       </main>
     </div>
   );
