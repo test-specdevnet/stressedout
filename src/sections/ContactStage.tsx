@@ -19,7 +19,12 @@ const initialFormState: ContactFormState = {
 
 const CONTACT_EMAIL = "hello@stressoutadvertising.com";
 
-export function ContactStage() {
+type ContactStageProps = {
+  isMobileTouchViewport?: boolean;
+};
+
+export function ContactStage(props?: ContactStageProps) {
+  const isMobileTouchViewport = props?.isMobileTouchViewport ?? false;
   const [formState, setFormState] = useState<ContactFormState>(initialFormState);
   const [statusMessage, setStatusMessage] = useState("");
 
@@ -56,6 +61,8 @@ export function ContactStage() {
           className="contact-stage__logo"
           src="/assets/stressed-out/images/logo-3.png"
           alt="Stressed Out logo"
+          loading={isMobileTouchViewport ? "lazy" : undefined}
+          decoding={isMobileTouchViewport ? "async" : undefined}
         />
       </div>
 

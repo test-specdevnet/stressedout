@@ -199,6 +199,11 @@ export function useStoryScroll({
   }
 
   function completeTransitionSoon() {
+    if (mobileTouchModeRef.current) {
+      setIsTransitioning(false);
+      return;
+    }
+
     if (transitionTimeoutRef.current !== null) {
       window.clearTimeout(transitionTimeoutRef.current);
     }
@@ -243,7 +248,7 @@ export function useStoryScroll({
 
     target.scrollIntoView({
       block: "start",
-      behavior: "smooth",
+      behavior: mobileTouchModeRef.current ? "auto" : "smooth",
     });
   }
 

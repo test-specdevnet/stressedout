@@ -70,10 +70,12 @@ const variantVideoIndices = {
 
 type DynamicVideosStageProps = {
   isActive?: boolean;
+  isMobileTouchViewport?: boolean;
 };
 
 export function DynamicVideosStage(props?: DynamicVideosStageProps) {
   const isActive = props?.isActive ?? false;
+  const isMobileTouchViewport = props?.isMobileTouchViewport ?? false;
   const videoRefs = useRef<HTMLVideoElement[]>([]);
   const [playingVideos, setPlayingVideos] = useState<Record<number, boolean>>({});
 
@@ -185,7 +187,8 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
                 <img
                   src={row.staticImage}
                   alt={row.staticAlt}
-                  loading="lazy"
+                  loading={isMobileTouchViewport ? "lazy" : undefined}
+                  decoding={isMobileTouchViewport ? "async" : undefined}
                   className="dynamic-static-image"
                 />
               </figure>
