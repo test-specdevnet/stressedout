@@ -1,5 +1,4 @@
 import { ChevronDown, ChevronUp, Instagram, Mail, Menu, X } from "lucide-react";
-import { BorderBeam } from "border-beam";
 import { useEffect, useState } from "react";
 import { GlassButton } from "./components/GlassButton";
 import { useStoryScroll } from "./hooks/useStoryScroll";
@@ -52,9 +51,6 @@ const DEFAULT_TRANSITION_MS = 720;
 const REDUCED_TRANSITION_MS = 220;
 const NAVIGATION_COOLDOWN_MS = 88;
 const TOUCH_THRESHOLD = 34;
-const BEAM_BORDER_RADIUS = 24;
-const BEAM_DURATION = 2.35;
-
 export default function App() {
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const [isMobileTouchViewport, setIsMobileTouchViewport] = useState(false);
@@ -133,34 +129,24 @@ export default function App() {
 
       <header className="site-header">
         <div className="site-header__brand-row">
-          <BorderBeam
-            className="beam-shell beam-shell--widget"
-            size="md"
-            colorVariant="ocean"
-            duration={BEAM_DURATION}
-            strength={0.82}
-            borderRadius={BEAM_BORDER_RADIUS}
-            active={!prefersReducedMotion}
+          <a
+            className="brand-mark glass-nav"
+            href="#hero"
+            aria-label="Stressed Out home"
+            onClick={(event) => {
+              event.preventDefault();
+              handleAnchorNavigation("hero");
+            }}
           >
-            <a
-              className="brand-mark glass-nav"
-              href="#hero"
-              aria-label="Stressed Out home"
-              onClick={(event) => {
-                event.preventDefault();
-                handleAnchorNavigation("hero");
-              }}
-            >
-              <img
-                className="brand-mark__logo"
-                src="/assets/stressed-out/images/logo-3.png"
-                srcSet="/assets/stressed-out/images/logo-3.png 1x"
-                sizes="(max-width: 48rem) 2.75rem, 3.3rem"
-                alt="Stressed Out logo"
-              />
-              <span className="brand-mark__name">Stressed Out Advertising</span>
-            </a>
-          </BorderBeam>
+            <img
+              className="brand-mark__logo"
+              src="/assets/stressed-out/images/logo-3.png"
+              srcSet="/assets/stressed-out/images/logo-3.png 1x"
+              sizes="(max-width: 48rem) 2.75rem, 3.3rem"
+              alt="Stressed Out logo"
+            />
+            <span className="brand-mark__name">Stressed Out Advertising</span>
+          </a>
 
           {isMobileTouchViewport ? (
             <button
@@ -171,52 +157,32 @@ export default function App() {
               aria-controls="mobile-story-menu"
               onClick={() => setIsMobileMenuOpen((current) => !current)}
             >
-              <span className="mobile-menu-toggle__label">{sections[activeIndex]?.shortLabel ?? "Menu"}</span>
+              <span className="mobile-menu-toggle__label">Menu</span>
               {isMobileMenuOpen ? <X size={20} strokeWidth={2.2} /> : <Menu size={20} strokeWidth={2.2} />}
             </button>
           ) : null}
         </div>
 
         <div className="floating-widget-stack" aria-label="Quick actions">
-          <BorderBeam
-            className="beam-shell beam-shell--widget"
-            size="md"
-            colorVariant="ocean"
-            duration={BEAM_DURATION}
-            strength={0.82}
-            borderRadius={999}
-            active={!prefersReducedMotion}
+          <GlassButton
+            className="floating-widget"
+            href="mailto:hello@stressedoutadvertising.com"
+            icon={Mail}
+            aria-label="Email us"
           >
-            <GlassButton
-              className="floating-widget"
-              href="mailto:hello@stressedoutadvertising.com"
-              icon={Mail}
-              aria-label="Email us"
-            >
-              Email us
-            </GlassButton>
-          </BorderBeam>
-          <BorderBeam
-            className="beam-shell beam-shell--widget"
-            size="md"
-            colorVariant="ocean"
-            duration={BEAM_DURATION}
-            strength={0.82}
-            borderRadius={999}
-            active={!prefersReducedMotion}
+            Email us
+          </GlassButton>
+          <GlassButton
+            className="floating-widget"
+            href="https://www.instagram.com/stressedoutadvertising?igsh=MzJxdXcybGRobTdt"
+            target="_blank"
+            rel="noreferrer"
+            icon={Instagram}
+            variant="secondary"
+            aria-label="Follow us on Instagram"
           >
-            <GlassButton
-              className="floating-widget"
-              href="https://www.instagram.com/stressedoutadvertising?igsh=MzJxdXcybGRobTdt"
-              target="_blank"
-              rel="noreferrer"
-              icon={Instagram}
-              variant="secondary"
-              aria-label="Follow us on Instagram"
-            >
-              Follow us
-            </GlassButton>
-          </BorderBeam>
+            Follow us
+          </GlassButton>
         </div>
 
         {isMobileTouchViewport ? (
@@ -324,44 +290,24 @@ export default function App() {
         </div>
 
         <div className="story-stage__controls" aria-label="Story navigation">
-          <BorderBeam
-            className="beam-shell beam-shell--nav-control"
-            size="md"
-            colorVariant="ocean"
-            duration={BEAM_DURATION}
-            strength={0.82}
-            borderRadius={BEAM_BORDER_RADIUS}
-            active={!prefersReducedMotion}
+          <button
+            type="button"
+            className="story-arrow glass-nav"
+            onClick={() => navigateTo(activeIndex - 1, { wrap: true, directionOverride: "backward" })}
+            disabled={isTransitioning}
+            aria-label="Go to previous section"
           >
-            <button
-              type="button"
-              className="story-arrow glass-nav"
-              onClick={() => navigateTo(activeIndex - 1, { wrap: true, directionOverride: "backward" })}
-              disabled={isTransitioning}
-              aria-label="Go to previous section"
-            >
-              <ChevronUp size={22} strokeWidth={2.2} />
-            </button>
-          </BorderBeam>
-          <BorderBeam
-            className="beam-shell beam-shell--nav-control"
-            size="md"
-            colorVariant="ocean"
-            duration={BEAM_DURATION}
-            strength={0.82}
-            borderRadius={BEAM_BORDER_RADIUS}
-            active={!prefersReducedMotion}
+            <ChevronUp size={22} strokeWidth={2.2} />
+          </button>
+          <button
+            type="button"
+            className="story-arrow glass-nav"
+            onClick={() => navigateTo(activeIndex + 1, { wrap: true, directionOverride: "forward" })}
+            disabled={isTransitioning}
+            aria-label="Go to next section"
           >
-            <button
-              type="button"
-              className="story-arrow glass-nav"
-              onClick={() => navigateTo(activeIndex + 1, { wrap: true, directionOverride: "forward" })}
-              disabled={isTransitioning}
-              aria-label="Go to next section"
-            >
-              <ChevronDown size={22} strokeWidth={2.2} />
-            </button>
-          </BorderBeam>
+            <ChevronDown size={22} strokeWidth={2.2} />
+          </button>
         </div>
 
         <div className="story-stage__pinwheel" aria-hidden="true">
