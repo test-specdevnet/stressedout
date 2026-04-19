@@ -3267,6 +3267,7 @@ section#hero .story-panel__meta {
   .story-panel[data-active="false"] {
     display: grid;
     opacity: 1;
+    pointer-events: auto;
   }
 
   .story-panel:not(.is-center) .story-panel__surface,
