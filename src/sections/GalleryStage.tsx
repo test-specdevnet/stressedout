@@ -8,6 +8,7 @@ const galleryAds = [
     format: "16:9 landscape",
     description: "Click or swipe to continue through the sequence.",
     video: "/assets/stressed-out/videos/glasses-ad.mp4",
+    poster: "/assets/stressed-out/images/pain-point-01.png",
   },
   {
     id: "sneaker",
@@ -15,6 +16,7 @@ const galleryAds = [
     format: "16:9 landscape",
     description: "Optimized for smooth autoplay in a static deploy.",
     video: "/assets/stressed-out/videos/shoe-ad.mp4",
+    poster: "/assets/stressed-out/images/pain-point-02.png",
   },
   {
     id: "dog",
@@ -22,6 +24,7 @@ const galleryAds = [
     format: "9:16 portrait",
     description: "Portrait format preserved without crop.",
     video: "/assets/stressed-out/videos/dog-ad.mp4",
+    poster: "/assets/stressed-out/images/pain-point-03.png",
     orientation: "portrait" as const,
   },
 ];
@@ -248,8 +251,10 @@ export function GalleryStage({ isActive = false }: GalleryStageProps = {}) {
                             muted
                             playsInline
                             preload="metadata"
+                            poster={ad.poster}
                             loop
                             controls={false}
+                            disablePictureInPicture
                             aria-label={ad.title}
                           >
                             <source src={ad.video.replace(".mp4", ".webm")} type="video/webm" />

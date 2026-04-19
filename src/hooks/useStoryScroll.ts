@@ -44,6 +44,29 @@ export function useStoryScroll({
   const touchLastYRef = useRef<number | null>(null);
   const transitionTimeoutRef = useRef<number | null>(null);
   const scrollFrameRef = useRef<number | null>(null);
+  const mobileTouchModeRef = useRef(false);
+
+  useEffect(() => {
+    const coarsePointer = window.matchMedia("(pointer: coarse)");
+    const noHover = window.matchMedia("(hover: none)");
+    const mobileWidth = window.matchMedia("(max-width: 768px)");
+
+    const update = () => {
+      mobileTouchModeRef.current =
+        mobileWidth.matches || coarsePointer.matches || noHover.matches;
+    };
+
+    update();
+    coarsePointer.addEventListener("change", update);
+    noHover.addEventListener("change", update);
+    mobileWidth.addEventListener("change", update);
+
+    return () => {
+      coarsePointer.removeEventListener("change", update);
+      noHover.removeEventListener("change", update);
+      mobileWidth.removeEventListener("change", update);
+    };
+  }, []);
 
   useEffect(() => {
     activeIndexRef.current = activeIndex;
@@ -225,6 +248,10 @@ export function useStoryScroll({
   }
 
   function handleTouchStart(event: TouchEvent<HTMLElement>) {
+    if (mobileTouchModeRef.current) {
+      return;
+    }
+
     if (event.touches.length !== 1) {
       return;
     }
@@ -234,6 +261,10 @@ export function useStoryScroll({
   }
 
   function handleTouchMove(event: TouchEvent<HTMLElement>) {
+    if (mobileTouchModeRef.current) {
+      return;
+    }
+
     if (touchStartYRef.current === null || event.touches.length !== 1) {
       return;
     }
@@ -242,6 +273,12 @@ export function useStoryScroll({
   }
 
   function handleTouchEnd() {
+    if (mobileTouchModeRef.current) {
+      touchStartYRef.current = null;
+      touchLastYRef.current = null;
+      return;
+    }
+
     if (touchStartYRef.current === null || touchLastYRef.current === null) {
       touchStartYRef.current = null;
       touchLastYRef.current = null;
