@@ -10,7 +10,6 @@ type TransformationRow = {
     label: "Variant 1" | "Variant 2";
     displayLabel: string;
     video: string;
-    poster: string;
   }[];
 };
 
@@ -25,13 +24,11 @@ const transformationRows: TransformationRow[] = [
         label: "Variant 1",
         displayLabel: "Coffee Ad Variant 1",
         video: "/assets/stressed-out/gallery/videos/coffee-variant-a.mp4",
-        poster: "/assets/stressed-out/gallery/images/coffee-static.png",
       },
       {
         label: "Variant 2",
         displayLabel: "Coffee Ad Variant 2",
         video: "/assets/stressed-out/gallery/videos/coffee-variant-b.mp4",
-        poster: "/assets/stressed-out/gallery/images/coffee-static.png",
       },
     ],
   },
@@ -45,13 +42,11 @@ const transformationRows: TransformationRow[] = [
         label: "Variant 1",
         displayLabel: "Wine Ad Variant 1",
         video: "/assets/stressed-out/gallery/videos/wine-variant-a.mp4",
-        poster: "/assets/stressed-out/gallery/images/wine-static.png",
       },
       {
         label: "Variant 2",
         displayLabel: "Wine Ad Variant 2",
         video: "/assets/stressed-out/gallery/videos/wine-variant-b.mp4",
-        poster: "/assets/stressed-out/gallery/images/wine-static.png",
       },
     ],
   },
@@ -210,7 +205,6 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
                         loop
                         playsInline
                         preload="metadata"
-                        poster={variant.poster}
                         aria-label={variant.displayLabel}
                         controls={false}
                         disablePictureInPicture

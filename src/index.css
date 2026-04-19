@@ -3057,7 +3057,7 @@ section#hero .story-panel__meta {
   }
 }
 
-@media (max-width: 768px), (pointer: coarse), (hover: none) {
+@media (max-width: 768px) {
   html,
   body,
   #root,
@@ -3386,9 +3386,7 @@ section#hero .story-panel__meta {
   }
 }
 
-@media (max-width: 768px) and (prefers-reduced-motion: reduce),
-  (pointer: coarse) and (prefers-reduced-motion: reduce),
-  (hover: none) and (prefers-reduced-motion: reduce) {
+@media (max-width: 768px) and (prefers-reduced-motion: reduce) {
   .aurora,
   .site-backdrop::before,
   .site-backdrop::after,

@@ -47,23 +47,16 @@ export function useStoryScroll({
   const mobileTouchModeRef = useRef(false);
 
   useEffect(() => {
-    const coarsePointer = window.matchMedia("(pointer: coarse)");
-    const noHover = window.matchMedia("(hover: none)");
     const mobileWidth = window.matchMedia("(max-width: 768px)");
 
     const update = () => {
-      mobileTouchModeRef.current =
-        mobileWidth.matches || coarsePointer.matches || noHover.matches;
+      mobileTouchModeRef.current = mobileWidth.matches;
     };
 
     update();
-    coarsePointer.addEventListener("change", update);
-    noHover.addEventListener("change", update);
     mobileWidth.addEventListener("change", update);
 
     return () => {
-      coarsePointer.removeEventListener("change", update);
-      noHover.removeEventListener("change", update);
       mobileWidth.removeEventListener("change", update);
     };
   }, []);
