@@ -3243,7 +3243,7 @@ section#hero .story-panel__meta {
   .story-stage__viewport {
     overflow-y: auto;
     overflow-x: hidden;
-    scroll-snap-type: y proximity;
+    scroll-snap-type: none;
     scroll-behavior: auto;
     overscroll-behavior-y: contain;
     -webkit-overflow-scrolling: touch;
@@ -3305,6 +3305,20 @@ section#hero .story-panel__meta {
   section#pricing .story-panel__surface::before,
   section#pricing .story-panel__frame::before {
     display: none;
+  }
+
+  section#gallery.story-panel.glass-panel::before,
+  section#gallery.story-panel.glass-panel::after,
+  section#pricing.story-panel.glass-panel::before,
+  section#pricing.story-panel.glass-panel::after,
+  section#gallery .story-panel__surface.glass-panel::before,
+  section#gallery .story-panel__surface.glass-panel::after,
+  section#pricing .story-panel__surface.glass-panel::before,
+  section#pricing .story-panel__surface.glass-panel::after {
+    display: none;
+    opacity: 0;
+    background: none;
+    box-shadow: none;
   }
 
   .glass-nav,
