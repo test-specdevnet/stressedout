@@ -3254,7 +3254,7 @@ section#hero .story-panel__meta {
   }
 
   .story-panel {
-    scroll-snap-align: start;
+    scroll-snap-align: none;
     scroll-snap-stop: normal;
     height: auto;
     min-height: auto;
@@ -3288,37 +3288,22 @@ section#hero .story-panel__meta {
       inset 0 1px 0 rgba(255, 255, 255, 0.28);
   }
 
-  .story-panel__surface::before,
-  .story-panel__surface::after,
-  .site-backdrop::before,
-  .site-backdrop::after {
-    opacity: 0.55;
-  }
-
   .story-panel__surface,
   .story-panel__frame {
     overflow: hidden;
   }
 
-  section#gallery .story-panel__surface::before,
-  section#gallery .story-panel__frame::before,
-  section#pricing .story-panel__surface::before,
-  section#pricing .story-panel__frame::before {
-    display: none;
-  }
-
-  section#gallery.story-panel.glass-panel::before,
-  section#gallery.story-panel.glass-panel::after,
-  section#pricing.story-panel.glass-panel::before,
-  section#pricing.story-panel.glass-panel::after,
-  section#gallery .story-panel__surface.glass-panel::before,
-  section#gallery .story-panel__surface.glass-panel::after,
-  section#pricing .story-panel__surface.glass-panel::before,
-  section#pricing .story-panel__surface.glass-panel::after {
-    display: none;
-    opacity: 0;
-    background: none;
-    box-shadow: none;
+  .story-panel__surface::before,
+  .story-panel__surface::after,
+  .story-panel__frame::before,
+  .glass-panel::before,
+  .glass-panel::after,
+  .site-backdrop::before,
+  .site-backdrop::after {
+    display: none !important;
+    opacity: 0 !important;
+    background: none !important;
+    box-shadow: none !important;
   }
 
   .glass-nav,
