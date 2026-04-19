@@ -1,6 +1,8 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
+const MOBILE_SWIPE_THRESHOLD_PX = 60;
+
 const galleryAds = [
   {
     id: "glasses",
@@ -140,7 +142,7 @@ export function GalleryStage({
   }
 
   function handleTouchEnd() {
-    if (Math.abs(touchDeltaX) > 54) {
+    if (Math.abs(touchDeltaX) >= MOBILE_SWIPE_THRESHOLD_PX) {
       if (touchDeltaX < 0) {
         goToNextSlide();
       } else {

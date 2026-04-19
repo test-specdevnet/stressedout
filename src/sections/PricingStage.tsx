@@ -81,7 +81,7 @@ const pricingCards: PricingCard[] = [
   },
 ];
 
-const SWIPE_THRESHOLD_PX = 48;
+const SWIPE_THRESHOLD_PX = 60;
 
 export function PricingStage() {
   const [activeIndex, setActiveIndex] = useState(1);

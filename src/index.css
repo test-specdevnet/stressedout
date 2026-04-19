@@ -3243,7 +3243,7 @@ section#hero .story-panel__meta {
   .story-stage__viewport {
     overflow-y: auto;
     overflow-x: hidden;
-    scroll-snap-type: y proximity;
+    scroll-snap-type: none;
     scroll-behavior: auto;
     overscroll-behavior-y: contain;
     -webkit-overflow-scrolling: touch;
@@ -3578,13 +3578,36 @@ section#hero .story-panel__meta {
   .gallery-carousel__viewport,
   .gallery-carousel__ambient-glow,
   .pricing-stage__viewport,
-  .pricing-stage-card::before {
+  .pricing-stage-card::before,
+  .gallery-slide__shell::before,
+  .gallery-slide__shell::after,
+  .pricing-stage-card.glass-panel::before,
+  .pricing-stage-card.glass-panel::after {
     background-image: none;
   }
 
   .gallery-carousel__ambient-glow,
-  .pricing-stage-card::before {
+  .pricing-stage-card::before,
+  .gallery-slide__shell::before,
+  .pricing-stage-card.glass-panel::before {
     display: none;
+  }
+
+  .gallery-slide__shell::after,
+  .pricing-stage-card.glass-panel::after {
+    box-shadow: none;
+    opacity: 0;
+  }
+
+  .gallery-slide__shell,
+  .pricing-stage-card {
+    background:
+      linear-gradient(180deg, rgba(94, 46, 161, 0.96), rgba(57, 24, 108, 0.97)),
+      rgba(26, 15, 56, 0.98);
+    box-shadow:
+      0 10px 24px rgba(5, 9, 21, 0.2),
+      0 4px 12px rgba(2, 8, 20, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.16);
   }
 
   .pricing-stage-card {
