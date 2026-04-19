@@ -2965,19 +2965,19 @@ section#hero .story-panel__meta {
   }
 
   .pricing-stage__arrow {
-    position: absolute;
-    top: 50%;
-    z-index: 3;
+    position: static;
+    z-index: auto;
     margin-top: 0;
-    --gallery-arrow-transform: translateY(-50%);
+    --gallery-arrow-transform: none;
+    order: 2;
   }
 
   .pricing-stage__arrow--prev {
-    left: 0.8rem;
+    justify-self: start;
   }
 
   .pricing-stage__arrow--next {
-    right: 0.8rem;
+    justify-self: end;
   }
 
   .pricing-stage__track {
@@ -3050,22 +3050,23 @@ section#hero .story-panel__meta {
   .gallery-carousel__arrow {
     width: 3.3rem;
     height: 3.3rem;
+    position: static;
+    z-index: auto;
+    --gallery-arrow-transform: none;
+    order: 2;
   }
 
   .gallery-carousel__arrow--prev,
   .gallery-carousel__arrow--next {
-    position: absolute;
-    z-index: 3;
-    top: 50%;
-    --gallery-arrow-transform: translateY(-50%);
+    position: static;
   }
 
   .gallery-carousel__arrow--prev {
-    left: 0.8rem;
+    justify-self: start;
   }
 
   .gallery-carousel__arrow--next {
-    right: 0.8rem;
+    justify-self: end;
   }
 
   .gallery-carousel__viewport {
@@ -3503,6 +3504,11 @@ section#hero .story-panel__meta {
 
   .gallery-carousel__viewport.is-portrait-active {
     min-height: 22rem;
+  }
+
+  .gallery-carousel__viewport,
+  .pricing-stage__viewport {
+    order: 1;
   }
 
   .gallery-slide__media-stage,

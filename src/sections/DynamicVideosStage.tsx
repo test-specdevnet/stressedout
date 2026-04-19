@@ -207,7 +207,7 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
                         muted
                         loop
                         playsInline
-                        preload="metadata"
+                        preload={isMobileTouchViewport ? "metadata" : "none"}
                         aria-label={variant.displayLabel}
                         controls={false}
                         disablePictureInPicture

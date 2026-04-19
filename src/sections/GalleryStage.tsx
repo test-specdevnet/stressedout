@@ -67,7 +67,7 @@ export function GalleryStage({
     video.muted = true;
     video.defaultMuted = true;
     video.playsInline = true;
-    video.preload = isMobileTouchViewport ? "auto" : "metadata";
+    video.preload = isMobileTouchViewport ? "auto" : "none";
 
     const attemptPlay = () => {
       const playPromise = video.play();
@@ -217,7 +217,7 @@ export function GalleryStage({
                         className="gallery-slide__video"
                         muted
                         playsInline
-                        preload="metadata"
+                        preload="none"
                         loop
                         autoPlay={false}
                         controls={false}
