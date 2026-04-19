@@ -44,8 +44,7 @@ export function GalleryStage({
   const [activeIndex, setActiveIndex] = useState(0);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [touchDeltaX, setTouchDeltaX] = useState(0);
-  const videoRefs = useRef<Array<HTMLVideoElement | null>>([]);
-  const visibleVideosRef = useRef<Set<HTMLVideoElement>>(new Set());
+  const activeVideoRef = useRef<HTMLVideoElement | null>(null);
 
   const activeAd = galleryAds[activeIndex];
   const carouselLabel = useMemo(
@@ -54,92 +53,47 @@ export function GalleryStage({
   );
 
   useEffect(() => {
-    const videos = videoRefs.current.filter(Boolean) as HTMLVideoElement[];
-    if (videos.length === 0) {
+    const video = activeVideoRef.current;
+    if (!video) {
       return;
     }
-    const scrollViewport = document.querySelector(".story-stage__viewport");
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          const video = entry.target as HTMLVideoElement;
-          if (entry.intersectionRatio >= 0.4) {
-            visibleVideosRef.current.add(video);
-            const index = videoRefs.current.findIndex((item) => item === video);
-            if (index === activeIndex && isActive && !isMobileTouchViewport) {
-              if (Math.abs(video.currentTime) > 0.08) {
-                video.currentTime = 0;
-              }
-              const playPromise = video.play();
-              if (playPromise && typeof playPromise.catch === "function") {
-                playPromise.catch(() => undefined);
-              }
-            }
-          } else {
-            visibleVideosRef.current.delete(video);
-            video.pause();
-            if (Math.abs(video.currentTime) > 0.08) {
-              video.currentTime = 0;
-            }
-          }
-        }
-      },
-      { threshold: [0, 0.4, 1], root: scrollViewport },
-    );
+    if (!isActive) {
+      video.pause();
+      video.currentTime = 0;
+      return;
+    }
 
-    videos.forEach((video) => {
-      observer.observe(video);
-    });
+    video.muted = true;
+    video.defaultMuted = true;
+    video.playsInline = true;
 
-    return () => {
-      observer.disconnect();
-      visibleVideosRef.current.clear();
-    };
-  }, [activeIndex, isActive, isMobileTouchViewport]);
+    const playPromise = video.play();
+    if (playPromise && typeof playPromise.catch === "function") {
+      playPromise.catch(() => undefined);
+    }
+  }, [activeAd.id, isActive, isMobileTouchViewport]);
 
   useEffect(() => {
-    videoRefs.current.forEach((video, index) => {
+    const onVisibilityChange = () => {
+      const video = activeVideoRef.current;
       if (!video) {
         return;
       }
 
-      if (index === activeIndex && isActive && visibleVideosRef.current.has(video) && !isMobileTouchViewport) {
-        if (Math.abs(video.currentTime) > 0.08) {
-          video.currentTime = 0;
-        }
+      if (document.hidden) {
+        video.pause();
+      } else if (isActive) {
         const playPromise = video.play();
         if (playPromise && typeof playPromise.catch === "function") {
           playPromise.catch(() => undefined);
         }
-      } else {
-        video.pause();
-        video.currentTime = 0;
       }
-    });
-  }, [activeIndex, isActive, isMobileTouchViewport]);
+    };
 
-  useEffect(() => {
-    if (!isActive) {
-      return;
-    }
-
-    videoRefs.current.forEach((video, index) => {
-      if (
-        !video ||
-        index !== activeIndex ||
-        !visibleVideosRef.current.has(video) ||
-        isMobileTouchViewport
-      ) {
-        return;
-      }
-
-      const playPromise = video.play();
-      if (playPromise && typeof playPromise.catch === "function") {
-        playPromise.catch(() => undefined);
-      }
-    });
-  }, [activeIndex, isActive, isMobileTouchViewport]);
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", onVisibilityChange);
+  }, [isActive]);
 
   function goToSlide(index: number) {
     setActiveIndex((index + galleryAds.length) % galleryAds.length);
@@ -232,44 +186,31 @@ export function GalleryStage({
           <div className={`gallery-carousel__viewport ${activeAd.orientation === "portrait" ? "is-portrait-active" : ""}`.trim()}>
             <div className="gallery-carousel__ambient-glow" aria-hidden="true" />
             <div className="gallery-carousel__track">
-              {galleryAds.map((ad, index) => {
-                const isCurrent = index === activeIndex;
-                const offset = index - activeIndex;
-                const normalizedOffset =
-                  Math.abs(offset) > 1 ? (offset > 0 ? -1 : 1) * (galleryAds.length - Math.abs(offset)) : offset;
-
-                return (
-                  <article
-                    key={ad.id}
-                    className={`gallery-slide ${isCurrent ? "is-active" : ""} ${ad.orientation === "portrait" ? "is-portrait" : ""}`.trim()}
-                    data-offset={normalizedOffset}
-                    aria-hidden={!isCurrent}
-                  >
-                    <div className="gallery-slide__shell glass-media-frame">
-                      <div className="gallery-slide__shell-inner">
-                        <div className="gallery-slide__media-stage">
-                          <video
-                            ref={(node) => {
-                              videoRefs.current[index] = node;
-                            }}
-                            className="gallery-slide__video"
-                            muted
-                            playsInline
-                            preload={isCurrent && isActive && !isMobileTouchViewport ? "metadata" : "none"}
-                            loop
-                            autoPlay={!isMobileTouchViewport && isCurrent && isActive}
-                            controls={false}
-                            disablePictureInPicture
-                            aria-label={ad.title}
-                          >
-                            <source src={ad.video} type="video/mp4" />
-                          </video>
-                        </div>
-                      </div>
+              <article
+                className={`gallery-slide is-active ${activeAd.orientation === "portrait" ? "is-portrait" : ""}`.trim()}
+              >
+                <div className="gallery-slide__shell glass-media-frame">
+                  <div className="gallery-slide__shell-inner">
+                    <div className="gallery-slide__media-stage">
+                      <video
+                        key={activeAd.id}
+                        ref={activeVideoRef}
+                        className="gallery-slide__video"
+                        muted
+                        playsInline
+                        preload={isActive ? "auto" : "metadata"}
+                        loop
+                        autoPlay={isActive}
+                        controls={false}
+                        disablePictureInPicture
+                        aria-label={activeAd.title}
+                      >
+                        <source src={activeAd.video} type="video/mp4" />
+                      </video>
                     </div>
-                  </article>
-                );
-              })}
+                  </div>
+                </div>
+              </article>
             </div>
           </div>
 
