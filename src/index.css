@@ -3243,7 +3243,7 @@ section#hero .story-panel__meta {
   .story-stage__viewport {
     overflow-y: auto;
     overflow-x: hidden;
-    scroll-snap-type: none;
+    scroll-snap-type: y proximity;
     scroll-behavior: auto;
     overscroll-behavior-y: contain;
     -webkit-overflow-scrolling: touch;
@@ -3255,6 +3255,7 @@ section#hero .story-panel__meta {
 
   .story-panel {
     scroll-snap-align: start;
+    scroll-snap-stop: normal;
     height: auto;
     min-height: auto;
     padding:
@@ -3292,6 +3293,18 @@ section#hero .story-panel__meta {
   .site-backdrop::before,
   .site-backdrop::after {
     opacity: 0.55;
+  }
+
+  .story-panel__surface,
+  .story-panel__frame {
+    overflow: hidden;
+  }
+
+  section#gallery .story-panel__surface::before,
+  section#gallery .story-panel__frame::before,
+  section#pricing .story-panel__surface::before,
+  section#pricing .story-panel__frame::before {
+    display: none;
   }
 
   .glass-nav,
