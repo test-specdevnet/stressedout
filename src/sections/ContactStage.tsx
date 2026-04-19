@@ -70,6 +70,7 @@ export function ContactStage() {
               value={formState.name}
               onChange={(event) => updateField("name", event.target.value)}
               autoComplete="name"
+              enterKeyHint="next"
               required
             />
           </label>
@@ -83,6 +84,7 @@ export function ContactStage() {
               value={formState.company}
               onChange={(event) => updateField("company", event.target.value)}
               autoComplete="organization"
+              enterKeyHint="next"
             />
           </label>
 
@@ -95,6 +97,8 @@ export function ContactStage() {
               value={formState.email}
               onChange={(event) => updateField("email", event.target.value)}
               autoComplete="email"
+              inputMode="email"
+              enterKeyHint="next"
               required
             />
           </label>
@@ -108,6 +112,8 @@ export function ContactStage() {
               value={formState.phone}
               onChange={(event) => updateField("phone", event.target.value)}
               autoComplete="tel"
+              inputMode="tel"
+              enterKeyHint="next"
             />
           </label>
 
@@ -119,6 +125,7 @@ export function ContactStage() {
               value={formState.message}
               onChange={(event) => updateField("message", event.target.value)}
               rows={5}
+              enterKeyHint="send"
               required
             />
           </label>

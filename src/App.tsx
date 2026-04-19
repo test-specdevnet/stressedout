@@ -53,6 +53,7 @@ const BEAM_DURATION = 2.35;
 
 export default function App() {
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [isMobileTouchViewport, setIsMobileTouchViewport] = useState(false);
 
   useEffect(() => {
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -63,6 +64,29 @@ export default function App() {
     update();
     media.addEventListener("change", update);
     return () => media.removeEventListener("change", update);
+  }, []);
+
+  useEffect(() => {
+    const coarsePointer = window.matchMedia("(pointer: coarse)");
+    const noHover = window.matchMedia("(hover: none)");
+    const mobileWidth = window.matchMedia("(max-width: 768px)");
+
+    const update = () => {
+      setIsMobileTouchViewport(
+        mobileWidth.matches || coarsePointer.matches || noHover.matches,
+      );
+    };
+
+    update();
+    coarsePointer.addEventListener("change", update);
+    noHover.addEventListener("change", update);
+    mobileWidth.addEventListener("change", update);
+
+    return () => {
+      coarsePointer.removeEventListener("change", update);
+      noHover.removeEventListener("change", update);
+      mobileWidth.removeEventListener("change", update);
+    };
   }, []);
 
   const transitionDuration = prefersReducedMotion ? REDUCED_TRANSITION_MS : DEFAULT_TRANSITION_MS;
@@ -176,12 +200,12 @@ export default function App() {
       </header>
 
       <main
-        className={`story-stage ${isTransitioning ? "is-transitioning" : ""} ${prefersReducedMotion ? "is-reduced-motion" : ""}`.trim()}
+        className={`story-stage ${isTransitioning ? "is-transitioning" : ""} ${prefersReducedMotion ? "is-reduced-motion" : ""} ${isMobileTouchViewport ? "is-mobile-touch" : ""}`.trim()}
         data-direction={direction}
         aria-live="polite"
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
+        onTouchStart={isMobileTouchViewport ? undefined : handleTouchStart}
+        onTouchMove={isMobileTouchViewport ? undefined : handleTouchMove}
+        onTouchEnd={isMobileTouchViewport ? undefined : handleTouchEnd}
       >
         <div className="story-stage__progress glass-nav" aria-label="Story progress">
           <p className="story-stage__progress-label">
