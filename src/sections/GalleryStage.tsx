@@ -89,7 +89,6 @@ export function GalleryStage({
     );
 
     videos.forEach((video) => {
-      video.load();
       observer.observe(video);
     });
 
@@ -256,14 +255,13 @@ export function GalleryStage({
                             className="gallery-slide__video"
                             muted
                             playsInline
-                            preload="metadata"
+                            preload={isCurrent && isActive && !isMobileTouchViewport ? "metadata" : "none"}
                             loop
                             autoPlay={!isMobileTouchViewport && isCurrent && isActive}
                             controls={false}
                             disablePictureInPicture
                             aria-label={ad.title}
                           >
-                            <source src={ad.video.replace(".mp4", ".webm")} type="video/webm" />
                             <source src={ad.video} type="video/mp4" />
                           </video>
                         </div>

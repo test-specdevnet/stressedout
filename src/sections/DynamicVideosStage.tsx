@@ -207,7 +207,7 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
                         muted
                         loop
                         playsInline
-                        preload="metadata"
+                        preload={isActive ? "metadata" : "none"}
                         aria-label={variant.displayLabel}
                         controls={false}
                         disablePictureInPicture
@@ -217,7 +217,6 @@ export function DynamicVideosStage(props?: DynamicVideosStageProps) {
                           }
                         }}
                       >
-                        <source src={variant.video.replace(".mp4", ".webm")} type="video/webm" />
                         <source src={variant.video} type="video/mp4" />
                       </video>
                       <button

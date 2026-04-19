@@ -134,10 +134,6 @@ video {
   display: block;
   max-width: 100%;
   object-fit: cover;
-  transform: translateZ(0);
-  backface-visibility: hidden;
-  will-change: transform;
-  contain: layout paint;
 }
 
 :focus-visible {
@@ -752,11 +748,7 @@ video {
   visibility: visible;
   pointer-events: auto;
   transform-origin: var(--story-wheel-pivot-x, 112%) var(--story-wheel-pivot-y, 50%);
-  transform: translateZ(0);
   filter: none;
-  backface-visibility: hidden;
-  transform-style: preserve-3d;
-  will-change: transform;
   transition: none;
   scroll-snap-align: start;
   scroll-snap-stop: always;
@@ -3063,8 +3055,7 @@ section#hero .story-panel__meta {
   #root,
   .site-shell,
   .story-stage,
-  .story-stage__viewport,
-  .story-panel {
+  .story-stage__viewport {
     height: 100dvh;
     min-height: 100dvh;
   }
@@ -3085,39 +3076,34 @@ section#hero .story-panel__meta {
   }
 
   .story-stage {
-    padding-bottom: calc(7.8rem + env(safe-area-inset-bottom));
+    padding-bottom: 0;
   }
 
   .story-stage__viewport {
     overflow-y: auto;
     overflow-x: hidden;
-    scroll-snap-type: y mandatory;
-    scroll-behavior: smooth;
+    scroll-snap-type: y proximity;
+    scroll-behavior: auto;
     overscroll-behavior-y: contain;
     -webkit-overflow-scrolling: touch;
     touch-action: pan-y;
-    scroll-padding-top: calc(max(5.4rem, env(safe-area-inset-top) + 4.4rem));
-    padding-bottom: calc(8.5rem + env(safe-area-inset-bottom));
+    scroll-padding-top: calc(max(5rem, env(safe-area-inset-top) + 4rem));
+    padding-bottom: calc(10.25rem + env(safe-area-inset-bottom));
     scrollbar-width: none;
-    contain: layout paint style;
   }
 
   .story-panel {
     scroll-snap-align: start;
-    scroll-snap-stop: always;
     height: auto;
-    min-height: 100dvh;
-    contain: layout paint;
-    content-visibility: auto;
-    contain-intrinsic-size: 100dvh;
+    min-height: auto;
     padding:
-      calc(max(5.4rem, env(safe-area-inset-top) + 4.4rem))
+      calc(max(5rem, env(safe-area-inset-top) + 4rem))
       clamp(0.9rem, 4vw, 1.3rem)
-      calc(8.75rem + env(safe-area-inset-bottom));
+      calc(10.5rem + env(safe-area-inset-bottom));
   }
 
   .story-panel__surface {
-    min-height: calc(100dvh - 14rem);
+    min-height: min(34rem, calc(100dvh - 16rem));
     padding: clamp(0.78rem, 2.5vw, 1rem);
     transform: none;
     box-shadow:
@@ -3238,11 +3224,7 @@ section#hero .story-panel__meta {
   }
 
   .story-stage__pinwheel {
-    right: 0.8rem;
-    bottom: calc(8.4rem + env(safe-area-inset-bottom));
-    width: 4.35rem;
-    filter: drop-shadow(0 0 10px rgba(143, 52, 223, 0.22));
-    opacity: 0.72;
+    display: none;
   }
 
   .story-stage__pinwheel::before,
@@ -3319,7 +3301,6 @@ section#hero .story-panel__meta {
     min-height: 0;
     width: 100%;
     overflow: hidden;
-    transform: translateZ(0);
   }
 
   .dynamic-variant-video {
@@ -3331,9 +3312,7 @@ section#hero .story-panel__meta {
     object-fit: cover !important;
     object-position: center center !important;
     border-radius: 0.6rem;
-    contain: paint;
     will-change: auto;
-    transform: translateZ(0);
   }
 
   .dynamic-video-play-button {
@@ -3354,7 +3333,6 @@ section#hero .story-panel__meta {
     aspect-ratio: 16 / 9;
     padding: 0.7rem;
     overflow: hidden;
-    contain: layout paint;
   }
 
   .gallery-slide__media-stage,
@@ -3378,7 +3356,6 @@ section#hero .story-panel__meta {
     height: 100%;
     object-fit: cover;
     object-position: center;
-    transform: translateZ(0);
     will-change: auto;
   }
 
